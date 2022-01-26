@@ -1,0 +1,5 @@
+# Visual Studio
+.vs/
+
+# Builds
+src/cpp/out/
