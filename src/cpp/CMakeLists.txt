@@ -3,7 +3,7 @@
 #
 cmake_minimum_required (VERSION 3.8)
 
-project ("grpc_json_client")
+project ("grpc_dynamic_client")
 
 # Find Protobuf installation
 # Looks for protobuf-config.cmake file installed by Protobuf's cmake installation.
@@ -45,7 +45,7 @@ add_custom_command(
 )
 
 # Add source to this project's library
-add_executable(grpc_json_client "grpc_dynamic_client.cpp" "proto_reflection_descriptor_database.cc" ${reflection_proto_src} ${reflection_grpc_src})
-target_link_libraries(grpc_json_client ${_REFLECTION} ${_PROTOBUF_LIBPROTOBUF} ${_GRPC_GRPCPP})
+add_executable(grpc_dynamic_client "grpc_dynamic_client.cpp" "proto_reflection_descriptor_database.cc" ${reflection_proto_src} ${reflection_grpc_src})
+target_link_libraries(grpc_dynamic_client ${_REFLECTION} ${_PROTOBUF_LIBPROTOBUF} ${_GRPC_GRPCPP})
 
 # TODO: Add tests and install targets if needed.
