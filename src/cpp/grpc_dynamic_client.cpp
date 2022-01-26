@@ -31,8 +31,8 @@ int main()
 	const google::protobuf::Descriptor* response_descriptor = method_descriptor->output_type();
 	const google::protobuf::Message* request_prototype = message_factory.GetPrototype(request_descriptor);
 	const google::protobuf::Message* response_prototype = message_factory.GetPrototype(response_descriptor);
-	google::protobuf::Message* request(request_prototype->New());
-	google::protobuf::Message* response(response_prototype->New());
+	google::protobuf::Message* request = request_prototype->New();
+	google::protobuf::Message* response = response_prototype->New();
 	google::protobuf::util::JsonStringToMessage("{\"resource_name\": \"VST2_01\"}", request);
 
 	grpc::ByteBuffer serialized_request;
