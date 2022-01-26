@@ -8,7 +8,7 @@
 #include <grpc/grpc.h>
 #include <grpcpp/generic/generic_stub.h>
 
-#include "grpc_json_client.h"
+#include "grpc_dynamic_client.h"
 #include "proto_reflection_descriptor_database.h"
 
 // TODO(sean): remove after solving blocking unary call issue
