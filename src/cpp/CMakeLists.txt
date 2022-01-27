@@ -45,7 +45,7 @@ add_custom_command(
 )
 
 # Add source to this project's library
-add_executable(grpc_dynamic_client "grpc_dynamic_client.cpp" "proto_reflection_descriptor_database.cc" ${reflection_proto_src} ${reflection_grpc_src})
+add_library(grpc_dynamic_client SHARED "dynamic_client.cpp" "proto_reflection_descriptor_database.cc" "exports.cpp" ${reflection_proto_src} ${reflection_grpc_src})
 target_link_libraries(grpc_dynamic_client ${_REFLECTION} ${_PROTOBUF_LIBPROTOBUF} ${_GRPC_GRPCPP})
 
 # TODO: Add tests and install targets if needed.
