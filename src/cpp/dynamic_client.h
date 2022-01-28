@@ -7,7 +7,6 @@
 #include <grpc/grpc.h>
 #include <grpcpp/impl/client_unary_call.h>
 
-#include "dynamic_client.h"
 #include "proto_reflection_descriptor_database.h"
 
 using namespace std;
