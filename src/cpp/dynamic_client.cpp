@@ -1,9 +1,10 @@
-﻿// grpc_json_client.cpp : Defines the entry point for the application.
-//
+﻿#include "dynamic_client.h"
+#include "exceptions.h"
 
-#include "dynamic_client.h"
+using namespace std;
+using namespace ni;
 
-ni::DynamicClient::DynamicClient(const string& target)
+DynamicClient::DynamicClient(const string& target)
 {
 	shared_ptr<grpc::ChannelCredentials> insecure_credentials = grpc::InsecureChannelCredentials();
 	_channel = grpc::CreateChannel(target, insecure_credentials);
@@ -13,16 +14,25 @@ ni::DynamicClient::DynamicClient(const string& target)
 	_message_factory = new google::protobuf::DynamicMessageFactory(_descriptor_pool);
 }
 
-ni::DynamicClient::~DynamicClient()
+DynamicClient::~DynamicClient()
 {
 	delete _message_factory;
 	delete _descriptor_pool;
 	delete _reflection_db;
 }
 
-string ni::DynamicClient::Query(const string& service, const string& method, const string& request)
+string DynamicClient::Query(const string& service, const string& method, const string& request)
 {
-	const google::protobuf::MethodDescriptor* method_descriptor = _descriptor_pool->FindMethodByName(service + "." + method);
+	const google::protobuf::ServiceDescriptor* service_descriptor = _descriptor_pool->FindServiceByName(service);
+	if (service_descriptor == nullptr)
+	{
+		throw ServiceNotFoundException(service);
+	}
+	const google::protobuf::MethodDescriptor* method_descriptor = service_descriptor->FindMethodByName(method);
+	if (method_descriptor == nullptr)
+	{
+		throw MethodNotFoundException(method);
+	}
 	const google::protobuf::Descriptor* request_descriptor = method_descriptor->input_type();
 	const google::protobuf::Descriptor* response_descriptor = method_descriptor->output_type();
 	const google::protobuf::Message* request_prototype = _message_factory->GetPrototype(request_descriptor);

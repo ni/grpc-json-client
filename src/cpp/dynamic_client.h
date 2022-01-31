@@ -9,20 +9,18 @@
 
 #include "proto_reflection_descriptor_database.h"
 
-using namespace std;
-
 namespace ni
 {
 	class DynamicClient
 	{
 	public:
-		DynamicClient(const string& target);
+		DynamicClient(const std::string& target);
 		~DynamicClient();
 
-		string Query(const string& service, const string& method, const string& request);
+		std::string Query(const std::string & service, const std::string & method, const std::string & request);
 
 	private:
-		shared_ptr<grpc::Channel> _channel;
+		std::shared_ptr<grpc::Channel> _channel;
 		grpc::ProtoReflectionDescriptorDatabase* _reflection_db;
 		google::protobuf::DescriptorPool* _descriptor_pool;
 		google::protobuf::DynamicMessageFactory* _message_factory;
