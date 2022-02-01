@@ -38,23 +38,20 @@ string DynamicClient::Query(const string& service, const string& method, const s
 	const google::protobuf::Message* request_prototype = _message_factory->GetPrototype(request_descriptor);
 	const google::protobuf::Message* response_prototype = _message_factory->GetPrototype(response_descriptor);
 
-	google::protobuf::Message* request_message = request_prototype->New();
-	google::protobuf::Message* response_message = response_prototype->New();
+	unique_ptr<google::protobuf::Message> request_message(request_prototype->New());
+	unique_ptr<google::protobuf::Message> response_message(response_prototype->New());
 
-	google::protobuf::util::JsonStringToMessage(request, request_message);
+	google::protobuf::util::JsonStringToMessage(request, request_message.get());
 
 	string endpoint = string("/") + service + "/" + method;
 	grpc::internal::RpcMethod rpc_method(endpoint.c_str(), grpc::internal::RpcMethod::NORMAL_RPC);
-	grpc::internal::BlockingUnaryCall(_channel.get(), rpc_method, &grpc::ClientContext(), *request_message, response_message);
+	grpc::internal::BlockingUnaryCall(_channel.get(), rpc_method, &grpc::ClientContext(), *request_message, response_message.get());
 
 	string response;
 	google::protobuf::util::JsonOptions json_options;
 	json_options.always_print_primitive_fields = true;
 	json_options.preserve_proto_field_names = true;
 	google::protobuf::util::MessageToJsonString(*response_message, &response, json_options);
-
-	delete request_message;
-	delete response_message;
 
 	return response;
 }
