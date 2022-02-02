@@ -45,7 +45,7 @@ add_custom_command(
 )
 
 # Add source to this project's library
-add_library(grpc_dynamic_client SHARED "dynamic_client.cpp" "error_code.h" "exceptions.cpp" "exports.cpp" "proto_reflection_descriptor_database.cc" ${reflection_proto_src} ${reflection_grpc_src})
+add_library(grpc_dynamic_client SHARED "dynamic_client.cpp" "unary_dynamic_client.cpp" "error_code.h" "exceptions.cpp" "exports.cpp" "proto_reflection_descriptor_database.cc" ${reflection_proto_src} ${reflection_grpc_src})
 target_link_libraries(grpc_dynamic_client ${_REFLECTION} ${_PROTOBUF_LIBPROTOBUF} ${_GRPC_GRPCPP})
 
 # TODO: Add tests and install targets if needed.

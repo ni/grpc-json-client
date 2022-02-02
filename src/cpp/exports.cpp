@@ -1,4 +1,4 @@
-#include "dynamic_client.h"#
+#include "unary_dynamic_client.h"#
 #include "error_code.h"
 #include "exceptions.h"
 #include "exports.h"
@@ -8,17 +8,16 @@ using namespace ni;
 
 int32_t Init(const char* target, void** const session_handle)
 {
-	*session_handle = new DynamicClient(target);
+	*session_handle = new UnaryDynamicClient(target);
 	return 0;
 }
 
-int32_t Query(void* const session_handle, const char* service, const char* method, const char* request, void** const response_handle)
+int32_t Write(void* const session_handle, const char* service, const char* method, const char* request)
 {
-	DynamicClient* handle = (DynamicClient*)session_handle;
-	string response_string;
+	UnaryDynamicClient* handle = (UnaryDynamicClient*)session_handle;
 	try
 	{
-		response_string = handle->Query(service, method, request);
+		handle->Write(service, method, request);
 	}
 	catch (ServiceNotFoundException&)
 	{
@@ -32,23 +31,21 @@ int32_t Query(void* const session_handle, const char* service, const char* metho
 	{
 		return ErrorCode::UNKNOWN;
 	}
-	*response_handle = new string(response_string);
 	return 0;
 }
 
-int32_t ReadResponse(void* const response_handle, char* response, size_t* const size)
+int32_t Read(void* const session_handle, char* buffer, size_t* const size)
 {
-	string* handle = (string*)response_handle;
-	if (response != nullptr)
+	UnaryDynamicClient* handle = (UnaryDynamicClient*)session_handle;
+	const string* response = handle->Read();
+	if (buffer != nullptr)
 	{
-		handle->copy(response, *size, 0);
+		response->copy(buffer, *size, 0);
 	}
 	else if (size != nullptr)
 	{
-		*size = handle->size();
-		return 0;
+		*size = response->size();
 	}
-	delete response_handle;
 	return 0;
 }
 

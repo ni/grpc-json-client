@@ -18,14 +18,19 @@ classdef DynamicClient
         end
 
         function response = query(obj, service, method, request)
-            [error_code, ~, ~, ~, ~, response_handle] = calllib(DynamicClient.LIBRARY, 'Query', obj.handle, service, method, request, []);
+            error_code = calllib(DynamicClient.LIBRARY, 'Write', obj.handle, service, method, request);
             DynamicClient.check_error(error_code);
-            [~, ~, ~, size] = calllib(DynamicClient.LIBRARY, 'ReadResponse', response_handle, [], 0);
+            [~, ~, ~, size] = calllib(DynamicClient.LIBRARY, 'Read', obj.handle, [], 0);
             buffer = blanks(size);
-            [~, ~, response] = calllib(DynamicClient.LIBRARY, 'ReadResponse', response_handle, buffer, size);
+            [~, ~, response] = calllib(DynamicClient.LIBRARY, 'Read', obj.handle, buffer, size);
         end
 
-        function response = query_struct(obj, service, method, request)
+        function response = query_struct(obj, service, method, varargin)
+            if length(varargin) > 1
+                request = struct(varargin{:});
+            else
+                request = varargin{1};
+            end
             encoded_request = jsonencode(request);
             encoded_response = obj.query(service, method, encoded_request);
             response = jsondecode(encoded_response);

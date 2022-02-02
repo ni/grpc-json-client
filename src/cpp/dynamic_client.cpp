@@ -1,5 +1,7 @@
-﻿#include "dynamic_client.h"
+#include "dynamic_client.h"
 #include "exceptions.h"
+#include <google/protobuf/dynamic_message.h>
+#include <google/protobuf/util/json_util.h>
 
 using namespace std;
 using namespace ni;
@@ -7,51 +9,68 @@ using namespace ni;
 DynamicClient::DynamicClient(const string& target)
 {
 	shared_ptr<grpc::ChannelCredentials> insecure_credentials = grpc::InsecureChannelCredentials();
-	_channel = grpc::CreateChannel(target, insecure_credentials);
-	
-	_reflection_db = new grpc::ProtoReflectionDescriptorDatabase(_channel);
-	_descriptor_pool = new google::protobuf::DescriptorPool(_reflection_db);
-	_message_factory = new google::protobuf::DynamicMessageFactory(_descriptor_pool);
+	channel = grpc::CreateChannel(target, insecure_credentials);
+
+	_reflection_db = make_shared<grpc::ProtoReflectionDescriptorDatabase>(channel);
+	_descriptor_pool = make_shared<google::protobuf::DescriptorPool>(_reflection_db.get());
+	_message_factory = make_shared<google::protobuf::DynamicMessageFactory>(_descriptor_pool.get());
 }
 
-DynamicClient::~DynamicClient()
+const google::protobuf::MethodDescriptor* DynamicClient::FindMethod(const string& service_name, const string& method_name)
 {
-	delete _message_factory;
-	delete _descriptor_pool;
-	delete _reflection_db;
-}
-
-string DynamicClient::Query(const string& service, const string& method, const string& request)
-{
-	const google::protobuf::ServiceDescriptor* service_descriptor = _descriptor_pool->FindServiceByName(service);
+	const google::protobuf::ServiceDescriptor* service_descriptor = _descriptor_pool->FindServiceByName(service_name);
 	if (service_descriptor == nullptr)
 	{
-		throw ServiceNotFoundException(service);
+		throw ServiceNotFoundException(service_name);
 	}
-	const google::protobuf::MethodDescriptor* method_descriptor = service_descriptor->FindMethodByName(method);
+	const google::protobuf::MethodDescriptor* method_descriptor = service_descriptor->FindMethodByName(method_name);
 	if (method_descriptor == nullptr)
 	{
-		throw MethodNotFoundException(method);
+		throw MethodNotFoundException(method_name);
 	}
-	const google::protobuf::Descriptor* request_descriptor = method_descriptor->input_type();
-	const google::protobuf::Descriptor* response_descriptor = method_descriptor->output_type();
-	const google::protobuf::Message* request_prototype = _message_factory->GetPrototype(request_descriptor);
-	const google::protobuf::Message* response_prototype = _message_factory->GetPrototype(response_descriptor);
+	return method_descriptor;
+}
 
-	unique_ptr<google::protobuf::Message> request_message(request_prototype->New());
-	unique_ptr<google::protobuf::Message> response_message(response_prototype->New());
+grpc::ByteBuffer DynamicClient::SerializeMessage(const google::protobuf::Descriptor* message_type, const string& message_json)
+{
+	unique_ptr<google::protobuf::Message> message = CreateMessage(message_type);
+	google::protobuf::util::Status json_status = google::protobuf::util::JsonStringToMessage(message_json, message.get());
+	if (!json_status.ok())
+	{
+		// todo
+	}
+	grpc::ByteBuffer serialized_message;
+	bool own_buffer = false;
+	grpc::Status serialize_status = grpc::GenericSerialize<grpc::ProtoBufferWriter, void>(*message, &serialized_message, &own_buffer);
+	if (!serialize_status.ok())
+	{
+		// todo
+	}
+	return serialized_message;
+}
 
-	google::protobuf::util::JsonStringToMessage(request, request_message.get());
-
-	string endpoint = string("/") + service + "/" + method;
-	grpc::internal::RpcMethod rpc_method(endpoint.c_str(), grpc::internal::RpcMethod::NORMAL_RPC);
-	grpc::internal::BlockingUnaryCall(_channel.get(), rpc_method, &grpc::ClientContext(), *request_message, response_message.get());
-
+string DynamicClient::DeserializeMessage(const google::protobuf::Descriptor* message_type, grpc::ByteBuffer& serialized_message)
+{
+	unique_ptr<google::protobuf::Message> message = CreateMessage(message_type);
+	grpc::Status deserialize_status = grpc::GenericDeserialize<grpc::ProtoBufferReader, void>(&serialized_message, message.get());
+	if (!deserialize_status.ok())
+	{
+		// todo
+	}
 	string response;
 	google::protobuf::util::JsonOptions json_options;
 	json_options.always_print_primitive_fields = true;
 	json_options.preserve_proto_field_names = true;
-	google::protobuf::util::MessageToJsonString(*response_message, &response, json_options);
-
+	google::protobuf::util::Status json_status = google::protobuf::util::MessageToJsonString(*message, &response, json_options);
+	if (!json_status.ok())
+	{
+		// todo
+	}
 	return response;
+}
+
+unique_ptr<google::protobuf::Message> DynamicClient::CreateMessage(const google::protobuf::Descriptor* message_type)
+{
+	const google::protobuf::Message* message_prototype = _message_factory->GetPrototype(message_type);
+	return unique_ptr<google::protobuf::Message>(message_prototype->New());
 }
