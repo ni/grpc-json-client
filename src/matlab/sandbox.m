@@ -1,9 +1,7 @@
 client = DynamicClient('localhost:31763');
+rfsa_service = 'nirfsa_grpc.NiRFSA';
 
-init_request = struct('resource_name', 'VST2_01');
-init_response = client.query_struct('nirfsa_grpc.NiRFSA', 'Init', init_request);
-
-close_request = struct('vi', init_response.vi);
-close_response = client.query_struct('nirfsa_grpc.NiRFSA', 'Close', close_request);
+init_response = client.query_struct(rfsa_service, 'Init', 'resource_name', 'VST2_01');
+close_response = client.query_struct(rfsa_service, 'Close', 'vi', init_response.vi);
 
 client.close();
