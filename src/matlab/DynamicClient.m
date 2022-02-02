@@ -26,7 +26,7 @@ classdef DynamicClient
         end
 
         function response = query_struct(obj, service, method, varargin)
-            if length(varargin) > 1
+            if nargin > 1
                 request = struct(varargin{:});
             else
                 request = varargin{1};
