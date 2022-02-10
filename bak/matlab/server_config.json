@@ -1,0 +1,9 @@
+{
+   "port": 31763,
+   "feature_toggles": {"nirfmxinstr": true, "nirfmxspecan": true },
+   "security" : {
+      "server_cert": "",
+      "server_key": "",
+      "root_cert": ""
+   }
+}

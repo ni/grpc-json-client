@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+service MyService {
+  rpc MyMethod(MyMessage) returns (MyMessage);
+}
+
+message MyMessage {
+  int32 my_int = 1;
+}

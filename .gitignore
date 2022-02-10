@@ -2,7 +2,7 @@
 .vs/
 
 # Builds
-src/cpp/out/
+out/
 
 # MATLAB
 *.asv
