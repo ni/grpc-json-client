@@ -51,9 +51,4 @@ namespace ni
 			MethodDescriptorNotFoundException
 		);
 	}
-
-	TEST_F(DynamicClientTest, SerializeMessageSerializesValidString)
-	{
-		const MethodDescriptor* method = client.FindMethod("nirfsa_grpc.NiRFSA", "Init");
-	}
 }

@@ -3,6 +3,8 @@
 #include <grpcpp/impl/codegen/proto_utils.h>
 #include <google/protobuf/util/json_util.h>
 
+#include "exceptions.h"
+
 using google::protobuf::Descriptor;
 using google::protobuf::Message;
 using google::protobuf::util::JsonOptions;
@@ -22,14 +24,17 @@ namespace ni
 		google::protobuf::util::Status json_status = google::protobuf::util::JsonStringToMessage(message_json, message.get());
 		if (!json_status.ok())
 		{
-			// todo
+			string summary("Failed to create protobuf message from JSON string.\n\n");
+			string description(json_status.message());
+			throw SerializationException(summary + description);
 		}
 		ByteBuffer serialized_message;
 		bool own_buffer = false;
 		grpc::Status serialize_status = grpc::GenericSerialize<ProtoBufferWriter, void>(*message, &serialized_message, &own_buffer);
 		if (!serialize_status.ok())
 		{
-			// todo
+			string summary("Failed to serialize protobuf message.\n\n");
+			throw SerializationException(summary + serialize_status.error_message());
 		}
 		return serialized_message;
 	}
@@ -40,7 +45,7 @@ namespace ni
 		grpc::Status deserialize_status = grpc::GenericDeserialize<ProtoBufferReader, void>(&serialized_message, message.get());
 		if (!deserialize_status.ok())
 		{
-			// todo
+			//throw DeserializationException();
 		}
 		string response;
 		JsonOptions json_options;
@@ -49,7 +54,7 @@ namespace ni
 		google::protobuf::util::Status json_status = google::protobuf::util::MessageToJsonString(*message, &response, json_options);
 		if (!json_status.ok())
 		{
-			// todo
+			//throw DeserializationException();
 		}
 		return response;
 	}

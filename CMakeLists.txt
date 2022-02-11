@@ -78,6 +78,7 @@ target_link_libraries(grpc_dynamic_client
 # Add tests
 add_executable(tests
     "${tests_dir}/test_dynamic_client.cpp"
+    "${tests_dir}/test_json_serializer.cpp"
     ${src_files}
 )
 target_include_directories(tests PRIVATE

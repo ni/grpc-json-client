@@ -20,6 +20,7 @@ int32_t Write(void* const session_handle, const char* service, const char* metho
 	{
 		handle->Write(service, method, request);
 	}
+	
 	catch (ni::ServiceDescriptorNotFoundException&)
 	{
 		return ErrorCode::SERVICE_NOT_FOUND;
@@ -28,6 +29,7 @@ int32_t Write(void* const session_handle, const char* service, const char* metho
 	{
 		return ErrorCode::METHOD_NOT_FOUND;
 	}
+	
 	catch (...)
 	{
 		return ErrorCode::UNKNOWN;

@@ -4,33 +4,36 @@
 
 namespace ni
 {
-	class DynamicClientException : std::exception
+	class DynamicClientException : public std::exception
 	{
 	public:
-		DynamicClientException() {}
+		explicit DynamicClientException(const std::string& _Message) : std::exception(_Message.c_str()) {}
+	};
+	
+	class ServiceUnavailableException : public DynamicClientException
+	{
+		using DynamicClientException::DynamicClientException;
 	};
 
-	class ServiceUnavailableException : DynamicClientException
+	class ServiceDescriptorNotFoundException : public DynamicClientException
 	{
 	public:
-		ServiceUnavailableException() = default;
+		ServiceDescriptorNotFoundException(const std::string& name) : DynamicClientException(name) {}
 	};
 
-	class ServiceDescriptorNotFoundException : DynamicClientException
+	class MethodDescriptorNotFoundException :public  DynamicClientException
 	{
 	public:
-		ServiceDescriptorNotFoundException(const std::string& name);
-
-	private:
-		std::string _name;
+		MethodDescriptorNotFoundException(const std::string& name) : DynamicClientException(name) {}
 	};
-
-	class MethodDescriptorNotFoundException : DynamicClientException
+	
+	class SerializationException : public DynamicClientException
 	{
-	public:
-		MethodDescriptorNotFoundException(const std::string& name);
-
-	private:
-		std::string _name;
+		using DynamicClientException::DynamicClientException;
+	};
+	
+	class DeserializationException : public DynamicClientException
+	{
+		using DynamicClientException::DynamicClientException;
 	};
 }
