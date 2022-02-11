@@ -1,14 +1,16 @@
 #include "exceptions.h"
 
-using namespace std;
-using namespace ni;
+using std::string;
 
-ServiceNotFoundException::ServiceNotFoundException(const string& name)
+namespace ni
 {
-	_name = name;
-}
+	ServiceDescriptorNotFoundException::ServiceDescriptorNotFoundException(const string& name)
+	{
+		_name = name;
+	}
 
-MethodNotFoundException::MethodNotFoundException(const string& name)
-{
-	_name = name;
+	MethodDescriptorNotFoundException::MethodDescriptorNotFoundException(const string& name)
+	{
+		_name = name;
+	}
 }

@@ -10,19 +10,25 @@ namespace ni
 		DynamicClientException() {}
 	};
 
-	class ServiceNotFoundException : DynamicClientException
+	class ServiceUnavailableException : DynamicClientException
 	{
 	public:
-		ServiceNotFoundException(const std::string& name);
+		ServiceUnavailableException() = default;
+	};
+
+	class ServiceDescriptorNotFoundException : DynamicClientException
+	{
+	public:
+		ServiceDescriptorNotFoundException(const std::string& name);
 
 	private:
 		std::string _name;
 	};
 
-	class MethodNotFoundException : DynamicClientException
+	class MethodDescriptorNotFoundException : DynamicClientException
 	{
 	public:
-		MethodNotFoundException(const std::string& name);
+		MethodDescriptorNotFoundException(const std::string& name);
 
 	private:
 		std::string _name;

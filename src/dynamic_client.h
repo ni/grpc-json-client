@@ -1,10 +1,7 @@
 #pragma once
 
-#include <memory>
-
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/descriptor_database.h>
-#include <google/protobuf/dynamic_message.h>
 #include <grpcpp/channel.h>
 
 namespace ni
@@ -16,18 +13,16 @@ namespace ni
 
 	private:
 		google::protobuf::SimpleDescriptorDatabase _reflection_db;
-		std::unique_ptr<google::protobuf::DescriptorPool> _descriptor_pool;
-		std::unique_ptr<google::protobuf::DynamicMessageFactory> _message_factory;
+		google::protobuf::DescriptorPool _descriptor_pool;
 
 	public:
 		DynamicClient(const std::string& target);
 		~DynamicClient() = default;
 
-		const google::protobuf::MethodDescriptor* FindMethod(const std::string& service_name, const std::string& method_name);
-		grpc::ByteBuffer SerializeMessage(const google::protobuf::Descriptor* message_type, const std::string& message_json);
-		std::string DeserializeMessage(const google::protobuf::Descriptor* message_type, grpc::ByteBuffer& serialized_message);
+		// Populate descriptor pool with file descriptors for all services exposed by the reflection service on the host.
+		void QueryReflectionService();
 
-	private:
-		std::unique_ptr<google::protobuf::Message> CreateMessage(const google::protobuf::Descriptor* message_type);
+		// Search for a method in the descriptor database.
+		const google::protobuf::MethodDescriptor* FindMethod(const std::string& service_name, const std::string& method_name);
 	};
 }

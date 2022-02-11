@@ -1,7 +1,5 @@
 #include "dynamic_client.h"
 
-#include <google/protobuf/text_format.h>
-#include <google/protobuf/util/json_util.h>
 #include <grpcpp/grpcpp.h>
 
 #include "exceptions.h"
@@ -9,21 +7,13 @@
 #include "reflection.grpc.pb.h"
 
 using google::protobuf::Descriptor;
-using google::protobuf::DescriptorPool;
-using google::protobuf::DynamicMessageFactory;
 using google::protobuf::FileDescriptorProto;
-using google::protobuf::Message;
 using google::protobuf::MethodDescriptor;
 using google::protobuf::RepeatedPtrField;
 using google::protobuf::ServiceDescriptor;
-using google::protobuf::TextFormat;
-using google::protobuf::util::JsonOptions;
-using grpc::ByteBuffer;
 using grpc::ChannelCredentials;
 using grpc::ClientContext;
 using grpc::ClientReaderWriter;
-using grpc::ProtoBufferReader;
-using grpc::ProtoBufferWriter;
 using grpc::reflection::v1alpha::ServerReflection;
 using grpc::reflection::v1alpha::ServerReflectionRequest;
 using grpc::reflection::v1alpha::ServerReflectionResponse;
@@ -34,13 +24,17 @@ using std::unique_ptr;
 
 namespace ni
 {
-	DynamicClient::DynamicClient(const string& target)
+	DynamicClient::DynamicClient(const string& target) :
+		_descriptor_pool(&_reflection_db)
 	{
 		shared_ptr<ChannelCredentials> insecure_credentials = grpc::InsecureChannelCredentials();
 		channel = CreateChannel(target, insecure_credentials);
-		ServerReflection::Stub reflection_stub(channel);
+	}
 
+	void DynamicClient::QueryReflectionService()
+	{
 		// request server to list services
+		ServerReflection::Stub reflection_stub(channel);
 		ClientContext context;
 		unique_ptr<ClientReaderWriter<ServerReflectionRequest, ServerReflectionResponse>> stream = reflection_stub.ServerReflectionInfo(&context);
 		ServerReflectionRequest request;
@@ -77,67 +71,20 @@ namespace ni
 		{
 			// todo
 		}
-
-		_descriptor_pool = std::make_unique<DescriptorPool>(&_reflection_db);
-		_message_factory = std::make_unique<DynamicMessageFactory>(_descriptor_pool.get());
 	}
 
 	const MethodDescriptor* DynamicClient::FindMethod(const string& service_name, const string& method_name)
 	{
-		const ServiceDescriptor* service_descriptor = _descriptor_pool->FindServiceByName(service_name);
+		const ServiceDescriptor* service_descriptor = _descriptor_pool.FindServiceByName(service_name);
 		if (service_descriptor == nullptr)
 		{
-			throw ServiceNotFoundException(service_name);
+			throw ServiceDescriptorNotFoundException(service_name);
 		}
 		const MethodDescriptor* method_descriptor = service_descriptor->FindMethodByName(method_name);
 		if (method_descriptor == nullptr)
 		{
-			throw MethodNotFoundException(method_name);
+			throw MethodDescriptorNotFoundException(method_name);
 		}
 		return method_descriptor;
-	}
-
-	ByteBuffer DynamicClient::SerializeMessage(const Descriptor* message_type, const string& message_json)
-	{
-		unique_ptr<Message> message = CreateMessage(message_type);
-		google::protobuf::util::Status json_status = google::protobuf::util::JsonStringToMessage(message_json, message.get());
-		if (!json_status.ok())
-		{
-			// todo
-		}
-		ByteBuffer serialized_message;
-		bool own_buffer = false;
-		grpc::Status serialize_status = grpc::GenericSerialize<ProtoBufferWriter, void>(*message, &serialized_message, &own_buffer);
-		if (!serialize_status.ok())
-		{
-			// todo
-		}
-		return serialized_message;
-	}
-
-	string DynamicClient::DeserializeMessage(const Descriptor* message_type, ByteBuffer& serialized_message)
-	{
-		unique_ptr<Message> message = CreateMessage(message_type);
-		grpc::Status deserialize_status = grpc::GenericDeserialize<ProtoBufferReader, void>(&serialized_message, message.get());
-		if (!deserialize_status.ok())
-		{
-			// todo
-		}
-		string response;
-		JsonOptions json_options;
-		json_options.always_print_primitive_fields = true;
-		json_options.preserve_proto_field_names = true;
-		google::protobuf::util::Status json_status = google::protobuf::util::MessageToJsonString(*message, &response, json_options);
-		if (!json_status.ok())
-		{
-			// todo
-		}
-		return response;
-	}
-
-	unique_ptr<Message> DynamicClient::CreateMessage(const Descriptor* message_type)
-	{
-		const Message* message_prototype = _message_factory->GetPrototype(message_type);
-		return unique_ptr<Message>(message_prototype->New());
 	}
 }

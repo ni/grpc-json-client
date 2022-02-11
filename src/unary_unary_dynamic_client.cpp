@@ -1,6 +1,7 @@
 ﻿#include "unary_unary_dynamic_client.h"
 
 #include "exceptions.h"
+#include "json_serializer.h"
 
 using grpc::ByteBuffer;
 using grpc::CompletionQueue;
@@ -20,7 +21,7 @@ namespace ni
 	void UnaryUnaryDynamicClient::Write(const string& service_name, const string& method_name, const string& request_json)
 	{
 		_method_type = FindMethod(service_name, method_name);
-		ByteBuffer serialized_request = SerializeMessage(_method_type->input_type(), request_json);
+		ByteBuffer serialized_request = JsonSerializer::SerializeMessage(_method_type->input_type(), request_json);
 		string endpoint = string("/") + service_name + "/" + method_name;
 		_context = std::make_unique<ClientContext>();
 		_response_reader = _stub->PrepareUnaryCall(_context.get(), endpoint, serialized_request, _completion_queue.get());
@@ -47,18 +48,8 @@ namespace ni
 				// todo
 			}
 
-			_response = DeserializeMessage(_method_type->output_type(), serialized_response);
+			_response = JsonSerializer::DeserializeMessage(_method_type->output_type(), serialized_response);
 		}
 		return &_response;
 	}
-}
-
-int main()
-{
-	ni::UnaryUnaryDynamicClient client("localhost:31763");
-	//client.Debug("nirfsa_grpc.NiRFSA", "Init", "{\"resource_name\":\"VST2_01\"}");
-	client.Write("nirfsa_grpc.NiRFSA", "Init", "{\"session_name\": \"VST\", \"resource_name\":\"VST2_01\"}");
-	std::cout << *client.Read() << std::endl;
-	client.Write("nirfsa_grpc.NiRFSA", "Close", "{\"vi\":{\"name\":\"VST\"}}");
-	std::cout << *client.Read() << std::endl;
 }

@@ -3,8 +3,9 @@
 #include "exceptions.h"
 #include "exports.h"
 
-using namespace std;
-using namespace ni;
+using ni::ErrorCode;
+using ni::UnaryUnaryDynamicClient;
+using std::string;
 
 int32_t Init(const char* target, void** const session_handle)
 {
@@ -19,11 +20,11 @@ int32_t Write(void* const session_handle, const char* service, const char* metho
 	{
 		handle->Write(service, method, request);
 	}
-	catch (ServiceNotFoundException&)
+	catch (ni::ServiceDescriptorNotFoundException&)
 	{
 		return ErrorCode::SERVICE_NOT_FOUND;
 	}
-	catch (MethodNotFoundException&)
+	catch (ni::MethodDescriptorNotFoundException&)
 	{
 		return ErrorCode::METHOD_NOT_FOUND;
 	}
