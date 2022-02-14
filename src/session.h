@@ -7,17 +7,25 @@
 
 namespace ni
 {
-	class Session
-	{
-	public:
-		Session(const std::string& target, const grpc::ChannelCredentials& credentials);
+    namespace dynclient
+    {
+        class Session
+        {
+        public:
+            Session(const std::string& target, const std::shared_ptr<grpc::ChannelCredentials>& credentials);
 
-		UnaryUnaryDynamicClient& client();
-		int last_error_code();
-		string last_error_description();
+            UnaryUnaryDynamicClient& client();
+            std::mutex& lock();
+            DynamicClientException& last_exception();
+            ErrorCode last_error_code() const;
+            std::string last_error_description() const;
 
-	private:
-		UnaryUnaryDynamicClient _client;
-		DynamicClientException _last_exception;
-	};
+            void ClearLastException();
+
+        private:
+            UnaryUnaryDynamicClient _unary_unary_client;
+            std::mutex _lock;
+            std::unique_ptr<DynamicClientException> _last_exception;
+        };
+    }
 }

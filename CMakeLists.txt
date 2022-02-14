@@ -8,7 +8,6 @@ project ("grpc_dynamic_client")
 set(CMAKE_CXX_STANDARD 11)
 
 # Find Protobuf installation
-# Looks for protobuf-config.cmake file installed by Protobuf's cmake installation.
 set(protobuf_MODULE_COMPATIBLE TRUE)
 find_package(Protobuf CONFIG REQUIRED)
 message(STATUS "Using protobuf ${Protobuf_VERSION}")
@@ -17,7 +16,6 @@ set(_PROTOBUF_LIBPROTOBUF protobuf::libprotobuf)
 set(_PROTOBUF_PROTOC $<TARGET_FILE:protobuf::protoc>)
 
 # Find gRPC installation
-# Looks for gRPCConfig.cmake file installed by gRPC's cmake installation.
 find_package(gRPC CONFIG REQUIRED)
 message(STATUS "Using gRPC ${gRPC_VERSION}")
 
@@ -26,8 +24,8 @@ set(_GRPC_REFLECTION gRPC::grpc++_reflection)
 set(_GRPC_CPP_PLUGIN_EXECUTABLE $<TARGET_FILE:gRPC::grpc_cpp_plugin>)
 
 # Add GTest submodule
-add_subdirectory("${CMAKE_SOURCE_DIR}/third_party/gtest/" "${CMAKE_BINARY_DIR}/gtest" EXCLUDE_FROM_ALL)
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+add_subdirectory("${CMAKE_SOURCE_DIR}/third_party/gtest/" "${CMAKE_BINARY_DIR}/gtest" EXCLUDE_FROM_ALL)
 
 set(_GTEST GTest::gtest)
 set(_GTEST_MAIN GTest::gtest_main)
@@ -57,22 +55,24 @@ add_custom_command(
 
 set(src_files
     "${src_files_dir}/dynamic_client.cpp"
+    "${src_files_dir}/dynamic_client_base.cpp"
     "${src_files_dir}/error_code.h"
-    "${src_files_dir}/exports.cpp"
     "${src_files_dir}/json_serializer.cpp"
+    "${src_files_dir}/session.cpp"
     "${src_files_dir}/unary_unary_dynamic_client.cpp"
-    ${reflection_proto_src}
+    ${reflection_pb_src}
     ${reflection_grpc_src}
+)
+set(grpc_libs
+    ${_PROTOBUF_LIBPROTOBUF}
+    ${_GRPC_GRPCPP}
+    ${_GRPC_REFLECTION}
 )
 
 # Add source to this project's library
 add_library(grpc_dynamic_client SHARED ${src_files})
 target_include_directories(grpc_dynamic_client PRIVATE ${generated_files_dir})
-target_link_libraries(grpc_dynamic_client
-    ${_PROTOBUF_LIBPROTOBUF}
-    ${_GRPC_GRPCPP}
-    ${_GRPC_REFLECTION}
-)
+target_link_libraries(grpc_dynamic_client ${grpc_libs})
 
 # Add tests
 add_executable(tests
@@ -87,7 +87,5 @@ target_include_directories(tests PRIVATE
 target_link_libraries(tests
     ${_GTEST}
     ${_GTEST_MAIN}
-    ${_PROTOBUF_LIBPROTOBUF}
-    ${_GRPC_GRPCPP}
-    ${_GRPC_REFLECTION}
+    ${grpc_libs}
 )

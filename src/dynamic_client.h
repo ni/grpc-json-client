@@ -1,28 +1,18 @@
 #pragma once
 
-#include <google/protobuf/descriptor.h>
-#include <google/protobuf/descriptor_database.h>
-#include <grpcpp/grpcpp.h>
+#include <stdint.h>
 
-namespace ni
+#ifdef __cplusplus
+extern "C"
 {
-	class DynamicClient
-	{
-	protected:
-		std::shared_ptr<grpc::Channel> channel;
+#endif
 
-	private:
-		google::protobuf::SimpleDescriptorDatabase _reflection_db;
-		google::protobuf::DescriptorPool _descriptor_pool;
+__declspec(dllexport) int32_t Init(const char* target, void** const session_handle);
+__declspec(dllexport) int32_t Write(void* const session_handle, const char* service, const char* method, const char* request);
+__declspec(dllexport) int32_t Read(void* const session_handle, char* response, size_t* const size);
+__declspec(dllexport) int32_t Close(void* const session_handle);
+__declspec(dllexport) int32_t GetErrorMessage(int32_t error_code, char* const message, size_t* const size);
 
-	public:
-		DynamicClient(const std::string& target, const std::shared_ptr<grpc::ChannelCredentials>& credentials);
-		~DynamicClient() = default;
-
-		// Populate descriptor pool with file descriptors for all services exposed by the reflection service on the host.
-		void QueryReflectionService();
-
-		// Search for a method in the descriptor database.
-		const google::protobuf::MethodDescriptor* FindMethod(const std::string& service_name, const std::string& method_name);
-	};
+#ifdef __cplusplus
 }
+#endif
