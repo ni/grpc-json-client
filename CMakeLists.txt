@@ -58,7 +58,6 @@ add_custom_command(
 set(src_files
     "${src_files_dir}/dynamic_client.cpp"
     "${src_files_dir}/error_code.h"
-    "${src_files_dir}/exceptions.cpp"
     "${src_files_dir}/exports.cpp"
     "${src_files_dir}/json_serializer.cpp"
     "${src_files_dir}/unary_unary_dynamic_client.cpp"

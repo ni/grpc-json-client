@@ -3,13 +3,16 @@
 #include "exceptions.h"
 #include "exports.h"
 
+using grpc::ChannelCredentials;
 using ni::ErrorCode;
 using ni::UnaryUnaryDynamicClient;
+using std::shared_ptr;
 using std::string;
 
 int32_t Init(const char* target, void** const session_handle)
 {
-	*session_handle = new UnaryUnaryDynamicClient(target);
+	shared_ptr<ChannelCredentials> credentials = grpc::InsecureChannelCredentials();
+	*session_handle = new UnaryUnaryDynamicClient(target, credentials);
 	return 0;
 }
 
@@ -20,16 +23,10 @@ int32_t Write(void* const session_handle, const char* service, const char* metho
 	{
 		handle->Write(service, method, request);
 	}
-	
-	catch (ni::ServiceDescriptorNotFoundException&)
+	catch (ni::DynamicClientException& ex)
 	{
-		return ErrorCode::SERVICE_NOT_FOUND;
+		return ex.error_code();
 	}
-	catch (ni::MethodDescriptorNotFoundException&)
-	{
-		return ErrorCode::METHOD_NOT_FOUND;
-	}
-	
 	catch (...)
 	{
 		return ErrorCode::UNKNOWN;

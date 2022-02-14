@@ -25,8 +25,8 @@ namespace ni
 		if (!json_status.ok())
 		{
 			string summary("Failed to create protobuf message from JSON string.\n\n");
-			string description(json_status.message());
-			throw SerializationException(summary + description);
+			string details(json_status.message());
+			throw SerializationException(summary + details);
 		}
 		ByteBuffer serialized_message;
 		bool own_buffer = false;
@@ -45,7 +45,8 @@ namespace ni
 		grpc::Status deserialize_status = grpc::GenericDeserialize<ProtoBufferReader, void>(&serialized_message, message.get());
 		if (!deserialize_status.ok())
 		{
-			//throw DeserializationException();
+			string summary("Failed to deserialize protobuf message.\n\n");
+			throw DeserializationException(summary + deserialize_status.error_message());
 		}
 		string response;
 		JsonOptions json_options;
@@ -54,7 +55,9 @@ namespace ni
 		google::protobuf::util::Status json_status = google::protobuf::util::MessageToJsonString(*message, &response, json_options);
 		if (!json_status.ok())
 		{
-			//throw DeserializationException();
+			string summary("Failed to create JSON string from protobuf message.\n\n");
+			string details(json_status.message());
+			throw DeserializationException(summary + details);
 		}
 		return response;
 	}

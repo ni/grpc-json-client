@@ -17,7 +17,7 @@ namespace ni
 		DynamicClient client;
 
 		DynamicClientTest() :
-			client(host)
+			client(host, grpc::InsecureChannelCredentials())
 		{
 		}
 

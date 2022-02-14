@@ -1,7 +1,5 @@
 #include "dynamic_client.h"
 
-#include <grpcpp/grpcpp.h>
-
 #include "exceptions.h"
 #include "reflection.pb.h"
 #include "reflection.grpc.pb.h"
@@ -24,11 +22,10 @@ using std::unique_ptr;
 
 namespace ni
 {
-	DynamicClient::DynamicClient(const string& target) :
+	DynamicClient::DynamicClient(const string& target, const shared_ptr<ChannelCredentials>& credentials) :
 		_descriptor_pool(&_reflection_db)
 	{
-		shared_ptr<ChannelCredentials> insecure_credentials = grpc::InsecureChannelCredentials();
-		channel = CreateChannel(target, insecure_credentials);
+		channel = CreateChannel(target, credentials);
 	}
 
 	void DynamicClient::QueryReflectionService()
@@ -69,7 +66,8 @@ namespace ni
 		grpc::Status status = stream->Finish();
 		if (!status.ok())
 		{
-			// todo
+			string summary("Failed to retreive file descriptors from the host. Ensure the reflection service is running and reachable.\n\n");
+			throw ReflectionServiceException(summary + status.error_message());
 		}
 	}
 

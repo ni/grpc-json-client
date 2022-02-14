@@ -2,11 +2,14 @@
 
 namespace ni
 {
-	enum ErrorCode
+	enum ErrorCode : int
 	{
 		NONE = 0,
 		UNKNOWN = -1,
-		SERVICE_NOT_FOUND = -2,
-		METHOD_NOT_FOUND = -3
+		REFLECTION_ERROR = -2,
+		SERVICE_NOT_FOUND = -3,
+		METHOD_NOT_FOUND = -4,
+		SERIALIZATION_ERROR = -5,
+		DESERIALIZATION_ERROR = -6
 	};
 }

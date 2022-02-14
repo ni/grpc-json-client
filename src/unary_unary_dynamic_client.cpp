@@ -4,18 +4,20 @@
 #include "json_serializer.h"
 
 using grpc::ByteBuffer;
+using grpc::ChannelCredentials;
 using grpc::CompletionQueue;
 using grpc::ClientContext;
 using grpc::GenericStub;
 using grpc::Status;
+using std::shared_ptr;
 using std::string;
 
 namespace ni
 {
-	UnaryUnaryDynamicClient::UnaryUnaryDynamicClient(const std::string& target) : DynamicClient(target)
+	UnaryUnaryDynamicClient::UnaryUnaryDynamicClient(const std::string& target, const shared_ptr<ChannelCredentials>& credentials) : 
+		DynamicClient(target, credentials),
+		_stub(channel)
 	{
-		_stub = std::make_unique<GenericStub>(channel);
-		_completion_queue = std::make_unique<CompletionQueue>();
 	}
 
 	void UnaryUnaryDynamicClient::Write(const string& service_name, const string& method_name, const string& request_json)
@@ -24,7 +26,7 @@ namespace ni
 		ByteBuffer serialized_request = JsonSerializer::SerializeMessage(_method_type->input_type(), request_json);
 		string endpoint = string("/") + service_name + "/" + method_name;
 		_context = std::make_unique<ClientContext>();
-		_response_reader = _stub->PrepareUnaryCall(_context.get(), endpoint, serialized_request, _completion_queue.get());
+		_response_reader = _stub.PrepareUnaryCall(_context.get(), endpoint, serialized_request, &_completion_queue);
 		_response_reader->StartCall();
 	}
 
@@ -39,7 +41,7 @@ namespace ni
 
 			void* got_tag;
 			bool ok = false;
-			if (!_completion_queue->Next(&got_tag, &ok))
+			if (!_completion_queue.Next(&got_tag, &ok))
 			{
 				// todo
 			}

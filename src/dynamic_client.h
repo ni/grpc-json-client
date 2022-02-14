@@ -2,7 +2,7 @@
 
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/descriptor_database.h>
-#include <grpcpp/channel.h>
+#include <grpcpp/grpcpp.h>
 
 namespace ni
 {
@@ -16,7 +16,7 @@ namespace ni
 		google::protobuf::DescriptorPool _descriptor_pool;
 
 	public:
-		DynamicClient(const std::string& target);
+		DynamicClient(const std::string& target, const std::shared_ptr<grpc::ChannelCredentials>& credentials);
 		~DynamicClient() = default;
 
 		// Populate descriptor pool with file descriptors for all services exposed by the reflection service on the host.
