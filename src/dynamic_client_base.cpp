@@ -73,7 +73,7 @@ namespace ni
             }
         }
 
-        const MethodDescriptor* DynamicClientBase::FindMethod(const string& service_name, const string& method_name)
+        const MethodDescriptor* DynamicClientBase::FindMethod(const string& service_name, const string& method_name) const
         {
             const ServiceDescriptor* service_descriptor = _descriptor_pool.FindServiceByName(service_name);
             if (service_descriptor == nullptr)

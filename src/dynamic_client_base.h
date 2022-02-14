@@ -25,7 +25,7 @@ namespace ni
             void QueryReflectionService();
 
             // Search for a method in the descriptor database.
-            const google::protobuf::MethodDescriptor* FindMethod(const std::string& service_name, const std::string& method_name);
+            const google::protobuf::MethodDescriptor* FindMethod(const std::string& service_name, const std::string& method_name) const;
         };
     }
 }
