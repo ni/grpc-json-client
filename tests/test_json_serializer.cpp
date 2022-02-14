@@ -12,7 +12,7 @@ using std::string;
 
 namespace ni
 {
-    namespace dynclient
+    namespace json_client
     {
         TEST(JsonSerializerTest, SerializesJsonObject)
         {

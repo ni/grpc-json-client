@@ -1,24 +1,24 @@
 #include <gtest/gtest.h>
 #include <google/protobuf/descriptor.h>
 
-#include "dynamic_client_base.h"
 #include "exceptions.h"
+#include "json_client_base.h"
 
 using google::protobuf::MethodDescriptor;
 using std::string;
 
 namespace ni
 {
-    namespace dynclient
+    namespace json_client
     {
         const std::string host = "localhost:31763";
 
-        class DynamicClientTest : public testing::Test
+        class JsonClientTest : public testing::Test
         {
         protected:
-            DynamicClientBase client;
+            JsonClientBase client;
 
-            DynamicClientTest() :
+            JsonClientTest() :
                 client(host, grpc::InsecureChannelCredentials())
             {
             }
@@ -29,7 +29,7 @@ namespace ni
             }
         };
 
-        TEST_F(DynamicClientTest, FindMethodFindsValidMethod)
+        TEST_F(JsonClientTest, FindMethodFindsValidMethod)
         {
             const MethodDescriptor* method;
             ASSERT_NO_THROW(
@@ -38,7 +38,7 @@ namespace ni
             EXPECT_EQ(method->full_name(), "nirfsa_grpc.NiRFSA.Init");
         }
 
-        TEST_F(DynamicClientTest, FindMethodFailsOnInvalidServiceName)
+        TEST_F(JsonClientTest, FindMethodFailsOnInvalidServiceName)
         {
             ASSERT_THROW(
                 client.FindMethod("invalid.service.name", "Init"),
@@ -46,7 +46,7 @@ namespace ni
             );
         }
 
-        TEST_F(DynamicClientTest, FindMethodFailsOnInvalidMethodName)
+        TEST_F(JsonClientTest, FindMethodFailsOnInvalidMethodName)
         {
             ASSERT_THROW(
                 client.FindMethod("nirfsa_grpc.NiRFSA", "InvalidMethodName"),

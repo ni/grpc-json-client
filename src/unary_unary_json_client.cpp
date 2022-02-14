@@ -1,4 +1,4 @@
-﻿#include "unary_unary_dynamic_client.h"
+﻿#include "unary_unary_json_client.h"
 
 #include "exceptions.h"
 #include "json_serializer.h"
@@ -14,15 +14,15 @@ using std::string;
 
 namespace ni
 {
-	namespace dynclient
+	namespace json_client
 	{
-		UnaryUnaryDynamicClient::UnaryUnaryDynamicClient(const std::string& target, const shared_ptr<ChannelCredentials>& credentials) :
-			DynamicClientBase(target, credentials),
+		UnaryUnaryJsonClient::UnaryUnaryJsonClient(const std::string& target, const shared_ptr<ChannelCredentials>& credentials) :
+			JsonClientBase(target, credentials),
 			_stub(channel)
 		{
 		}
 
-		void UnaryUnaryDynamicClient::Write(const string& service_name, const string& method_name, const string& request_json)
+		void UnaryUnaryJsonClient::Write(const string& service_name, const string& method_name, const string& request_json)
 		{
 			_method_type = FindMethod(service_name, method_name);
 			ByteBuffer serialized_request = JsonSerializer::SerializeMessage(_method_type->input_type(), request_json);
@@ -32,7 +32,7 @@ namespace ni
 			_response_reader->StartCall();
 		}
 
-		const string* UnaryUnaryDynamicClient::Read()
+		const string* UnaryUnaryJsonClient::Read()
 		{
 			if (_response_reader)
 			{

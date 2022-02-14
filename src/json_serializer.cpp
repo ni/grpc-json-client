@@ -16,7 +16,7 @@ using std::unique_ptr;
 
 namespace ni
 {
-    namespace dynclient
+    namespace json_client
     {
         google::protobuf::DynamicMessageFactory JsonSerializer::factory;
 

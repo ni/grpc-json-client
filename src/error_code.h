@@ -2,7 +2,7 @@
 
 namespace ni
 {
-    namespace dynclient
+    namespace json_client
     {
         enum ErrorCode : int
         {

@@ -54,12 +54,12 @@ add_custom_command(
 )
 
 set(src_files
-    "${src_files_dir}/dynamic_client.cpp"
-    "${src_files_dir}/dynamic_client_base.cpp"
     "${src_files_dir}/error_code.h"
+    "${src_files_dir}/json_client.cpp"
+    "${src_files_dir}/json_client_base.cpp"
     "${src_files_dir}/json_serializer.cpp"
     "${src_files_dir}/session.cpp"
-    "${src_files_dir}/unary_unary_dynamic_client.cpp"
+    "${src_files_dir}/unary_unary_json_client.cpp"
     ${reflection_pb_src}
     ${reflection_grpc_src}
 )
@@ -70,13 +70,13 @@ set(grpc_libs
 )
 
 # Add source to this project's library
-add_library(grpc_dynamic_client SHARED ${src_files})
-target_include_directories(grpc_dynamic_client PRIVATE ${generated_files_dir})
-target_link_libraries(grpc_dynamic_client ${grpc_libs})
+add_library(grpc_json_client SHARED ${src_files})
+target_include_directories(grpc_json_client PRIVATE ${generated_files_dir})
+target_link_libraries(grpc_json_client ${grpc_libs})
 
 # Add tests
 add_executable(tests
-    "${tests_dir}/test_dynamic_client.cpp"
+    "${tests_dir}/test_json_client.cpp"
     "${tests_dir}/test_json_serializer.cpp"
     ${src_files}
 )

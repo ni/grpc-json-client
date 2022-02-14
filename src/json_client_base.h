@@ -6,10 +6,10 @@
 
 namespace ni
 {
-    namespace dynclient
+    namespace json_client
     {
         // Base class for dynamic client implementations.
-        class DynamicClientBase
+        class JsonClientBase
         {
         protected:
             std::shared_ptr<grpc::Channel> channel;
@@ -19,7 +19,7 @@ namespace ni
             google::protobuf::DescriptorPool _descriptor_pool;
 
         public:
-            DynamicClientBase(const std::string& target, const std::shared_ptr<grpc::ChannelCredentials>& credentials);
+            JsonClientBase(const std::string& target, const std::shared_ptr<grpc::ChannelCredentials>& credentials);
 
             // Populate descriptor pool with file descriptors for all services exposed by the reflection service on the host.
             void QueryReflectionService();

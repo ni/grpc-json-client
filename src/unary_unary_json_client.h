@@ -1,14 +1,14 @@
 ﻿#pragma once
 
-#include "dynamic_client_base.h"
+#include "json_client_base.h"
 
 #include <grpcpp/generic/generic_stub.h>
 
 namespace ni
 {
-    namespace dynclient
+    namespace json_client
     {
-        class UnaryUnaryDynamicClient : public DynamicClientBase
+        class UnaryUnaryJsonClient : public JsonClientBase
         {
         private:
             grpc::GenericStub _stub;
@@ -19,7 +19,7 @@ namespace ni
             std::string _response;
 
         public:
-            UnaryUnaryDynamicClient(const std::string& target, const std::shared_ptr<grpc::ChannelCredentials>& credentials);
+            UnaryUnaryJsonClient(const std::string& target, const std::shared_ptr<grpc::ChannelCredentials>& credentials);
 
             void Write(const std::string& service_name, const std::string& method_name, const std::string& request_json);
             const std::string* Read();

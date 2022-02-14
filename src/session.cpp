@@ -6,7 +6,7 @@ using std::string;
 
 namespace ni
 {
-	namespace dynclient
+	namespace json_client
 	{
 		Session::Session(const std::string& target, const std::shared_ptr<grpc::ChannelCredentials>& credentials) :
 			_unary_unary_client(target, credentials),
@@ -14,7 +14,7 @@ namespace ni
 		{
 		}
 
-		UnaryUnaryDynamicClient& Session::client()
+		UnaryUnaryJsonClient& Session::client()
 		{
 			return _unary_unary_client;
 		}
@@ -24,7 +24,7 @@ namespace ni
 			return _lock;
 		}
 
-		DynamicClientException& Session::last_exception()
+		JsonClientException& Session::last_exception()
 		{
 			return *_last_exception;
 		}

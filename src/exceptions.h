@@ -6,12 +6,12 @@
 
 namespace ni
 {
-    namespace dynclient
+    namespace json_client
     {
-        class DynamicClientException : public std::exception
+        class JsonClientException : public std::exception
         {
         public:
-            DynamicClientException(const std::string& description) : std::exception(description.c_str()) {}
+            JsonClientException(const std::string& description) : std::exception(description.c_str()) {}
 
             virtual ErrorCode error_code()
             {
@@ -19,10 +19,10 @@ namespace ni
             }
         };
     
-        class ReflectionServiceException : public DynamicClientException
+        class ReflectionServiceException : public JsonClientException
         {
         public:
-            using DynamicClientException::DynamicClientException;
+            using JsonClientException::JsonClientException;
 
             ErrorCode error_code() override
             {
@@ -30,11 +30,11 @@ namespace ni
             }
         };
 
-        class ServiceDescriptorNotFoundException : public DynamicClientException
+        class ServiceDescriptorNotFoundException : public JsonClientException
         {
         public:
             ServiceDescriptorNotFoundException(const std::string& name) :
-                DynamicClientException("Service descriptor not found: " + name) {}
+                JsonClientException("Service descriptor not found: " + name) {}
 
             ErrorCode error_code() override
             {
@@ -42,11 +42,11 @@ namespace ni
             }
         };
 
-        class MethodDescriptorNotFoundException :public  DynamicClientException
+        class MethodDescriptorNotFoundException :public JsonClientException
         {
         public:
             MethodDescriptorNotFoundException(const std::string& name) :
-                DynamicClientException("Method descriptor not found: " + name) {}
+                JsonClientException("Method descriptor not found: " + name) {}
 
             ErrorCode error_code() override
             {
@@ -54,9 +54,9 @@ namespace ni
             }
         };
     
-        class SerializationException : public DynamicClientException
+        class SerializationException : public JsonClientException
         {
-            using DynamicClientException::DynamicClientException;
+            using JsonClientException::JsonClientException;
 
             ErrorCode error_code() override
             {
@@ -64,9 +64,9 @@ namespace ni
             }
         };
     
-        class DeserializationException : public DynamicClientException
+        class DeserializationException : public JsonClientException
         {
-            using DynamicClientException::DynamicClientException;
+            using JsonClientException::JsonClientException;
 
             ErrorCode error_code() override
             {

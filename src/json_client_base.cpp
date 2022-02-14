@@ -1,4 +1,4 @@
-#include "dynamic_client_base.h"
+#include "json_client_base.h"
 
 #include "exceptions.h"
 #include "reflection.pb.h"
@@ -22,15 +22,15 @@ using std::unique_ptr;
 
 namespace ni
 {
-    namespace dynclient
+    namespace json_client
     {
-        DynamicClientBase::DynamicClientBase(const string& target, const shared_ptr<ChannelCredentials>& credentials) :
+        JsonClientBase::JsonClientBase(const string& target, const shared_ptr<ChannelCredentials>& credentials) :
             _descriptor_pool(&_reflection_db)
         {
             channel = CreateChannel(target, credentials);
         }
 
-        void DynamicClientBase::QueryReflectionService()
+        void JsonClientBase::QueryReflectionService()
         {
             // request server to list services
             ServerReflection::Stub reflection_stub(channel);
@@ -73,7 +73,7 @@ namespace ni
             }
         }
 
-        const MethodDescriptor* DynamicClientBase::FindMethod(const string& service_name, const string& method_name) const
+        const MethodDescriptor* JsonClientBase::FindMethod(const string& service_name, const string& method_name) const
         {
             const ServiceDescriptor* service_descriptor = _descriptor_pool.FindServiceByName(service_name);
             if (service_descriptor == nullptr)
