@@ -40,7 +40,7 @@ int32_t InitInsecure(const char* target, void** const session_handle)
 {
     shared_ptr<ChannelCredentials> credentials = grpc::InsecureChannelCredentials();
     *session_handle = new Session(target, credentials);
-    return Evaluate(session_handle, [](UnaryUnaryJsonClient& client) { client.QueryReflectionService(); });
+    return Evaluate(*session_handle, [](UnaryUnaryJsonClient& client) { client.QueryReflectionService(); });
 }
 
 int32_t Write(void* const session_handle, const char* service, const char* method, const char* request)
@@ -56,11 +56,11 @@ int32_t Read(void* const session_handle, char* buffer, size_t* const size)
     {
         if (buffer != nullptr)
         {
-            response.copy(buffer, *size, 0);
+            strncpy(buffer, response.c_str(), *size);
         }
         else if (size != nullptr)
         {
-            *size = response.size();
+            *size = response.size() + 1;  // include null character
         }
     }
     return error_code;
@@ -91,11 +91,11 @@ int32_t GetError(void* const session_handle, int32_t* const code, char* const de
     }
     if (description != nullptr)
     {
-        last_error_description.copy(description, *size, 0);
+        strncpy(description, last_error_description.c_str(), *size);
     }
     else if (size != nullptr)
     {
-        *size = last_error_description.size();
+        *size = last_error_description.size() + 1;  // include null character
     }
     return (int32_t)ErrorCode::kNone;
 }
