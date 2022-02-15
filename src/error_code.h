@@ -4,15 +4,17 @@ namespace ni
 {
     namespace json_client
     {
-        enum ErrorCode : int
+        enum class ErrorCode : int
         {
-            NONE = 0,
-            UNKNOWN = -1,
-            REFLECTION_ERROR = -2,
-            SERVICE_NOT_FOUND = -3,
-            METHOD_NOT_FOUND = -4,
-            SERIALIZATION_ERROR = -5,
-            DESERIALIZATION_ERROR = -6
+            kNone = 0,
+            kUnknown = -1,
+            kReflectionError = -2,
+            kServiceNotFound = -3,
+            kMethodNotFound = -4,
+            kSerializationError = -5,
+            kDeserializationError = -6
         };
+
+        const char* GetErrorDescription(const ErrorCode& error_code);
     }
 }

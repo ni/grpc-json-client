@@ -15,7 +15,7 @@ namespace ni
 
             virtual ErrorCode error_code()
             {
-                return ErrorCode::UNKNOWN;
+                return ErrorCode::kUnknown;
             }
         };
     
@@ -26,7 +26,7 @@ namespace ni
 
             ErrorCode error_code() override
             {
-                return ErrorCode::REFLECTION_ERROR;
+                return ErrorCode::kReflectionError;
             }
         };
 
@@ -38,7 +38,7 @@ namespace ni
 
             ErrorCode error_code() override
             {
-                return ErrorCode::SERVICE_NOT_FOUND;
+                return ErrorCode::kServiceNotFound;
             }
         };
 
@@ -50,7 +50,7 @@ namespace ni
 
             ErrorCode error_code() override
             {
-                return ErrorCode::METHOD_NOT_FOUND;
+                return ErrorCode::kMethodNotFound;
             }
         };
     
@@ -60,7 +60,7 @@ namespace ni
 
             ErrorCode error_code() override
             {
-                return ErrorCode::SERIALIZATION_ERROR;
+                return ErrorCode::kSerializationError;
             }
         };
     
@@ -70,7 +70,7 @@ namespace ni
 
             ErrorCode error_code() override
             {
-                return ErrorCode::DESERIALIZATION_ERROR;
+                return ErrorCode::kDeserializationError;
             }
         };
     }
