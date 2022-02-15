@@ -6,10 +6,10 @@
 #include "unary_unary_json_client.h"
 
 using grpc::ChannelCredentials;
-using ni::json_client::ErrorCode;
-using ni::json_client::JsonClientException;
-using ni::json_client::Session;
-using ni::json_client::UnaryUnaryJsonClient;
+using ni::grpc_json_client::ErrorCode;
+using ni::grpc_json_client::JsonClientException;
+using ni::grpc_json_client::Session;
+using ni::grpc_json_client::UnaryUnaryJsonClient;
 using std::lock_guard;
 using std::mutex;
 using std::shared_ptr;
@@ -78,7 +78,7 @@ int32_t GetError(void* const session_handle, int32_t* const code, char* const de
     string last_error_description;
     if (session == nullptr)
     {
-        last_error_description = ni::json_client::GetErrorDescription((ErrorCode)*code);
+        last_error_description = ni::grpc_json_client::GetErrorDescription((ErrorCode)*code);
     }
     else
     {

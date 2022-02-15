@@ -6,7 +6,7 @@ using std::string;
 
 namespace ni
 {
-	namespace json_client
+	namespace grpc_json_client
 	{
 		Session::Session(const std::string& target, const std::shared_ptr<grpc::ChannelCredentials>& credentials) :
 			_unary_unary_client(target, credentials),

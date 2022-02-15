@@ -7,7 +7,7 @@ using std::string;
 
 namespace ni
 {
-	namespace json_client
+	namespace grpc_json_client
 	{
 		string GetErrorDescription(const ErrorCode& error_code)
 		{

@@ -6,7 +6,7 @@
 
 namespace ni
 {
-    namespace json_client
+    namespace grpc_json_client
     {
         // Base class for json client implementations.
         class JsonClientBase

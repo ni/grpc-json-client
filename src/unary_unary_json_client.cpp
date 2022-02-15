@@ -14,7 +14,7 @@ using std::string;
 
 namespace ni
 {
-	namespace json_client
+	namespace grpc_json_client
 	{
 		UnaryUnaryJsonClient::UnaryUnaryJsonClient(const std::string& target, const shared_ptr<ChannelCredentials>& credentials) :
 			JsonClientBase(target, credentials),
