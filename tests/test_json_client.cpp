@@ -29,7 +29,7 @@ namespace ni
             }
         };
 
-        TEST_F(JsonClientTest, FindMethodFindsValidMethod)
+        TEST_F(JsonClientTest, FindMethodSucceedsOnValidMethod)
         {
             const MethodDescriptor* method;
             ASSERT_NO_THROW(
