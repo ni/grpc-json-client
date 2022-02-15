@@ -12,6 +12,7 @@ using google::protobuf::ServiceDescriptor;
 using grpc::ChannelCredentials;
 using grpc::ClientContext;
 using grpc::ClientReaderWriter;
+using grpc::reflection::v1alpha::FileDescriptorResponse;
 using grpc::reflection::v1alpha::ServerReflection;
 using grpc::reflection::v1alpha::ServerReflectionRequest;
 using grpc::reflection::v1alpha::ServerReflectionResponse;
@@ -51,8 +52,8 @@ namespace ni
                 request.set_file_containing_symbol(service.name());
                 stream->Write(request);
                 stream->Read(&response);
-                auto serialized_file_descriptors = response.file_descriptor_response().file_descriptor_proto();
-                for (string serialized_file_descriptor : serialized_file_descriptors)
+                const FileDescriptorResponse& file_descriptor_response = response.file_descriptor_response(); 
+                for (string serialized_file_descriptor : file_descriptor_response.file_descriptor_proto())
                 {
                     FileDescriptorProto file_descriptor_proto;
                     file_descriptor_proto.ParseFromString(serialized_file_descriptor);

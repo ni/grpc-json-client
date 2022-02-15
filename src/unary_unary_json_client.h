@@ -1,8 +1,8 @@
 ﻿#pragma once
 
-#include "json_client_base.h"
-
 #include <grpcpp/generic/generic_stub.h>
+
+#include "json_client_base.h"
 
 namespace ni
 {
@@ -22,7 +22,7 @@ namespace ni
             UnaryUnaryJsonClient(const std::string& target, const std::shared_ptr<grpc::ChannelCredentials>& credentials);
 
             void Write(const std::string& service_name, const std::string& method_name, const std::string& request_json);
-            const std::string* Read();
+            std::string Read();
         };
     }
 }

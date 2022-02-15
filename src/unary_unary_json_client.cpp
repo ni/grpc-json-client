@@ -19,8 +19,7 @@ namespace ni
 		UnaryUnaryJsonClient::UnaryUnaryJsonClient(const std::string& target, const shared_ptr<ChannelCredentials>& credentials) :
 			JsonClientBase(target, credentials),
 			_stub(channel)
-		{
-		}
+		{}
 
 		void UnaryUnaryJsonClient::Write(const string& service_name, const string& method_name, const string& request_json)
 		{
@@ -32,7 +31,7 @@ namespace ni
 			_response_reader->StartCall();
 		}
 
-		const string* UnaryUnaryJsonClient::Read()
+		string UnaryUnaryJsonClient::Read()
 		{
 			if (_response_reader)
 			{
@@ -54,7 +53,7 @@ namespace ni
 
 				_response = JsonSerializer::DeserializeMessage(_method_type->output_type(), serialized_response);
 			}
-			return &_response;
+			return _response;
 		}
 	}
 }

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 namespace ni
 {
     namespace json_client
@@ -15,6 +17,6 @@ namespace ni
             kDeserializationError = -6
         };
 
-        const char* GetErrorDescription(const ErrorCode& error_code);
+        std::string GetErrorDescription(const ErrorCode& error_code);
     }
 }

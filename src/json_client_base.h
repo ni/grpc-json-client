@@ -8,7 +8,7 @@ namespace ni
 {
     namespace json_client
     {
-        // Base class for dynamic client implementations.
+        // Base class for json client implementations.
         class JsonClientBase
         {
         protected:

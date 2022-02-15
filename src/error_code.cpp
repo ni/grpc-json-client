@@ -3,12 +3,13 @@
 #include <array>
 
 using std::array;
+using std::string;
 
 namespace ni
 {
 	namespace json_client
 	{
-		const char* GetErrorDescription(const ErrorCode& error_code)
+		string GetErrorDescription(const ErrorCode& error_code)
 		{
 			static const array<char*, 7> error_descriptions = {
 				"No error.",

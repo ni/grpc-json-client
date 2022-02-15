@@ -11,8 +11,7 @@ namespace ni
 		Session::Session(const std::string& target, const std::shared_ptr<grpc::ChannelCredentials>& credentials) :
 			_unary_unary_client(target, credentials),
 			_last_exception(nullptr)
-		{
-		}
+		{}
 
 		UnaryUnaryJsonClient& Session::client()
 		{
@@ -31,7 +30,7 @@ namespace ni
 
 		ErrorCode Session::last_error_code() const
 		{
-			return _last_exception ? _last_exception->error_code() : ErrorCode::NONE;
+			return _last_exception ? _last_exception->error_code() : ErrorCode::kNone;
 		}
 
 		string Session::last_error_description() const

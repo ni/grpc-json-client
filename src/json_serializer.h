@@ -8,6 +8,7 @@ namespace ni
 {
     namespace json_client
     {
+        // Contains utilities for serializing messages to and from JSON.
         class JsonSerializer
         {
         private:

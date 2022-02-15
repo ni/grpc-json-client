@@ -13,7 +13,7 @@ namespace ni
         public:
             JsonClientException(const std::string& description) : std::exception(description.c_str()) {}
 
-            virtual ErrorCode error_code()
+            virtual ErrorCode error_code() const
             {
                 return ErrorCode::kUnknown;
             }
@@ -24,7 +24,7 @@ namespace ni
         public:
             using JsonClientException::JsonClientException;
 
-            ErrorCode error_code() override
+            ErrorCode error_code() const override
             {
                 return ErrorCode::kReflectionError;
             }
@@ -36,7 +36,7 @@ namespace ni
             ServiceDescriptorNotFoundException(const std::string& name) :
                 JsonClientException("Service descriptor not found: " + name) {}
 
-            ErrorCode error_code() override
+            ErrorCode error_code() const override
             {
                 return ErrorCode::kServiceNotFound;
             }
@@ -48,7 +48,7 @@ namespace ni
             MethodDescriptorNotFoundException(const std::string& name) :
                 JsonClientException("Method descriptor not found: " + name) {}
 
-            ErrorCode error_code() override
+            ErrorCode error_code() const override
             {
                 return ErrorCode::kMethodNotFound;
             }
@@ -58,7 +58,7 @@ namespace ni
         {
             using JsonClientException::JsonClientException;
 
-            ErrorCode error_code() override
+            ErrorCode error_code() const override
             {
                 return ErrorCode::kSerializationError;
             }
@@ -68,7 +68,7 @@ namespace ni
         {
             using JsonClientException::JsonClientException;
 
-            ErrorCode error_code() override
+            ErrorCode error_code() const override
             {
                 return ErrorCode::kDeserializationError;
             }
