@@ -13,12 +13,12 @@ namespace ni
     {
         const std::string host = "localhost:31763";
 
-        class JsonClientTest : public testing::Test
+        class JsonClientBaseTest : public testing::Test
         {
         protected:
             JsonClientBase client;
 
-            JsonClientTest() :
+            JsonClientBaseTest() :
                 client(host, grpc::InsecureChannelCredentials())
             {
             }
@@ -29,7 +29,7 @@ namespace ni
             }
         };
 
-        TEST_F(JsonClientTest, FindMethodSucceedsOnValidMethod)
+        TEST_F(JsonClientBaseTest, FindMethodSucceedsOnValidMethod)
         {
             const MethodDescriptor* method;
             ASSERT_NO_THROW(
@@ -38,7 +38,7 @@ namespace ni
             EXPECT_EQ(method->full_name(), "nirfsa_grpc.NiRFSA.Init");
         }
 
-        TEST_F(JsonClientTest, FindMethodFailsOnInvalidServiceName)
+        TEST_F(JsonClientBaseTest, FindMethodFailsOnInvalidServiceName)
         {
             ASSERT_THROW(
                 client.FindMethod("invalid.service.name", "Init"),
@@ -46,7 +46,7 @@ namespace ni
             );
         }
 
-        TEST_F(JsonClientTest, FindMethodFailsOnInvalidMethodName)
+        TEST_F(JsonClientBaseTest, FindMethodFailsOnInvalidMethodName)
         {
             ASSERT_THROW(
                 client.FindMethod("nirfsa_grpc.NiRFSA", "InvalidMethodName"),

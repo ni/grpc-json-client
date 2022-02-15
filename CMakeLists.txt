@@ -76,7 +76,8 @@ target_link_libraries(grpc_json_client ${grpc_libs})
 
 # Add tests
 add_executable(tests
-    "${tests_dir}/test_json_client.cpp"
+    "${tests_dir}/test_grpc_json_client.cpp"
+    "${tests_dir}/test_json_client_base.cpp"
     "${tests_dir}/test_json_serializer.cpp"
     ${src_files}
 )
