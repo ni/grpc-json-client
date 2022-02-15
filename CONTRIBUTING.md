@@ -1,5 +1,5 @@
-
 # CONTRIBUTING
+Contributions to grpc-json-client are welcome by all!
 ## Build Environment Setup
 ### Dependencies
 1. Install [CMake](https://cmake.org/) and add it to `path`.
