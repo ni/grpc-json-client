@@ -1,4 +1,4 @@
-#include "json_client.h"
+#include "grpc_json_client.h"
 
 #include "error_code.h"
 #include "exceptions.h"

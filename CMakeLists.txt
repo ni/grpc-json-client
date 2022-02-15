@@ -55,7 +55,7 @@ add_custom_command(
 
 set(src_files
     "${src_files_dir}/error_code.h"
-    "${src_files_dir}/json_client.cpp"
+    "${src_files_dir}/grpc_json_client.cpp"
     "${src_files_dir}/json_client_base.cpp"
     "${src_files_dir}/json_serializer.cpp"
     "${src_files_dir}/session.cpp"
