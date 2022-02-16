@@ -7,6 +7,9 @@ project ("grpc_dynamic_client")
 
 set(CMAKE_CXX_STANDARD 11)
 
+# Options
+option(gRPC_JSON_CLIENT_BUILD_TESTS "Build gRPC JSON client tests" ON)
+
 # Find Protobuf installation
 set(protobuf_MODULE_COMPATIBLE TRUE)
 find_package(Protobuf CONFIG REQUIRED)
@@ -22,13 +25,6 @@ message(STATUS "Using gRPC ${gRPC_VERSION}")
 set(_GRPC_GRPCPP gRPC::grpc++)
 set(_GRPC_REFLECTION gRPC::grpc++_reflection)
 set(_GRPC_CPP_PLUGIN_EXECUTABLE $<TARGET_FILE:gRPC::grpc_cpp_plugin>)
-
-# Add GTest submodule
-set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-add_subdirectory("${CMAKE_SOURCE_DIR}/third_party/gtest/" "${CMAKE_BINARY_DIR}/gtest" EXCLUDE_FROM_ALL)
-
-set(_GTEST GTest::gtest)
-set(_GTEST_MAIN GTest::gtest_main)
 
 # Paths
 set(protos_dir "${CMAKE_SOURCE_DIR}/third_party/grpc/src/proto/grpc/reflection/v1alpha/")
@@ -74,19 +70,35 @@ add_library(grpc_json_client SHARED ${src_files})
 target_include_directories(grpc_json_client PRIVATE ${generated_files_dir})
 target_link_libraries(grpc_json_client ${grpc_libs})
 
-# Add tests
-add_executable(tests
-    "${tests_dir}/test_grpc_json_client.cpp"
-    "${tests_dir}/test_json_client_base.cpp"
-    "${tests_dir}/test_json_serializer.cpp"
-    ${src_files}
-)
-target_include_directories(tests PRIVATE
-    ${src_files_dir}
-    ${generated_files_dir}
-)
-target_link_libraries(tests
-    ${_GTEST}
-    ${_GTEST_MAIN}
-    ${grpc_libs}
-)
+if(gRPC_JSON_CLIENT_BUILD_TESTS)
+    # Add GTest submodule
+    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+    add_subdirectory("${CMAKE_SOURCE_DIR}/third_party/gtest/" "${CMAKE_BINARY_DIR}/gtest/" EXCLUDE_FROM_ALL)
+
+    set(_GTEST GTest::gtest)
+    set(_GTEST_MAIN GTest::gtest_main)
+
+    # Add JSON submodule
+    set(JSON_BuildTests OFF CACHE INTERNAL "")
+    add_subdirectory("${CMAKE_SOURCE_DIR}/third_party/json/" "${CMAKE_BINARY_DIR}/json/" EXCLUDE_FROM_ALL)
+
+    set(_JSON nlohmann_json::nlohmann_json)
+
+    # Add tests
+    add_executable(tests
+        "${tests_dir}/test_grpc_json_client.cpp"
+        "${tests_dir}/test_json_client_base.cpp"
+        "${tests_dir}/test_json_serializer.cpp"
+        ${src_files}
+    )
+    target_include_directories(tests PRIVATE
+        ${src_files_dir}
+        ${generated_files_dir}
+    )
+    target_link_libraries(tests
+        ${_GTEST}
+        ${_GTEST_MAIN}
+        ${grpc_libs}
+        ${_JSON}
+    )
+endif()
