@@ -16,7 +16,7 @@ namespace ni
 
             UnaryUnaryJsonClient& client();
             std::mutex& lock();
-            JsonClientException& last_exception();
+            void set_last_exception(const JsonClientException& exception);
             ErrorCode last_error_code() const;
             std::string last_error_description() const;
 

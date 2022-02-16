@@ -25,13 +25,14 @@ int32_t Evaluate(void* const session_handle, const std::function<void(UnaryUnary
     {
         func(session->client());
     }
-    catch (JsonClientException& ex)
+    catch (const JsonClientException& ex)
     {
-        session->last_exception() = ex;
+        session->set_last_exception(ex);
     }
     catch (...)
     {
-        session->last_exception() = JsonClientException("An unhandled exception occurred.");
+        JsonClientException ex("An unhandled exception occurred.");
+        session->set_last_exception(ex);
     }
     return (int32_t)session->last_error_code();
 }

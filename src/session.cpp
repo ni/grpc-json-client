@@ -23,9 +23,9 @@ namespace ni
 			return _lock;
 		}
 
-		JsonClientException& Session::last_exception()
+		void Session::set_last_exception(const JsonClientException& exception)
 		{
-			return *_last_exception;
+			_last_exception = std::make_unique<JsonClientException>(exception);
 		}
 
 		ErrorCode Session::last_error_code() const
