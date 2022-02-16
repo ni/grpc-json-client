@@ -29,20 +29,18 @@ namespace ni
 			_context = std::make_unique<ClientContext>();
 			_response_reader = _stub.PrepareUnaryCall(_context.get(), endpoint, serialized_request, &_completion_queue);
 			_response_reader->StartCall();
+			_response_reader->Finish(&_serialized_response, &_status, (void*)1);
 		}
 
 		string UnaryUnaryJsonClient::Read()
 		{
 			if (_response_reader)
 			{
-				ByteBuffer serialized_response;
-				Status status;
-				_response_reader->Finish(&serialized_response, &status, (void*)1);
 				_response_reader.reset();
 
-				void* got_tag;
+				void* tag;
 				bool ok = false;
-				if (!_completion_queue.Next(&got_tag, &ok))
+				if (!_completion_queue.Next(&tag, &ok))
 				{
 					// todo
 				}
@@ -51,7 +49,7 @@ namespace ni
 					// todo
 				}
 
-				_response = JsonSerializer::DeserializeMessage(_method_type->output_type(), serialized_response);
+				_response = JsonSerializer::DeserializeMessage(_method_type->output_type(), _serialized_response);
 			}
 			return _response;
 		}

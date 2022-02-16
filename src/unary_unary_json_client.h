@@ -16,6 +16,8 @@ namespace ni
             grpc::CompletionQueue _completion_queue;
             const google::protobuf::MethodDescriptor* _method_type = nullptr;
             std::unique_ptr<grpc::GenericClientAsyncResponseReader> _response_reader;
+            grpc::ByteBuffer _serialized_response;
+            grpc::Status _status;
             std::string _response;
 
         public:
