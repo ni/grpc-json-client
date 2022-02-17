@@ -16,11 +16,11 @@ __declspec(dllexport) int32_t Write(void* const session_handle, const char* serv
 // Read a response from the host.
 __declspec(dllexport) int32_t Read(void* const session_handle, char* response, size_t* const size);
 
-// Get error information.
-__declspec(dllexport) int32_t GetError(void* const session_handle, int32_t* const code, char* const description, size_t* const size);
-
 // Release resources allocated by the session.
 __declspec(dllexport) int32_t Close(void* const session_handle);
+
+// Get error information.
+__declspec(dllexport) int32_t GetError(void* const session_handle, int32_t* const code, char* const description, size_t* const size);
 
 #ifdef __cplusplus
 }
