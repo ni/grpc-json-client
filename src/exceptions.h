@@ -74,13 +74,23 @@ namespace ni
             }
         };
 
+        class InvalidTagException : public JsonClientException
+        {
+            using JsonClientException::JsonClientException;
+
+            ErrorCode error_code() const override
+            {
+                return ErrorCode::kInvalidTag;
+            }
+        };
+
         class TimeoutException : public JsonClientException
         {
             using JsonClientException::JsonClientException;
 
             ErrorCode error_code() const override
             {
-                return ErrorCode::kTimeoutError;
+                return ErrorCode::kTimeout;
             }
         };
     }

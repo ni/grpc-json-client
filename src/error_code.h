@@ -15,7 +15,8 @@ namespace ni
             kMethodNotFound = -4,
             kSerializationError = -5,
             kDeserializationError = -6,
-            kTimeoutError = -7
+            kInvalidTag = -7,
+            kTimeout = -8,
         };
 
         std::string GetErrorDescription(const ErrorCode& error_code);
