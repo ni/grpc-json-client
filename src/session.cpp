@@ -8,7 +8,7 @@ using grpc::ChannelCredentials;
 using std::exception;
 using std::function;
 using std::lock_guard;
-using std::mutex;
+using std::recursive_mutex;
 using std::shared_ptr;
 using std::string;
 
@@ -69,7 +69,7 @@ namespace ni
             string last_error_description;
             if (session == nullptr)
             {
-                last_error_description = GetErrorDescription((ErrorCode)*code);
+                last_error_description = GetErrorDescription(static_cast<ErrorCode>(*code));
             }
             else
             {
@@ -79,33 +79,33 @@ namespace ni
                     *code = session->last_error_code();
                 }
             }
-            if (description != nullptr)
-            {
-                strncpy(description, last_error_description.c_str(), *size);
-            }
-            else if (size != nullptr)
+            if (description == nullptr)
             {
                 *size = last_error_description.size() + 1;  // include null character
+            }
+            else
+            {
+                strncpy(description, last_error_description.c_str(), *size);
             }
             return static_cast<int32_t>(ErrorCode::kNone);
         }
 
-        int32_t Session::last_error_code() const
+        int32_t Session::last_error_code()
         {
-            lock_guard<mutex> lock(_lock);
+            lock_guard<recursive_mutex> lock(_lock);
             ErrorCode error_code = _last_exception ? _last_exception->error_code() : ErrorCode::kNone;
             return static_cast<int32_t>(error_code);
         }
 
-        string Session::last_error_description() const
+        string Session::last_error_description()
         {
-            lock_guard<mutex> lock(_lock);
+            lock_guard<recursive_mutex> lock(_lock);
             return _last_exception ? _last_exception->what() : "";
         }
 
         int32_t Session::Evaluate(const function<void(UnaryUnaryJsonClient&)>& func)
         {
-            lock_guard<mutex> lock(_lock);
+            lock_guard<recursive_mutex> lock(_lock);
             _last_exception.reset();
             try
             {
@@ -126,7 +126,7 @@ namespace ni
                 JsonClientException json_client_ex("An unhandled exception occurred.");
                 _last_exception = std::make_unique<JsonClientException>(json_client_ex);
             }
-            return _last_exception ? _last_exception->error_code() : ErrorCode::kNone;
+            return last_error_code();
         }
     }
 }
