@@ -20,14 +20,14 @@ namespace ni
             int32_t Close();
             static int32_t GetError(Session* session, int32_t* code, char* description, size_t* size);
 
+            int32_t last_error_code() const;
+            std::string last_error_description() const;
+
         private:
             std::mutex _lock;
             UnaryUnaryJsonClient _client;
             std::unique_ptr<JsonClientException> _last_exception;
-            std::unique_ptr<std::string> _last_response;
-
-            int32_t _last_error_code() const;
-            std::string _last_error_description() const;
+            std::map<void*, std::string> _responses;
 
             // Helper function for locking access to the session and catching exceptions.
             int32_t Evaluate(const std::function<void(UnaryUnaryJsonClient&)>& func);

@@ -1,5 +1,7 @@
 #include "session.h"
 
+#include <mutex>
+
 #include "error_code.h"
 
 using grpc::ChannelCredentials;
@@ -31,29 +33,29 @@ namespace ni
 
         int32_t Session::FinishAsyncCall(void* tag, int32_t timeout, char* buffer, size_t* size)
         {
-            int32_t error_code = 0;
-            if (!_last_response)
-            {
-                error_code = Evaluate(
-                    [&](UnaryUnaryJsonClient& client)
+            return Evaluate(
+                [=](UnaryUnaryJsonClient& client)
+                {
+                    if (!_responses.count(tag))
                     {
-                        _last_response = std::make_unique<string>(client.FinishAsyncCall(tag, timeout));
+                        _responses[tag] = client.FinishAsyncCall(tag, timeout);
                     }
-                );
-            }
-            if (error_code >= 0)
-            {
-                if (buffer != nullptr)
-                {
-                    strncpy(buffer, _last_response->c_str(), *size);
-                    _last_response.reset();
+                    string& response = _responses[tag];
+                    if (buffer == nullptr)
+                    {
+                        *size = response.size() + 1;  // include null character
+                    }
+                    else if (*size >= response.size())
+                    {
+                        strncpy(buffer, response.c_str(), *size);
+                        _responses.erase(tag);
+                    }
+                    else
+                    {
+                        throw BufferSizeOutOfRangeException("Buffer size is not large enough for the response.");
+                    }
                 }
-                else if (size != nullptr)
-                {
-                    *size = _last_response->size() + 1;  // include null character
-                }
-            }
-            return error_code;
+            );
         }
 
         int32_t Session::Close()
@@ -71,11 +73,10 @@ namespace ni
             }
             else
             {
-                lock_guard<mutex> lock(session->_lock);
-                last_error_description = session->_last_error_description();
+                last_error_description = session->last_error_description();
                 if (code != nullptr)
                 {
-                    *code = session->_last_error_code();
+                    *code = session->last_error_code();
                 }
             }
             if (description != nullptr)
@@ -89,14 +90,16 @@ namespace ni
             return static_cast<int32_t>(ErrorCode::kNone);
         }
 
-        int32_t Session::_last_error_code() const
+        int32_t Session::last_error_code() const
         {
+            lock_guard<mutex> lock(_lock);
             ErrorCode error_code = _last_exception ? _last_exception->error_code() : ErrorCode::kNone;
             return static_cast<int32_t>(error_code);
         }
 
-        string Session::_last_error_description() const
+        string Session::last_error_description() const
         {
+            lock_guard<mutex> lock(_lock);
             return _last_exception ? _last_exception->what() : "";
         }
 
@@ -123,7 +126,7 @@ namespace ni
                 JsonClientException json_client_ex("An unhandled exception occurred.");
                 _last_exception = std::make_unique<JsonClientException>(json_client_ex);
             }
-            return _last_error_code();
+            return _last_exception ? _last_exception->error_code() : ErrorCode::kNone;
         }
     }
 }
