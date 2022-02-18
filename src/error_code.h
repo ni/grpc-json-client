@@ -17,8 +17,10 @@ namespace ni
             kDeserializationError = -6,
             kInvalidTag = -7,
             kTimeout = -8,
+            kBufferSizeOutOfRange = -9
         };
 
         std::string GetErrorDescription(const ErrorCode& error_code);
+        ErrorCode MergeErrors(ErrorCode first, ErrorCode second);
     }
 }

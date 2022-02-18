@@ -93,5 +93,15 @@ namespace ni
                 return ErrorCode::kTimeout;
             }
         };
+
+        class BufferSizeOutOfRangeException : public JsonClientException
+        {
+            using JsonClientException::JsonClientException;
+
+            ErrorCode error_code() const override
+            {
+                return ErrorCode::kBufferSizeOutOfRange;
+            }
+        };
     }
 }

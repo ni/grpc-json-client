@@ -11,7 +11,7 @@ namespace ni
     {
         string GetErrorDescription(const ErrorCode& error_code)
         {
-            static const array<char*, 9> error_descriptions = {
+            static const array<char*, 10> error_descriptions = {
                 "No error",
                 "Unknown error code",
                 "Remote procedure call error",
@@ -20,7 +20,8 @@ namespace ni
                 "Serialization error",
                 "Deserialization error",
                 "Invalid tag",
-                "Timeout"
+                "Timeout",
+                "Buffer size out of range"
             };
             int index = -1 * (int)error_code;
             if (index >= error_descriptions.size() || index < 0)
@@ -28,6 +29,21 @@ namespace ni
                 index = 1;  // unkown error code
             }
             return error_descriptions[index];
+        }
+
+        ErrorCode MergeErrors(ErrorCode first, ErrorCode second)
+        {
+            int first_value = static_cast<int>(first);
+            if (first_value < 0)
+            {
+                return first;
+            }
+            int second_value = static_cast<int>(second);
+            if (second_value < 0)
+            {
+                return second;
+            }
+            return first_value > 0 ? first : second;
         }
     }
 }
