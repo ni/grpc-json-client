@@ -3,7 +3,7 @@
 #include "session.h"
 
 using grpc::ChannelCredentials;
-using ni::json_client::Session;
+using ni::grpc_json_client::Session;
 using std::shared_ptr;
 
 int32_t InitInsecure(const char* target, void** const session_handle)
