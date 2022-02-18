@@ -14,21 +14,24 @@ namespace ni
             UnaryUnaryJsonClient(const std::string& target, const std::shared_ptr<grpc::ChannelCredentials>& credentials);
             ~UnaryUnaryJsonClient();
 
-            void Write(const std::string& service_name, const std::string& method_name, const std::string& request_json);
-            std::string Read(int timeout);
+            void* StartAsyncCall(const std::string& service_name, const std::string& method_name, const std::string& request_json);
+            std::string FinishAsyncCall(void* tag, int timeout);
 
-            UnaryUnaryJsonClient& operator=(const UnaryUnaryJsonClient& other) = delete;
         private:
-            struct AsyncCallInfo
+            class AsyncCallData
             {
+            public:
+                AsyncCallData();
+                ~AsyncCallData();
+
                 const google::protobuf::MethodDescriptor* method_type;
                 grpc::ClientContext context;
-                grpc::Status status;
-                grpc::ByteBuffer serialized_response;
+                grpc::CompletionQueue completion_queue;
+                std::unique_ptr<grpc::GenericClientAsyncResponseReader> response_reader;
             };
 
             grpc::GenericStub _stub;
-            grpc::CompletionQueue _completion_queue;
+            std::unordered_set<AsyncCallData*> _tags;
         };
     }
 }
