@@ -10,11 +10,12 @@ namespace ni
         {
             kNone = 0,
             kUnknown = -1,
-            kReflectionError = -2,
+            kRpcError = -2,
             kServiceNotFound = -3,
             kMethodNotFound = -4,
             kSerializationError = -5,
-            kDeserializationError = -6
+            kDeserializationError = -6,
+            kTimeoutError = -7
         };
 
         std::string GetErrorDescription(const ErrorCode& error_code);

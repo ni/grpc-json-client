@@ -19,14 +19,14 @@ namespace ni
             }
         };
     
-        class ReflectionServiceException : public JsonClientException
+        class RpcException : public JsonClientException
         {
         public:
             using JsonClientException::JsonClientException;
 
             ErrorCode error_code() const override
             {
-                return ErrorCode::kReflectionError;
+                return ErrorCode::kRpcError;
             }
         };
 
@@ -71,6 +71,16 @@ namespace ni
             ErrorCode error_code() const override
             {
                 return ErrorCode::kDeserializationError;
+            }
+        };
+
+        class TimeoutException : public JsonClientException
+        {
+            using JsonClientException::JsonClientException;
+
+            ErrorCode error_code() const override
+            {
+                return ErrorCode::kTimeoutError;
             }
         };
     }

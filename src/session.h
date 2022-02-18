@@ -16,7 +16,7 @@ namespace ni
 
             int32_t Init();
             int32_t Write(const char* service, const char* method, const char* request);
-            int32_t Read(char* buffer, size_t* const size);
+            int32_t Read(int32_t timeout, char* buffer, size_t* const size);
             int32_t Close();
             static int32_t GetError(Session* session, int32_t* const code, char* const description, size_t* const size);
 

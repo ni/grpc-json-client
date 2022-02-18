@@ -29,12 +29,12 @@ namespace ni
             return Evaluate([=](UnaryUnaryJsonClient& client) { client.Write(service, method, request); });
         }
 
-        int32_t Session::Read(char* buffer, size_t* const size)
+        int32_t Session::Read(int32_t timeout, char* buffer, size_t* const size)
         {
             int32_t error_code = 0;
             if (!_last_response)
             {
-                error_code = Evaluate([&](UnaryUnaryJsonClient& client) { _last_response = std::make_unique<string>(client.Read()); });
+                error_code = Evaluate([&](UnaryUnaryJsonClient& client) { _last_response = std::make_unique<string>(client.Read(timeout)); });
             }
             if (error_code >= 0)
             {

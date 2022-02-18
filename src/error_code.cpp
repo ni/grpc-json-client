@@ -11,14 +11,15 @@ namespace ni
 	{
 		string GetErrorDescription(const ErrorCode& error_code)
 		{
-			static const array<char*, 7> error_descriptions = {
+			static const array<char*, 8> error_descriptions = {
 				"No error.",
 				"Unknown error code.",
-				"Reflection error.",
+				"Remote procedure call error.",
 				"Service not found.",
 				"Method not found.",
 				"Serialization error.",
-				"Deserialization error."
+				"Deserialization error.",
+				"Timeout error."
 			};
 			int index = -1 * (int)error_code;
 			if (index >= error_descriptions.size() || index < 0)

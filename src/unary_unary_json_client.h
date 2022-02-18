@@ -10,21 +10,25 @@ namespace ni
     {
         class UnaryUnaryJsonClient : public JsonClientBase
         {
-        private:
-            grpc::GenericStub _stub;
-            std::unique_ptr<grpc::ClientContext> _context;
-            grpc::CompletionQueue _completion_queue;
-            const google::protobuf::MethodDescriptor* _method_type = nullptr;
-            std::unique_ptr<grpc::GenericClientAsyncResponseReader> _response_reader;
-            grpc::ByteBuffer _serialized_response;
-            grpc::Status _status;
-            std::string _response;
-
         public:
             UnaryUnaryJsonClient(const std::string& target, const std::shared_ptr<grpc::ChannelCredentials>& credentials);
+            ~UnaryUnaryJsonClient();
 
             void Write(const std::string& service_name, const std::string& method_name, const std::string& request_json);
-            std::string Read();
+            std::string Read(int timeout);
+
+            UnaryUnaryJsonClient& operator=(const UnaryUnaryJsonClient& other) = delete;
+        private:
+            struct AsyncCallInfo
+            {
+                const google::protobuf::MethodDescriptor* method_type;
+                grpc::ClientContext context;
+                grpc::Status status;
+                grpc::ByteBuffer serialized_response;
+            };
+
+            grpc::GenericStub _stub;
+            grpc::CompletionQueue _completion_queue;
         };
     }
 }

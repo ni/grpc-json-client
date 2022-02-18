@@ -14,7 +14,7 @@ __declspec(dllexport) int32_t InitInsecure(const char* target, void** const sess
 __declspec(dllexport) int32_t Write(void* const session_handle, const char* service, const char* method, const char* request);
 
 // Read a response from the host.
-__declspec(dllexport) int32_t Read(void* const session_handle, char* response, size_t* const size);
+__declspec(dllexport) int32_t Read(void* const session_handle, int32_t timeout, char* response, size_t* const size);
 
 // Release resources allocated by the session.
 __declspec(dllexport) int32_t Close(void* const session_handle);

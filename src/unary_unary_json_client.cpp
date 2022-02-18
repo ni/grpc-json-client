@@ -3,14 +3,18 @@
 #include "exceptions.h"
 #include "json_serializer.h"
 
+using google::protobuf::MethodDescriptor;
 using grpc::ByteBuffer;
-using grpc::ChannelCredentials;
 using grpc::CompletionQueue;
-using grpc::ClientContext;
-using grpc::GenericStub;
-using grpc::Status;
+using grpc::ChannelCredentials;
+using grpc::GenericClientAsyncResponseReader;
+using std::logic_error;
 using std::shared_ptr;
 using std::string;
+using std::unique_ptr;
+using std::chrono::milliseconds;
+using std::chrono::system_clock;
+using std::chrono::time_point;
 
 namespace ni
 {
@@ -21,37 +25,66 @@ namespace ni
 			_stub(channel)
 		{}
 
-		void UnaryUnaryJsonClient::Write(const string& service_name, const string& method_name, const string& request_json)
+		UnaryUnaryJsonClient::~UnaryUnaryJsonClient()
 		{
-			_method_type = FindMethod(service_name, method_name);
-			ByteBuffer serialized_request = JsonSerializer::SerializeMessage(_method_type->input_type(), request_json);
-			string endpoint = string("/") + service_name + "/" + method_name;
-			_context = std::make_unique<ClientContext>();
-			_response_reader = _stub.PrepareUnaryCall(_context.get(), endpoint, serialized_request, &_completion_queue);
-			_response_reader->StartCall();
-			_response_reader->Finish(&_serialized_response, &_status, (void*)1);
+			// shutdown and drain completion queue
+			_completion_queue.Shutdown();
+			void* tag = nullptr;
+			bool ok = false;
+			while (_completion_queue.Next(&tag, &ok));
 		}
 
-		string UnaryUnaryJsonClient::Read()
+		void UnaryUnaryJsonClient::Write(const string& service_name, const string& method_name, const string& request_json)
 		{
-			if (_response_reader)
+			const MethodDescriptor* method_type = FindMethod(service_name, method_name);
+			string endpoint = string("/") + service_name + "/" + method_name;
+			ByteBuffer serialized_request = JsonSerializer::SerializeMessage(method_type->input_type(), request_json);
+			AsyncCallInfo* async_call = new AsyncCallInfo();
+			async_call->method_type = method_type;
+			unique_ptr<GenericClientAsyncResponseReader> response_reader = _stub.PrepareUnaryCall(&async_call->context, endpoint, serialized_request, &_completion_queue);
+			response_reader->StartCall();
+			response_reader->Finish(&async_call->serialized_response, &async_call->status, async_call);
+		}
+		
+		string UnaryUnaryJsonClient::Read(int timeout)
+		{
+			void* tag = nullptr;
+			bool ok = false;
+			CompletionQueue::NextStatus next_status;
+			if (timeout < 0)
 			{
-				_response_reader.reset();
-
-				void* tag;
-				bool ok = false;
-				if (!_completion_queue.Next(&tag, &ok))
-				{
-					// todo
-				}
-				if (!ok)
-				{
-					// todo
-				}
-
-				_response = JsonSerializer::DeserializeMessage(_method_type->output_type(), _serialized_response);
+				next_status = static_cast<CompletionQueue::NextStatus>(_completion_queue.Next(&tag, &ok));
 			}
-			return _response;
+			else
+			{
+				system_clock::time_point deadline = system_clock::now() + milliseconds(timeout);
+				next_status = _completion_queue.AsyncNext(&tag, &ok, deadline);
+			}
+			switch (next_status)
+			{
+			case CompletionQueue::NextStatus::SHUTDOWN:
+				// we shouldn't reach this point since the completion queue should only be drained in the destructor
+				throw logic_error("A critical error occurred. The completion queue shut down unexpectedly.");
+			case CompletionQueue::NextStatus::GOT_EVENT:
+				if (ok)
+				{
+					unique_ptr<AsyncCallInfo> async_call(static_cast<AsyncCallInfo*>(tag));
+					if (!async_call->status.ok())
+					{
+						string summary("An error occurred during the remote procedure call.\n\n");
+						throw RpcException(summary + async_call->status.error_message());
+					}
+					const MethodDescriptor* method_type = async_call->method_type;
+					return JsonSerializer::DeserializeMessage(method_type->output_type(), async_call->serialized_response);
+				}
+				// if we reach this point then the completion queue is shutting down
+				throw logic_error("A critical error occurred. The completion queue is shutting down unexpectedly.");
+			case CompletionQueue::NextStatus::TIMEOUT:
+				throw TimeoutException("Remote procedure call timed out while waiting for a response from the host.");
+			default:
+				// throw exception for unhandled case
+				throw logic_error("A critical error occurred. An unknown status was returned from the completion queue.");
+			}
 		}
 	}
 }

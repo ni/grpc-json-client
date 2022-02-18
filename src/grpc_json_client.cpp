@@ -19,9 +19,9 @@ int32_t Write(void* const session_handle, const char* service, const char* metho
     return ((Session*)session_handle)->Write(service, method, request);
 }
 
-int32_t Read(void* const session_handle, char* buffer, size_t* const size)
+int32_t Read(void* const session_handle, int32_t timeout, char* buffer, size_t* const size)
 {
-    return ((Session*)session_handle)->Read(buffer, size);
+    return ((Session*)session_handle)->Read(timeout, buffer, size);
 }
 
 int32_t Close(void* const session_handle)
