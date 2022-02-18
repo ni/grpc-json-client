@@ -6,7 +6,7 @@
 
 namespace ni
 {
-    namespace json_client
+    namespace grpc_json_client
     {
         // Contains utilities for serializing messages to and from JSON.
         class JsonSerializer

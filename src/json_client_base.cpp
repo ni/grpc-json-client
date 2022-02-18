@@ -22,7 +22,7 @@ using std::unique_ptr;
 
 namespace ni
 {
-    namespace json_client
+    namespace grpc_json_client
     {
         JsonClientBase::JsonClientBase(const string& target, const shared_ptr<ChannelCredentials>& credentials) :
             _descriptor_pool(&_reflection_db)

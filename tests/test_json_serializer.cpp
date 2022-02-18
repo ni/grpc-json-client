@@ -12,7 +12,7 @@ using std::string;
 
 namespace ni
 {
-    namespace json_client
+    namespace grpc_json_client
     {
         TEST(JsonSerializerTest, SerializesJsonObject)
         {
