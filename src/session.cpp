@@ -24,17 +24,22 @@ namespace ni
             return Evaluate([](UnaryUnaryJsonClient& client) { client.QueryReflectionService(); });
         }
 
-        int32_t Session::Write(const char* service, const char* method, const char* request)
+        int32_t Session::StartAsyncCall(const char* service, const char* method, const char* request, void** tag)
         {
-            return Evaluate([=](UnaryUnaryJsonClient& client) { client.Write(service, method, request); });
+            return Evaluate([=](UnaryUnaryJsonClient& client) { *tag = client.StartAsyncCall(service, method, request); });
         }
 
-        int32_t Session::Read(int32_t timeout, char* buffer, size_t* const size)
+        int32_t Session::FinishAsyncCall(void* tag, int32_t timeout, char* buffer, size_t* size)
         {
             int32_t error_code = 0;
             if (!_last_response)
             {
-                error_code = Evaluate([&](UnaryUnaryJsonClient& client) { _last_response = std::make_unique<string>(client.Read(timeout)); });
+                error_code = Evaluate(
+                    [&](UnaryUnaryJsonClient& client)
+                    {
+                        _last_response = std::make_unique<string>(client.FinishAsyncCall(tag, timeout));
+                    }
+                );
             }
             if (error_code >= 0)
             {
@@ -57,7 +62,7 @@ namespace ni
             return static_cast<int32_t>(ErrorCode::kNone);
         }
 
-        int32_t Session::GetError(Session* const session, int32_t* const code, char* const description, size_t* const size)
+        int32_t Session::GetError(Session* session, int32_t* code, char* description, size_t* size)
         {
             string last_error_description;
             if (session == nullptr)

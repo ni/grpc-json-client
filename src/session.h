@@ -15,10 +15,10 @@ namespace ni
             Session(const std::string& target, const std::shared_ptr<grpc::ChannelCredentials>& credentials);
 
             int32_t Init();
-            int32_t Write(const char* service, const char* method, const char* request);
-            int32_t Read(int32_t timeout, char* buffer, size_t* const size);
+            int32_t StartAsyncCall(const char* service, const char* method, const char* request, void** tag);
+            int32_t FinishAsyncCall(void* tag, int32_t timeout, char* buffer, size_t* size);
             int32_t Close();
-            static int32_t GetError(Session* session, int32_t* const code, char* const description, size_t* const size);
+            static int32_t GetError(Session* session, int32_t* code, char* description, size_t* size);
 
         private:
             std::mutex _lock;
