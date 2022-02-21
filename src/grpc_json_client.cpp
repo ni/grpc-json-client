@@ -41,7 +41,7 @@ int32_t Close(void* session_handle)
     return error_code;
 }
 
-int32_t GetError(void* session_handle, int32_t* code, char* description, size_t* size)
+int32_t GetError(void* session_handle, int32_t* code, char* buffer, size_t* size)
 {
-    return Session::GetError(static_cast<Session*>(session_handle), code, description, size);
+    return Session::GetError(static_cast<Session*>(session_handle), code, buffer, size);
 }

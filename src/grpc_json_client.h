@@ -26,7 +26,7 @@ __declspec(dllexport) int32_t UnlockSession(void* session_handle);
 __declspec(dllexport) int32_t Close(void* session_handle);
 
 // Get error information.
-__declspec(dllexport) int32_t GetError(void* session_handle, int32_t* code, char* description, size_t* size);
+__declspec(dllexport) int32_t GetError(void* session_handle, int32_t* code, char* buffer, size_t* size);
 
 #ifdef __cplusplus
 }
