@@ -84,7 +84,7 @@ namespace ni
                     if (!status.ok())
                     {
                         string summary("An error occurred during the remote procedure call.\n\n");
-                        throw RpcException(summary + status.error_message());
+                        throw RemoteProcedureCallException(summary + status.error_message());
                     }
                     return JsonSerializer::DeserializeMessage(async_call->method_type->output_type(), serialized_response);
                 }

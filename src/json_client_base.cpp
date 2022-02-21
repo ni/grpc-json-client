@@ -69,7 +69,7 @@ namespace ni
             if (!status.ok())
             {
                 string summary("Failed to retreive file descriptors from the host. Ensure the reflection service is running and reachable.\n\n");
-                throw RpcException(summary + status.error_message());
+                throw RemoteProcedureCallException(summary + status.error_message());
             }
         }
 

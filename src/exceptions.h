@@ -19,14 +19,14 @@ namespace ni
             }
         };
     
-        class RpcException : public JsonClientException
+        class RemoteProcedureCallException : public JsonClientException
         {
         public:
             using JsonClientException::JsonClientException;
 
             ErrorCode error_code() const override
             {
-                return ErrorCode::kRpcError;
+                return ErrorCode::kRemoteProcedureCallError;
             }
         };
 

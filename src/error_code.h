@@ -11,7 +11,7 @@ namespace ni
             kBufferSizeOutOfRangeWarning = 1,
             kNone = 0,
             kUnknownError = -1,
-            kRpcError = -2,
+            kRemoteProcedureCallError = -2,
             kServiceNotFoundError = -3,
             kMethodNotFoundError = -4,
             kSerializationError = -5,

@@ -14,17 +14,17 @@ namespace ni
         string GetErrorDescription(const ErrorCode& error_code)
         {
             static const unordered_map<ErrorCode, char*> descriptions = {
-                {ErrorCode::kBufferSizeOutOfRangeWarning, "Buffer size out of range warning"},
+                {ErrorCode::kBufferSizeOutOfRangeWarning, "Buffer size out of range"},
                 {ErrorCode::kNone, "No error"},
                 {ErrorCode::kUnknownError, "Unknown error code"},
-                {ErrorCode::kRpcError, "Remote procedure call error"},
-                {ErrorCode::kServiceNotFoundError, "Service not found error"},
-                {ErrorCode::kMethodNotFoundError, "Method not found error"},
+                {ErrorCode::kRemoteProcedureCallError, "Remote procedure call error"},
+                {ErrorCode::kServiceNotFoundError, "Service not found"},
+                {ErrorCode::kMethodNotFoundError, "Method not found"},
                 {ErrorCode::kSerializationError, "Serialization error"},
                 {ErrorCode::kDeserializationError, "Deserialization error"},
-                {ErrorCode::kInvalidTagError, "Invalid tag error"},
-                {ErrorCode::kTimeoutError, "Timeout error"},
-                {ErrorCode::kBufferSizeOutOfRangeError, "Buffer size out of range error"}
+                {ErrorCode::kInvalidTagError, "Invalid tag"},
+                {ErrorCode::kTimeoutError, "Timeout"},
+                {ErrorCode::kBufferSizeOutOfRangeError, "Buffer size out of range"}
             };
             try
             {
