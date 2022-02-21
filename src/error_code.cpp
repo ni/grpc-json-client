@@ -35,20 +35,5 @@ namespace ni
                 return descriptions.at(ErrorCode::kUnknownError);
             }
         }
-
-        ErrorCode MergeErrors(ErrorCode first, ErrorCode second)
-        {
-            int first_value = static_cast<int>(first);
-            if (first_value < 0)
-            {
-                return first;
-            }
-            int second_value = static_cast<int>(second);
-            if (second_value < 0)
-            {
-                return second;
-            }
-            return first_value > 0 ? first : second;
-        }
     }
 }

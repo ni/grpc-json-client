@@ -22,6 +22,5 @@ namespace ni
         };
 
         std::string GetErrorDescription(const ErrorCode& error_code);
-        ErrorCode MergeErrors(ErrorCode first, ErrorCode second);
     }
 }
