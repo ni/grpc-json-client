@@ -1,9 +1,11 @@
 #include "error_code.h"
 
-#include <array>
+#include <stdexcept>
+#include <unordered_map>
 
-using std::array;
+using std::out_of_range;
 using std::string;
+using std::unordered_map;
 
 namespace ni
 {
@@ -11,24 +13,27 @@ namespace ni
     {
         string GetErrorDescription(const ErrorCode& error_code)
         {
-            static const array<char*, 10> error_descriptions = {
-                "No error",
-                "Unknown error code",
-                "Remote procedure call error",
-                "Service not found",
-                "Method not found",
-                "Serialization error",
-                "Deserialization error",
-                "Invalid tag",
-                "Timeout",
-                "Buffer size out of range"
+            static const unordered_map<ErrorCode, char*> descriptions = {
+                {ErrorCode::kBufferSizeOutOfRangeWarning, "Buffer size out of range warning"},
+                {ErrorCode::kNone, "No error"},
+                {ErrorCode::kUnknownError, "Unknown error code"},
+                {ErrorCode::kRpcError, "Remote procedure call error"},
+                {ErrorCode::kServiceNotFoundError, "Service not found error"},
+                {ErrorCode::kMethodNotFoundError, "Method not found error"},
+                {ErrorCode::kSerializationError, "Serialization error"},
+                {ErrorCode::kDeserializationError, "Deserialization error"},
+                {ErrorCode::kInvalidTagError, "Invalid tag error"},
+                {ErrorCode::kTimeoutError, "Timeout error"},
+                {ErrorCode::kBufferSizeOutOfRangeError, "Buffer size out of range error"}
             };
-            int index = -1 * (int)error_code;
-            if (index >= error_descriptions.size() || index < 0)
+            try
             {
-                index = 1;  // unkown error code
+                return descriptions.at(error_code);
             }
-            return error_descriptions[index];
+            catch (const out_of_range&)
+            {
+                return descriptions.at(ErrorCode::kUnknownError);
+            }
         }
 
         ErrorCode MergeErrors(ErrorCode first, ErrorCode second)

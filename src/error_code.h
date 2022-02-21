@@ -8,16 +8,17 @@ namespace ni
     {
         enum class ErrorCode : int
         {
+            kBufferSizeOutOfRangeWarning = 1,
             kNone = 0,
-            kUnknown = -1,
+            kUnknownError = -1,
             kRpcError = -2,
-            kServiceNotFound = -3,
-            kMethodNotFound = -4,
+            kServiceNotFoundError = -3,
+            kMethodNotFoundError = -4,
             kSerializationError = -5,
             kDeserializationError = -6,
-            kInvalidTag = -7,
-            kTimeout = -8,
-            kBufferSizeOutOfRange = -9
+            kInvalidTagError = -7,
+            kTimeoutError = -8,
+            kBufferSizeOutOfRangeError = -9
         };
 
         std::string GetErrorDescription(const ErrorCode& error_code);

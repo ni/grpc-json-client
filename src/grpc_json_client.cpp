@@ -11,7 +11,7 @@ int32_t InitInsecure(const char* target, void** session_handle)
     shared_ptr<ChannelCredentials> credentials = grpc::InsecureChannelCredentials();
     Session* session = new Session(target, credentials);
     *session_handle = session;
-    return session->Init();
+    return session->QueryReflectionService();
 }
 
 int32_t StartAsyncCall(void* session_handle, const char* service, const char* method, const char* request, void** tag)
@@ -22,6 +22,16 @@ int32_t StartAsyncCall(void* session_handle, const char* service, const char* me
 int32_t FinishAsyncCall(void* session_handle, void* tag, int32_t timeout, char* buffer, size_t* size)
 {
     return static_cast<Session*>(session_handle)->FinishAsyncCall(tag, timeout, buffer, size);
+}
+
+int32_t LockSession(void* session_handle)
+{
+    return static_cast<Session*>(session_handle)->Lock();
+}
+
+int32_t UnlockSession(void* session_handle)
+{
+    return static_cast<Session*>(session_handle)->Unlock();
 }
 
 int32_t Close(void* session_handle)

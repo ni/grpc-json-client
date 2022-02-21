@@ -15,7 +15,7 @@ namespace ni
 
             virtual ErrorCode error_code() const
             {
-                return ErrorCode::kUnknown;
+                return ErrorCode::kUnknownError;
             }
         };
     
@@ -38,7 +38,7 @@ namespace ni
 
             ErrorCode error_code() const override
             {
-                return ErrorCode::kServiceNotFound;
+                return ErrorCode::kServiceNotFoundError;
             }
         };
 
@@ -50,7 +50,7 @@ namespace ni
 
             ErrorCode error_code() const override
             {
-                return ErrorCode::kMethodNotFound;
+                return ErrorCode::kMethodNotFoundError;
             }
         };
     
@@ -80,7 +80,7 @@ namespace ni
 
             ErrorCode error_code() const override
             {
-                return ErrorCode::kInvalidTag;
+                return ErrorCode::kInvalidTagError;
             }
         };
 
@@ -90,7 +90,7 @@ namespace ni
 
             ErrorCode error_code() const override
             {
-                return ErrorCode::kTimeout;
+                return ErrorCode::kTimeoutError;
             }
         };
 
@@ -100,7 +100,7 @@ namespace ni
 
             ErrorCode error_code() const override
             {
-                return ErrorCode::kBufferSizeOutOfRange;
+                return ErrorCode::kBufferSizeOutOfRangeError;
             }
         };
     }

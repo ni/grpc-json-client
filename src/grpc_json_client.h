@@ -16,6 +16,12 @@ __declspec(dllexport) int32_t StartAsyncCall(void* session_handle, const char* s
 // Finish a call to the host.
 __declspec(dllexport) int32_t FinishAsyncCall(void* session_handle, void* tag, int32_t timeout, char* response, size_t* size);
 
+// Lock the session.
+__declspec(dllexport) int32_t LockSession(void* session_handle);
+
+// Unlock the session.
+__declspec(dllexport) int32_t UnlockSession(void* session_handle);
+
 // Release resources allocated by the session.
 __declspec(dllexport) int32_t Close(void* session_handle);
 
