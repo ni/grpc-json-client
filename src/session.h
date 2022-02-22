@@ -22,14 +22,10 @@ namespace ni
             int32_t Close();
             static int32_t GetError(Session* session, int32_t* code, char* buffer, size_t* size);
 
-            int32_t last_error_code();
-            const std::string& last_error_description();
-
         private:
             std::recursive_mutex _lock;
             UnaryUnaryJsonClient _client;
             std::unordered_map<void*, std::string> _responses;
-            bool _error_occurred = 0;
             ErrorCode _last_error_code;
             std::string _last_error_description;
 

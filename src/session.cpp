@@ -16,7 +16,6 @@ namespace ni
     {
         Session::Session(const string& target, const shared_ptr<ChannelCredentials>& credentials) :
             _client(target, credentials),
-            _error_occurred(false),
             _last_error_code(ErrorCode::kNone)
         {}
 
@@ -101,8 +100,8 @@ namespace ni
             if (session)
             {
                 lock_guard<recursive_mutex> lock(session->_lock);
-                *code = session->last_error_code();
-                description = session->last_error_description();
+                *code = static_cast<int32_t>(session->_last_error_code);
+                description = session->_last_error_description;
             }
             else
             {
@@ -124,44 +123,32 @@ namespace ni
             return static_cast<int32_t>(ErrorCode::kNone);
         }
 
-        int32_t Session::last_error_code()
-        {
-            return static_cast<int32_t>(_error_occurred ? _last_error_code : ErrorCode::kNone);
-        }
-
-        const string& Session::last_error_description()
-        {
-            return _error_occurred ? _last_error_description : "";
-        }
-
         int32_t Session::Evaluate(const function<void(UnaryUnaryJsonClient&)>& func)
         {
             lock_guard<recursive_mutex> lock(_lock);
-            _error_occurred = false;
+            _last_error_code = ErrorCode::kNone;
+            _last_error_description = "";
             try
             {
                 func(_client);
             }
             catch (const JsonClientException& ex)
             {
-                _error_occurred = true;
                 _last_error_code = ex.error_code();
                 _last_error_description = ex.what();
             }
             catch (const exception& ex)
             {
-                _error_occurred = true;
                 _last_error_code = ErrorCode::kUnknownError;
                 _last_error_description = "An unhandled exception occurred.\n\n";
                 _last_error_description += ex.what();
             }
             catch (...)
             {
-                _error_occurred = true;
                 _last_error_code = ErrorCode::kUnknownError;
                 _last_error_description = "An unhandled exception occurred.\n\n";
             }
-            return last_error_code();
+            return static_cast<int32_t>(_last_error_code);
         }
     }
 }
