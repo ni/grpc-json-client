@@ -86,7 +86,6 @@ if(gRPC_JSON_CLIENT_BUILD_TESTS)
 
     # Add tests
     add_executable(tests
-        "${tests_dir}/helpers.cpp"
         "${tests_dir}/test_grpc_json_client.cpp"
         "${tests_dir}/test_json_client_base.cpp"
         "${tests_dir}/test_json_serializer.cpp"
