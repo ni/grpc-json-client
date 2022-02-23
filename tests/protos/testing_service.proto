@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package ni.grpc_json_client;
+
+service TestingService {
+	rpc UnaryUnaryEcho (UnaryUnaryEchoMessage) returns (UnaryUnaryEchoMessage);
+}
+
+message UnaryUnaryEchoMessage {
+	oneof field_types {
+		string string_field = 1;
+		int32 int32_field = 2;
+		double double_field = 3;
+	}
+}
