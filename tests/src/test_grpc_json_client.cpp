@@ -1,7 +1,5 @@
-#include <iostream>
 #include <memory>
 #include <string>
-#include <stdint.h>
 
 #include <grpcpp/ext/proto_server_reflection_plugin.h>
 #include <grpcpp/grpcpp.h>
@@ -21,8 +19,6 @@ namespace ni
 {
     namespace grpc_json_client
     {
-        const std::string host = "localhost:50051";
-
         class GrpcJsonClientTest : public testing::Test
         {
         protected:
@@ -48,7 +44,7 @@ namespace ni
 
             void SetUp() override
             {
-                ASSERT_EQ(GrpcJsonClient_InitInsecure(host.c_str(), &session), 0);
+                ASSERT_EQ(GrpcJsonClient_InitInsecure("localhost:50051", &session), 0);
             }
 
             void TearDown() override
