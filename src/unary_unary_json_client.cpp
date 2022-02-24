@@ -48,11 +48,11 @@ namespace ni
         
         string UnaryUnaryJsonClient::FinishAsyncCall(void* tag, int timeout)
         {
-            unique_ptr<AsyncCallData> async_call(static_cast<AsyncCallData*>(tag));
-            if (!_tags.erase(async_call.get()))
+            if (!_tags.erase(static_cast<AsyncCallData*>(tag)))
             {
                 throw InvalidTagException("An active remote procedure call was not found for the specified tag.");
             }
+            unique_ptr<AsyncCallData> async_call(static_cast<AsyncCallData*>(tag));
             ByteBuffer serialized_response;
             Status status;
             async_call->response_reader->Finish(&serialized_response, &status, async_call.get());
