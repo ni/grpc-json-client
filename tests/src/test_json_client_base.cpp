@@ -1,26 +1,41 @@
+#include <memory>
+#include <string>
+
 #include <gtest/gtest.h>
 #include <google/protobuf/descriptor.h>
 
 #include "exceptions.h"
 #include "json_client_base.h"
+#include "testing_server.h"
 
 using google::protobuf::MethodDescriptor;
 using std::string;
+using std::unique_ptr;
 
 namespace ni
 {
     namespace grpc_json_client
     {
-        const std::string host = "localhost:31763";
-
         class JsonClientBaseTest : public testing::Test
         {
         protected:
             JsonClientBase client;
+            static unique_ptr<TestingServer> server;
 
             JsonClientBaseTest() :
-                client(host, grpc::InsecureChannelCredentials())
+                client("localhost:50051", grpc::InsecureChannelCredentials())
+            {}
+             
+            static void SetUpTestSuite()
             {
+                string address("0.0.0.0:50051");
+                server = std::make_unique<TestingServer>(address);
+                server->StartInsecure();
+            }
+
+            static void TearDownTestSuite()
+            {
+                server->Stop();
             }
 
             void SetUp() override
@@ -29,27 +44,29 @@ namespace ni
             }
         };
 
+        unique_ptr<TestingServer> JsonClientBaseTest::server;
+        
         TEST_F(JsonClientBaseTest, FindMethodSucceedsOnValidMethod)
         {
             const MethodDescriptor* method;
             ASSERT_NO_THROW(
-                method = client.FindMethod("nirfsa_grpc.NiRFSA", "Init");
+                method = client.FindMethod("ni.grpc_json_client.TestingService", "UnaryUnaryEcho");
             );
-            EXPECT_EQ(method->full_name(), "nirfsa_grpc.NiRFSA.Init");
+            EXPECT_EQ(method->full_name(), "ni.grpc_json_client.TestingService.UnaryUnaryEcho");
         }
 
-        TEST_F(JsonClientBaseTest, FindMethodFailsOnInvalidServiceName)
+        TEST_F(JsonClientBaseTest, FindMethodFailsOnUndefinedServiceName)
         {
             ASSERT_THROW(
-                client.FindMethod("invalid.service.name", "Init"),
+                client.FindMethod("undefined.service.name", "UnaryUnaryEcho"),
                 ServiceDescriptorNotFoundException
             );
         }
 
-        TEST_F(JsonClientBaseTest, FindMethodFailsOnInvalidMethodName)
+        TEST_F(JsonClientBaseTest, FindMethodFailsOnUndefinedMethodName)
         {
             ASSERT_THROW(
-                client.FindMethod("nirfsa_grpc.NiRFSA", "InvalidMethodName"),
+                client.FindMethod("ni.grpc_json_client.TestingService", "UndefinedMethodName"),
                 MethodDescriptorNotFoundException
             );
         }
