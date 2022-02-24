@@ -8,23 +8,36 @@ project ("grpc_dynamic_client")
 set(CMAKE_CXX_STANDARD 11)
 
 # Options
-option(gRPC_JSON_CLIENT_BUILD_TESTS "Build gRPC JSON client tests" ON)
+option(GRPC_JSON_CLIENT_BUILD_TESTS "Build gRPC JSON client tests" ON)
+option(GRPC_AS_SUBMODULE "Include gRPC as git submodule" ON)
 
-# Find Protobuf installation
-set(protobuf_MODULE_COMPATIBLE TRUE)
-find_package(Protobuf CONFIG REQUIRED)
-message(STATUS "Using protobuf ${Protobuf_VERSION}")
+if(GRPC_AS_SUBMODULE)
+    message(STATUS "Using gRPC via add_subdirectory.")
+    add_subdirectory("${CMAKE_SOURCE_DIR}/third_party/grpc/" "${CMAKE_BINARY_DIR}/grpc/" EXCLUDE_FROM_ALL)
 
-set(_PROTOBUF_LIBPROTOBUF protobuf::libprotobuf)
-set(_PROTOBUF_PROTOC $<TARGET_FILE:protobuf::protoc>)
+    set(_PROTOBUF_LIBPROTOBUF libprotobuf)
+    set(_PROTOBUF_PROTOC $<TARGET_FILE:protoc>)
 
-# Find gRPC installation
-find_package(gRPC CONFIG REQUIRED)
-message(STATUS "Using gRPC ${gRPC_VERSION}")
+    set(_GRPC_CPP_PLUGIN_EXECUTABLE $<TARGET_FILE:grpc_cpp_plugin>)
+    set(_GRPC_GRPCPP grpc++)
+    set(_GRPC_REFLECTION grpc++_reflection)
+else()
+    # Find Protobuf installation
+    set(protobuf_MODULE_COMPATIBLE TRUE)
+    find_package(Protobuf CONFIG REQUIRED)
+    message(STATUS "Using protobuf ${Protobuf_VERSION}")
+        
+    set(_PROTOBUF_LIBPROTOBUF protobuf::libprotobuf)
+    set(_PROTOBUF_PROTOC $<TARGET_FILE:protobuf::protoc>)
 
-set(_GRPC_CPP_PLUGIN_EXECUTABLE $<TARGET_FILE:gRPC::grpc_cpp_plugin>)
-set(_GRPC_GRPCPP gRPC::grpc++)
-set(_GRPC_REFLECTION gRPC::grpc++_reflection)
+    # Find gRPC installation
+    find_package(gRPC CONFIG REQUIRED)
+    message(STATUS "Using gRPC ${gRPC_VERSION}")
+
+    set(_GRPC_CPP_PLUGIN_EXECUTABLE $<TARGET_FILE:gRPC::grpc_cpp_plugin>)
+    set(_GRPC_GRPCPP gRPC::grpc++)
+    set(_GRPC_REFLECTION gRPC::grpc++_reflection)
+endif()
 
 # Paths
 set(src_dir "${CMAKE_SOURCE_DIR}/src")
@@ -70,7 +83,7 @@ target_include_directories(grpc_json_client PRIVATE ${generated_dir})
 target_link_libraries(grpc_json_client ${_GRPC_LIBS})
 
 # Build tests
-if(gRPC_JSON_CLIENT_BUILD_TESTS)
+if(GRPC_JSON_CLIENT_BUILD_TESTS)
     # Paths
     set(tests_dir "${CMAKE_SOURCE_DIR}/tests/")
     set(tests_src_dir "${tests_dir}/src/")
