@@ -9,7 +9,7 @@ set(CMAKE_CXX_STANDARD 11)
 
 # Options
 option(GRPC_JSON_CLIENT_BUILD_TESTS "Build gRPC JSON client tests" ON)
-option(GRPC_AS_SUBMODULE "Include gRPC as git submodule" ON)
+option(GRPC_AS_SUBMODULE "Include gRPC as git submodule" OFF)
 
 if(GRPC_AS_SUBMODULE)
     message(STATUS "Using gRPC via add_subdirectory.")
