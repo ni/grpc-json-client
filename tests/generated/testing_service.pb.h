@@ -112,9 +112,9 @@ class UnaryUnaryEchoMessage final :
     return *internal_default_instance();
   }
   enum FieldTypesCase {
-    kStringField = 1,
-    kInt32Field = 2,
-    kDoubleField = 3,
+    kStringField = 2,
+    kInt32Field = 3,
+    kDoubleField = 4,
     FIELD_TYPES_NOT_SET = 0,
   };
 
@@ -194,11 +194,21 @@ class UnaryUnaryEchoMessage final :
   // accessors -------------------------------------------------------
 
   enum : int {
-    kStringFieldFieldNumber = 1,
-    kInt32FieldFieldNumber = 2,
-    kDoubleFieldFieldNumber = 3,
+    kDelayFieldNumber = 1,
+    kStringFieldFieldNumber = 2,
+    kInt32FieldFieldNumber = 3,
+    kDoubleFieldFieldNumber = 4,
   };
-  // string string_field = 1;
+  // int32 delay = 1;
+  void clear_delay();
+  ::PROTOBUF_NAMESPACE_ID::int32 delay() const;
+  void set_delay(::PROTOBUF_NAMESPACE_ID::int32 value);
+  private:
+  ::PROTOBUF_NAMESPACE_ID::int32 _internal_delay() const;
+  void _internal_set_delay(::PROTOBUF_NAMESPACE_ID::int32 value);
+  public:
+
+  // string string_field = 2;
   bool has_string_field() const;
   private:
   bool _internal_has_string_field() const;
@@ -216,7 +226,7 @@ class UnaryUnaryEchoMessage final :
   std::string* _internal_mutable_string_field();
   public:
 
-  // int32 int32_field = 2;
+  // int32 int32_field = 3;
   bool has_int32_field() const;
   private:
   bool _internal_has_int32_field() const;
@@ -229,7 +239,7 @@ class UnaryUnaryEchoMessage final :
   void _internal_set_int32_field(::PROTOBUF_NAMESPACE_ID::int32 value);
   public:
 
-  // double double_field = 3;
+  // double double_field = 4;
   bool has_double_field() const;
   private:
   bool _internal_has_double_field() const;
@@ -257,6 +267,7 @@ class UnaryUnaryEchoMessage final :
   template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::int32 delay_;
   union FieldTypesUnion {
     constexpr FieldTypesUnion() : _constinit_{} {}
       ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized _constinit_;
@@ -280,7 +291,27 @@ class UnaryUnaryEchoMessage final :
 #endif  // __GNUC__
 // UnaryUnaryEchoMessage
 
-// string string_field = 1;
+// int32 delay = 1;
+inline void UnaryUnaryEchoMessage::clear_delay() {
+  delay_ = 0;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 UnaryUnaryEchoMessage::_internal_delay() const {
+  return delay_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 UnaryUnaryEchoMessage::delay() const {
+  // @@protoc_insertion_point(field_get:ni.grpc_json_client.UnaryUnaryEchoMessage.delay)
+  return _internal_delay();
+}
+inline void UnaryUnaryEchoMessage::_internal_set_delay(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  
+  delay_ = value;
+}
+inline void UnaryUnaryEchoMessage::set_delay(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _internal_set_delay(value);
+  // @@protoc_insertion_point(field_set:ni.grpc_json_client.UnaryUnaryEchoMessage.delay)
+}
+
+// string string_field = 2;
 inline bool UnaryUnaryEchoMessage::_internal_has_string_field() const {
   return field_types_case() == kStringField;
 }
@@ -362,7 +393,7 @@ inline void UnaryUnaryEchoMessage::set_allocated_string_field(std::string* strin
   // @@protoc_insertion_point(field_set_allocated:ni.grpc_json_client.UnaryUnaryEchoMessage.string_field)
 }
 
-// int32 int32_field = 2;
+// int32 int32_field = 3;
 inline bool UnaryUnaryEchoMessage::_internal_has_int32_field() const {
   return field_types_case() == kInt32Field;
 }
@@ -400,7 +431,7 @@ inline void UnaryUnaryEchoMessage::set_int32_field(::PROTOBUF_NAMESPACE_ID::int3
   // @@protoc_insertion_point(field_set:ni.grpc_json_client.UnaryUnaryEchoMessage.int32_field)
 }
 
-// double double_field = 3;
+// double double_field = 4;
 inline bool UnaryUnaryEchoMessage::_internal_has_double_field() const {
   return field_types_case() == kDoubleField;
 }

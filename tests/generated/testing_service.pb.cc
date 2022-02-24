@@ -20,7 +20,8 @@ namespace ni {
 namespace grpc_json_client {
 constexpr UnaryUnaryEchoMessage::UnaryUnaryEchoMessage(
   ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized)
-  : _oneof_case_{}{}
+  : delay_(0)
+  , _oneof_case_{}{}
 struct UnaryUnaryEchoMessageDefaultTypeInternal {
   constexpr UnaryUnaryEchoMessageDefaultTypeInternal()
     : _instance(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized{}) {}
@@ -43,6 +44,7 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_testing_5fservice_2eproto::off
   PROTOBUF_FIELD_OFFSET(::ni::grpc_json_client::UnaryUnaryEchoMessage, _oneof_case_[0]),
   ~0u,  // no _weak_field_map_
   ~0u,  // no _inlined_string_donated_
+  PROTOBUF_FIELD_OFFSET(::ni::grpc_json_client::UnaryUnaryEchoMessage, delay_),
   ::PROTOBUF_NAMESPACE_ID::internal::kInvalidFieldOffsetTag,
   ::PROTOBUF_NAMESPACE_ID::internal::kInvalidFieldOffsetTag,
   ::PROTOBUF_NAMESPACE_ID::internal::kInvalidFieldOffsetTag,
@@ -58,17 +60,17 @@ static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] =
 
 const char descriptor_table_protodef_testing_5fservice_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
   "\n\025testing_service.proto\022\023ni.grpc_json_cl"
-  "ient\"m\n\025UnaryUnaryEchoMessage\022\026\n\014string_"
-  "field\030\001 \001(\tH\000\022\025\n\013int32_field\030\002 \001(\005H\000\022\026\n\014"
-  "double_field\030\003 \001(\001H\000B\r\n\013field_types2z\n\016T"
-  "estingService\022h\n\016UnaryUnaryEcho\022*.ni.grp"
-  "c_json_client.UnaryUnaryEchoMessage\032*.ni"
-  ".grpc_json_client.UnaryUnaryEchoMessageb"
-  "\006proto3"
+  "ient\"|\n\025UnaryUnaryEchoMessage\022\r\n\005delay\030\001"
+  " \001(\005\022\026\n\014string_field\030\002 \001(\tH\000\022\025\n\013int32_fi"
+  "eld\030\003 \001(\005H\000\022\026\n\014double_field\030\004 \001(\001H\000B\r\n\013f"
+  "ield_types2z\n\016TestingService\022h\n\016UnaryUna"
+  "ryEcho\022*.ni.grpc_json_client.UnaryUnaryE"
+  "choMessage\032*.ni.grpc_json_client.UnaryUn"
+  "aryEchoMessageb\006proto3"
   ;
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_testing_5fservice_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_testing_5fservice_2eproto = {
-  false, false, 287, descriptor_table_protodef_testing_5fservice_2eproto, "testing_service.proto", 
+  false, false, 302, descriptor_table_protodef_testing_5fservice_2eproto, "testing_service.proto", 
   &descriptor_table_testing_5fservice_2eproto_once, nullptr, 0, 1,
   schemas, file_default_instances, TableStruct_testing_5fservice_2eproto::offsets,
   file_level_metadata_testing_5fservice_2eproto, file_level_enum_descriptors_testing_5fservice_2eproto, file_level_service_descriptors_testing_5fservice_2eproto,
@@ -100,6 +102,7 @@ UnaryUnaryEchoMessage::UnaryUnaryEchoMessage(::PROTOBUF_NAMESPACE_ID::Arena* are
 UnaryUnaryEchoMessage::UnaryUnaryEchoMessage(const UnaryUnaryEchoMessage& from)
   : ::PROTOBUF_NAMESPACE_ID::Message() {
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  delay_ = from.delay_;
   clear_has_field_types();
   switch (from.field_types_case()) {
     case kStringField: {
@@ -122,6 +125,7 @@ UnaryUnaryEchoMessage::UnaryUnaryEchoMessage(const UnaryUnaryEchoMessage& from)
 }
 
 void UnaryUnaryEchoMessage::SharedCtor() {
+delay_ = 0;
 clear_has_field_types();
 }
 
@@ -178,6 +182,7 @@ void UnaryUnaryEchoMessage::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
+  delay_ = 0;
   clear_field_types();
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
@@ -188,9 +193,17 @@ const char* UnaryUnaryEchoMessage::_InternalParse(const char* ptr, ::PROTOBUF_NA
     ::PROTOBUF_NAMESPACE_ID::uint32 tag;
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
     switch (tag >> 3) {
-      // string string_field = 1;
+      // int32 delay = 1;
       case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 10)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
+          delay_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // string string_field = 2;
+      case 2:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 18)) {
           auto str = _internal_mutable_string_field();
           ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
           CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "ni.grpc_json_client.UnaryUnaryEchoMessage.string_field"));
@@ -198,17 +211,17 @@ const char* UnaryUnaryEchoMessage::_InternalParse(const char* ptr, ::PROTOBUF_NA
         } else
           goto handle_unusual;
         continue;
-      // int32 int32_field = 2;
-      case 2:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 16)) {
+      // int32 int32_field = 3;
+      case 3:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 24)) {
           _internal_set_int32_field(::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr));
           CHK_(ptr);
         } else
           goto handle_unusual;
         continue;
-      // double double_field = 3;
-      case 3:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 25)) {
+      // double double_field = 4;
+      case 4:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 33)) {
           _internal_set_double_field(::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<double>(ptr));
           ptr += sizeof(double);
         } else
@@ -243,26 +256,32 @@ failure:
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // string string_field = 1;
+  // int32 delay = 1;
+  if (this->_internal_delay() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(1, this->_internal_delay(), target);
+  }
+
+  // string string_field = 2;
   if (_internal_has_string_field()) {
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
       this->_internal_string_field().data(), static_cast<int>(this->_internal_string_field().length()),
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
       "ni.grpc_json_client.UnaryUnaryEchoMessage.string_field");
     target = stream->WriteStringMaybeAliased(
-        1, this->_internal_string_field(), target);
+        2, this->_internal_string_field(), target);
   }
 
-  // int32 int32_field = 2;
+  // int32 int32_field = 3;
   if (_internal_has_int32_field()) {
     target = stream->EnsureSpace(target);
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(2, this->_internal_int32_field(), target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(3, this->_internal_int32_field(), target);
   }
 
-  // double double_field = 3;
+  // double double_field = 4;
   if (_internal_has_double_field()) {
     target = stream->EnsureSpace(target);
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteDoubleToArray(3, this->_internal_double_field(), target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteDoubleToArray(4, this->_internal_double_field(), target);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
@@ -281,20 +300,25 @@ size_t UnaryUnaryEchoMessage::ByteSizeLong() const {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
+  // int32 delay = 1;
+  if (this->_internal_delay() != 0) {
+    total_size += ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32SizePlusOne(this->_internal_delay());
+  }
+
   switch (field_types_case()) {
-    // string string_field = 1;
+    // string string_field = 2;
     case kStringField: {
       total_size += 1 +
         ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
           this->_internal_string_field());
       break;
     }
-    // int32 int32_field = 2;
+    // int32 int32_field = 3;
     case kInt32Field: {
       total_size += ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32SizePlusOne(this->_internal_int32_field());
       break;
     }
-    // double double_field = 3;
+    // double double_field = 4;
     case kDoubleField: {
       total_size += 1 + 8;
       break;
@@ -325,6 +349,9 @@ void UnaryUnaryEchoMessage::MergeFrom(const UnaryUnaryEchoMessage& from) {
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
+  if (from._internal_delay() != 0) {
+    _internal_set_delay(from._internal_delay());
+  }
   switch (from.field_types_case()) {
     case kStringField: {
       _internal_set_string_field(from._internal_string_field());
@@ -359,6 +386,7 @@ bool UnaryUnaryEchoMessage::IsInitialized() const {
 void UnaryUnaryEchoMessage::InternalSwap(UnaryUnaryEchoMessage* other) {
   using std::swap;
   _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  swap(delay_, other->delay_);
   swap(field_types_, other->field_types_);
   swap(_oneof_case_[0], other->_oneof_case_[0]);
 }
