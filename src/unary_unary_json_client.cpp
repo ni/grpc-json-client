@@ -68,17 +68,17 @@ namespace ni
                 system_clock::time_point deadline = system_clock::now() + milliseconds(timeout);
                 next_status = async_call->completion_queue.AsyncNext(&next_tag, &ok, deadline);
             }
-            if (next_tag != async_call.get())
-            {
-                // each call gets it's own completion queue so this shouldn't happen
-                throw logic_error("The specified tag did not match the tag returned from the completion queue.");
-            }
             switch (next_status)
             {
             case CompletionQueue::NextStatus::SHUTDOWN:
                 // we shouldn't reach this point since the completion queue should only be drained in the destructor
                 throw logic_error("The completion queue shut down unexpectedly.");
             case CompletionQueue::NextStatus::GOT_EVENT:
+                if (next_tag != async_call.get())
+                {
+                    // each call gets it's own completion queue so this shouldn't happen
+                    throw logic_error("The specified tag did not match the tag returned from the completion queue.");
+                }
                 if (ok)
                 {
                     if (!status.ok())
