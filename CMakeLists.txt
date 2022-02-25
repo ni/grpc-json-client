@@ -1,7 +1,7 @@
 ﻿# CMakeList.txt : CMake project for grpc_json_client, include source and define
 # project specific logic here.
 #
-cmake_minimum_required (VERSION 3.8)
+cmake_minimum_required (VERSION 3.10)
 
 project ("grpc_dynamic_client")
 
@@ -141,4 +141,9 @@ if(GRPC_JSON_CLIENT_BUILD_TESTS)
         ${_GTEST_MAIN}
         ${_JSON}
     )
+
+    # Register with CTest
+    enable_testing()
+    include(GoogleTest)
+    gtest_discover_tests(tests)
 endif()
