@@ -1,4 +1,5 @@
-﻿#include "unary_unary_json_client.h"
+﻿
+#include "unary_unary_json_client.h"
 
 #include "exceptions.h"
 #include "json_serializer.h"
