@@ -75,7 +75,7 @@ namespace ni
             const Descriptor* message_type = ServerReflectionRequest::GetDescriptor();
             string request("{\"host\":\"localhost\",\"file_by_filename\":\"session.proto\"}");
             ByteBuffer buffer = JsonSerializer::SerializeMessage(message_type, request);
-            string response = JsonSerializer::DeserializeMessage(message_type, buffer);
+            string response = JsonSerializer::DeserializeMessage(message_type, &buffer);
             ASSERT_EQ(request, response);
         }
 
@@ -85,7 +85,7 @@ namespace ni
             ByteBuffer empty_buffer;
             ASSERT_THROW
             (
-                JsonSerializer::DeserializeMessage(response_type, empty_buffer),
+                JsonSerializer::DeserializeMessage(response_type, &empty_buffer),
                 DeserializationException
             );
         }
