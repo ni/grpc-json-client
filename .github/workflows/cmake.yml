@@ -43,6 +43,6 @@ jobs:
       with:
         name: ni-grpc-json-client-windows-x64
         path: |
-          grpc_json_client.h
+          src/grpc_json_client.h
           build/Release/grpc_json_client.dll
         retention-days: 5
