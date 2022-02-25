@@ -1,31 +1,37 @@
+
 #pragma once
 
-#include <google/protobuf/descriptor.h>
-#include <google/protobuf/descriptor_database.h>
-#include <grpcpp/grpcpp.h>
+#include <memory>
+#include <string>
 
-namespace ni
-{
-    namespace json_client
-    {
-        // Base class for json client implementations.
-        class JsonClientBase
-        {
-        protected:
-            std::shared_ptr<grpc::Channel> channel;
+#include "google/protobuf/descriptor.h"
+#include "google/protobuf/descriptor_database.h"
+#include "grpcpp/grpcpp.h"
 
-        private:
-            google::protobuf::SimpleDescriptorDatabase _reflection_db;
-            google::protobuf::DescriptorPool _descriptor_pool;
+namespace ni {
+namespace grpc_json_client {
 
-        public:
-            JsonClientBase(const std::string& target, const std::shared_ptr<grpc::ChannelCredentials>& credentials);
+// Base class for json client implementations.
+class JsonClientBase {
+ protected:
+    std::shared_ptr<grpc::Channel> channel;
 
-            // Populate descriptor pool with file descriptors for all services exposed by the reflection service on the host.
-            void QueryReflectionService();
+ private:
+    google::protobuf::SimpleDescriptorDatabase _reflection_db;
+    google::protobuf::DescriptorPool _descriptor_pool;
 
-            // Search for a method in the descriptor database.
-            const google::protobuf::MethodDescriptor* FindMethod(const std::string& service_name, const std::string& method_name) const;
-        };
-    }
-}
+ public:
+    JsonClientBase(
+        const std::string& target, const std::shared_ptr<grpc::ChannelCredentials>& credentials);
+
+    // Populate descriptor pool with file descriptors
+    // for all services exposed by the reflection service on the host.
+    void QueryReflectionService();
+
+    // Search for a method in the descriptor database.
+    const google::protobuf::MethodDescriptor* FindMethod(
+        const std::string& service_name, const std::string& method_name) const;
+};
+
+}  // namespace grpc_json_client
+}  // namespace ni
