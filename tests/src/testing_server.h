@@ -1,32 +1,34 @@
+
 #pragma once
 
 #include <string>
 #include <memory>
 
-#include <grpcpp/grpcpp.h>
+#include "grpcpp/grpcpp.h"
 
 #include "testing_service.grpc.pb.h"
 
-namespace ni
-{
-	namespace grpc_json_client
-	{
-		class TestingServiceImpl final : public TestingService::Service
-		{
-			grpc::Status UnaryUnaryEcho(grpc::ServerContext* context, const UnaryUnaryEchoMessage* request, UnaryUnaryEchoMessage* response) override;
-		};
+namespace ni {
+namespace grpc_json_client {
 
-		class TestingServer
-		{
-		private:
-			std::string _address;
-			TestingServiceImpl _service;
-			std::unique_ptr<grpc::Server> _server;
+class TestingServiceImpl final : public TestingService::Service {
+    grpc::Status UnaryUnaryEcho(
+        grpc::ServerContext* context,
+        const UnaryUnaryEchoMessage* request,
+        UnaryUnaryEchoMessage* response) override;
+};
 
-		public:
-			TestingServer(const std::string& address);
-			void StartInsecure();
-			void Stop();
-		};
-	}
-}
+class TestingServer {
+ private:
+    std::string _address;
+    TestingServiceImpl _service;
+    std::unique_ptr<grpc::Server> _server;
+
+ public:
+    explicit TestingServer(const std::string& address);
+    void StartInsecure();
+    void Stop();
+};
+
+}  // namespace grpc_json_client
+}  // namespace ni
