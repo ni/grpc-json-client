@@ -28,7 +28,7 @@ class GrpcJsonClientTest : public testing::Test {
     }
 
     static void TearDownTestSuite() {
-        server->Stop();
+server->Stop();
     }
 
     void SetUp() override {
@@ -126,6 +126,22 @@ TEST_F(GrpcJsonClientTest, AsynchronousCallsWithoutTimeoutsSucceed) {
         json response = json::parse(buffer.get());
         ASSERT_EQ(response["string_field"], string_fields[i]);
     }
+}
+
+TEST_F(GrpcJsonClientTest, BlockingCallSucceeds) {
+    json request = { {"string_field", "BlockingCall"} };
+    char* service = "ni.grpc_json_client.TestingService";
+    void* tag = nullptr;
+    size_t size = 0;
+    int32_t error_code = GrpcJsonClient_BlockingCall(
+        session, service, "UnaryUnaryEcho", request.dump().c_str(), &tag, 100, nullptr, &size);
+    ASSERT_EQ(error_code, 0);
+    unique_ptr<char> buffer(new char[size]);
+    error_code = GrpcJsonClient_BlockingCall(
+        session, nullptr, nullptr, nullptr, &tag, 100, buffer.get(), &size);
+    ASSERT_EQ(error_code, 0);
+    json response = json::parse(buffer.get());
+    ASSERT_EQ(response["string_field"], "BlockingCall");
 }
 
 TEST_F(GrpcJsonClientTest, StartAsyncCallToUndefinedServiceFailsWithServiceNotFoundError) {
