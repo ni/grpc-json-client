@@ -17,8 +17,8 @@ class JsonClientBase {
     std::shared_ptr<grpc::Channel> channel;
 
  private:
-    google::protobuf::SimpleDescriptorDatabase _reflection_db;
-    google::protobuf::DescriptorPool _descriptor_pool;
+    std::unique_ptr<google::protobuf::SimpleDescriptorDatabase> _descriptor_db;
+    std::unique_ptr<google::protobuf::DescriptorPool> _descriptor_pool;
 
  public:
     JsonClientBase(
@@ -31,6 +31,9 @@ class JsonClientBase {
     // Search for a method in the descriptor database.
     const google::protobuf::MethodDescriptor* FindMethod(
         const std::string& service_name, const std::string& method_name) const;
+
+ private:
+    void ResetDescriptorPool();
 };
 
 }  // namespace grpc_json_client

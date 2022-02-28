@@ -8,10 +8,12 @@
 #include "reflection.pb.h"
 #include "reflection.grpc.pb.h"
 
+using google::protobuf::DescriptorPool;
 using google::protobuf::FileDescriptorProto;
 using google::protobuf::MethodDescriptor;
 using google::protobuf::RepeatedPtrField;
 using google::protobuf::ServiceDescriptor;
+using google::protobuf::SimpleDescriptorDatabase;
 using grpc::ChannelCredentials;
 using grpc::ClientContext;
 using grpc::ClientReaderWriter;
@@ -29,8 +31,9 @@ namespace grpc_json_client {
 
 JsonClientBase::JsonClientBase(
     const string& target, const shared_ptr<ChannelCredentials>& credentials
-) : _descriptor_pool(&_reflection_db) {
+) {
     channel = CreateChannel(target, credentials);
+    ResetDescriptorPool();
 }
 
 void JsonClientBase::QueryReflectionService() {
@@ -46,7 +49,9 @@ void JsonClientBase::QueryReflectionService() {
 
     // read services
     ServerReflectionResponse response;
-    stream->Read(&response);
+    if (stream->Read(&response)) {
+        ResetDescriptorPool();
+    }
     RepeatedPtrField<ServiceResponse> services = response.list_services_response().service();
 
     // request file descriptors for services
@@ -61,10 +66,10 @@ void JsonClientBase::QueryReflectionService() {
             FileDescriptorProto file_descriptor_proto;
             file_descriptor_proto.ParseFromString(serialized_file_descriptor);
             bool file_descriptor_in_database = {
-                _reflection_db.FindFileByName(file_descriptor_proto.name(), &file_descriptor_proto)
+                _descriptor_db->FindFileByName(file_descriptor_proto.name(), &file_descriptor_proto)
             };
             if (!file_descriptor_in_database) {
-                _reflection_db.Add(file_descriptor_proto);
+                _descriptor_db->Add(file_descriptor_proto);
             }
         }
     }
@@ -84,7 +89,7 @@ void JsonClientBase::QueryReflectionService() {
 const MethodDescriptor* JsonClientBase::FindMethod(
     const string& service_name, const string& method_name
 ) const {
-    const ServiceDescriptor* service_descriptor = _descriptor_pool.FindServiceByName(service_name);
+    const ServiceDescriptor* service_descriptor = _descriptor_pool->FindServiceByName(service_name);
     if (service_descriptor == nullptr) {
         throw ServiceDescriptorNotFoundException(service_name);
     }
@@ -93,6 +98,11 @@ const MethodDescriptor* JsonClientBase::FindMethod(
         throw MethodDescriptorNotFoundException(method_name);
     }
     return method_descriptor;
+}
+
+void JsonClientBase::ResetDescriptorPool() {
+    _descriptor_db = std::make_unique<SimpleDescriptorDatabase>();
+    _descriptor_pool = std::make_unique<DescriptorPool>(_descriptor_db.get());
 }
 
 }  // namespace grpc_json_client
