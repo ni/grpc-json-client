@@ -8,12 +8,16 @@
 using grpc::ChannelCredentials;
 using ni::grpc_json_client::Session;
 using std::shared_ptr;
+using std::unique_ptr;
 
 int32_t GrpcJsonClient_Initialize(const char* target, void** session_handle) {
     shared_ptr<ChannelCredentials> credentials = grpc::InsecureChannelCredentials();
-    Session* session = new Session(target, credentials);
-    *session_handle = session;
-    return session->QueryReflectionService();
+    unique_ptr<Session> session = std::make_unique<Session>(target, credentials);
+    int32_t error_code = session->QueryReflectionService();
+    if (error_code >= 0) {
+        *session_handle = session.release();
+    }
+    return error_code;
 }
 
 int32_t GrpcJsonClient_StartAsyncCall(
