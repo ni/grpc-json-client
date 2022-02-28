@@ -28,6 +28,20 @@ int32_t GrpcJsonClient_FinishAsyncCall(
     return static_cast<Session*>(session_handle)->FinishAsyncCall(tag, timeout, buffer, size);
 }
 
+int32_t GrpcJsonClient_BlockingCall(
+    void* session_handle,
+    const char* service,
+    const char* method,
+    const char* request,
+    void** tag,
+    int32_t timeout,
+    char* response,
+    size_t* size
+) {
+    return static_cast<Session*>(session_handle)->BlockingCall(
+        service, method, request, tag, timeout, response, size);
+}
+
 int32_t GrpcJsonClient_LockSession(void* session_handle) {
     return static_cast<Session*>(session_handle)->Lock();
 }

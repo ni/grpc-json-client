@@ -22,6 +22,14 @@ class Session {
     int32_t StartAsyncCall(
         const char* service, const char* method, const char* request, void** tag);
     int32_t FinishAsyncCall(void* tag, int32_t timeout, char* buffer, size_t* size);
+    int32_t BlockingCall(
+        const char* service,
+        const char* method,
+        const char* request,
+        void** tag,
+        int32_t timeout,
+        char* response,
+        size_t* size);
     int32_t Lock();
     int32_t Unlock();
     int32_t Close();

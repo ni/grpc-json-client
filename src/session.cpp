@@ -57,6 +57,30 @@ int32_t Session::FinishAsyncCall(void* tag, int32_t timeout, char* buffer, size_
         });
 }
 
+int32_t Session::BlockingCall(
+    const char* service,
+    const char* method,
+    const char* request,
+    void** tag,
+    int32_t timeout,
+    char* response,
+    size_t* size
+) {
+    if (*tag) {
+        return FinishAsyncCall(*tag, timeout, response, size);
+    }
+    Lock();
+    int32_t error_code = StartAsyncCall(service, method, request, tag);
+    if (error_code >= 0) {
+        int32_t next_error_code = FinishAsyncCall(*tag, timeout, response, size);
+        if (next_error_code < 0) {
+            error_code = next_error_code;
+        }
+    }
+    Unlock();
+    return error_code;
+}
+
 int32_t Session::Lock() {
     return Evaluate(
         [&](const UnaryUnaryJsonClient&) {
