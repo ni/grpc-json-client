@@ -32,7 +32,7 @@ class GrpcJsonClientTest : public testing::Test {
     }
 
     void SetUp() override {
-        ASSERT_EQ(GrpcJsonClient_InitInsecure("localhost:50051", &session), 0);
+        ASSERT_EQ(GrpcJsonClient_Initialize("localhost:50051", &session), 0);
     }
 
     void TearDown() override {

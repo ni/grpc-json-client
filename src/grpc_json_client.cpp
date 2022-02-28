@@ -9,7 +9,7 @@ using grpc::ChannelCredentials;
 using ni::grpc_json_client::Session;
 using std::shared_ptr;
 
-int32_t GrpcJsonClient_InitInsecure(const char* target, void** session_handle) {
+int32_t GrpcJsonClient_Initialize(const char* target, void** session_handle) {
     shared_ptr<ChannelCredentials> credentials = grpc::InsecureChannelCredentials();
     Session* session = new Session(target, credentials);
     *session_handle = session;

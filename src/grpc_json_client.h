@@ -8,7 +8,7 @@ extern "C" {
 #endif
 
 // Initialize a session with an insecure channel.
-__declspec(dllexport) int32_t GrpcJsonClient_InitInsecure(
+__declspec(dllexport) int32_t GrpcJsonClient_Initialize(
     const char* target, void** session_handle
 );
 
