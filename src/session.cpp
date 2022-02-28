@@ -134,8 +134,7 @@ int32_t Session::Evaluate(const function<void(UnaryUnaryJsonClient&)>& func) {
     }
     catch (const exception& ex) {
         _last_error_code = ErrorCode::kUnknownError;
-        _last_error_description = "An unhandled exception occurred.\n\n";
-        _last_error_description += ex.what();
+        _last_error_description = string("An unhandled exception occurred.\n\n") + ex.what();
     }
     catch (...) {
         _last_error_code = ErrorCode::kUnknownError;
