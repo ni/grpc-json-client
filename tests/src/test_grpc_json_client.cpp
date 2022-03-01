@@ -33,6 +33,7 @@ server->Stop();
 
     void SetUp() override {
         ASSERT_EQ(GrpcJsonClient_Initialize("localhost:50051", &session), 0);
+        ASSERT_EQ(GrpcJsonClient_QueryReflectionService(session), 0);
     }
 
     void TearDown() override {
@@ -202,7 +203,7 @@ TEST_F(GrpcJsonClientTest, FinishAsyncCallWithSmallBufferFailsWithBufferSizeOutO
     ASSERT_EQ(error_code, static_cast<int32_t>(ErrorCode::kBufferSizeOutOfRangeError));
 }
 
-TEST_F(GrpcJsonClientTest, GetErrorWithSessionSucceeds) {
+TEST_F(GrpcJsonClientTest, GetErrorSucceeds) {
     void* tag = nullptr;
     int32_t expected_error_code = GrpcJsonClient_StartAsyncCall(
         session, "UndefinedService", "UndefinedMethod", "{}", &tag);
@@ -220,19 +221,19 @@ TEST_F(GrpcJsonClientTest, GetErrorWithSessionSucceeds) {
     ASSERT_EQ(queried_error_code, expected_error_code);  // returns most recent code
 }
 
-TEST_F(GrpcJsonClientTest, GetErrorWithoutSessionSucceeds) {
+TEST_F(GrpcJsonClientTest, GetErrorStringWithoutSessionSucceeds) {
     void* tag = nullptr;
     int32_t error_code = GrpcJsonClient_StartAsyncCall(
         session, "UndefinedService", "UndefinedMethod", "{}", &tag);
 
     size_t size = 0;
-    int32_t get_error_error_code = GrpcJsonClient_GetError(nullptr, &error_code, nullptr, &size);
+    int32_t get_error_error_code = GrpcJsonClient_GetErrorString(nullptr, error_code, nullptr, &size);
     ASSERT_EQ(get_error_error_code, 0);
     unique_ptr<char> buffer(new char[size]);
-    get_error_error_code = GrpcJsonClient_GetError(nullptr, &error_code, buffer.get(), &size);
+    get_error_error_code = GrpcJsonClient_GetErrorString(nullptr, error_code, buffer.get(), &size);
     ASSERT_EQ(get_error_error_code, 0);
 
-    string expected_description = GetErrorDescription(static_cast<ErrorCode>(error_code));
+    string expected_description = GetErrorString(static_cast<ErrorCode>(error_code));
     ASSERT_STREQ(buffer.get(), expected_description.c_str());
 }
 

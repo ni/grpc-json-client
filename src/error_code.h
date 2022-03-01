@@ -20,7 +20,7 @@ enum class ErrorCode : int {
     kBufferSizeOutOfRangeError = -9
 };
 
-std::string GetErrorDescription(const ErrorCode& error_code);
+std::string GetErrorString(const ErrorCode& error_code);
 
 }  // namespace grpc_json_client
 }  // namespace ni

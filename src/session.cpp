@@ -19,13 +19,15 @@ namespace grpc_json_client {
 
 Session::Session(const string& target, const shared_ptr<ChannelCredentials>& credentials) :
     _client(target, credentials),
-    _last_error_code(ErrorCode::kNone)
+    _error_code(ErrorCode::kNone),
+    _error_description(ni::grpc_json_client::GetErrorString(ErrorCode::kNone))
 {}
 
 int32_t Session::QueryReflectionService() {
     return Evaluate(
         [](UnaryUnaryJsonClient& client) {
             client.QueryReflectionService();
+            return ErrorCode::kNone;
         });
 }
 
@@ -35,6 +37,7 @@ int32_t Session::StartAsyncCall(
     return Evaluate(
         [=](UnaryUnaryJsonClient& client) {
             *tag = client.StartAsyncCall(service, method, request);
+            return ErrorCode::kNone;
         });
 }
 
@@ -52,8 +55,9 @@ int32_t Session::FinishAsyncCall(void* tag, int32_t timeout, char* buffer, size_
                 _responses.erase(tag);
             } else {
                 throw BufferSizeOutOfRangeException(
-                    "Buffer size is too small to accommodate the response.");
+                    "The buffer size is too small to accommodate the response.");
             }
+            return ErrorCode::kNone;
         });
 }
 
@@ -83,32 +87,50 @@ int32_t Session::BlockingCall(
 
 int32_t Session::Lock() {
     return Evaluate(
-        [&](const UnaryUnaryJsonClient&) {
+        [=](const UnaryUnaryJsonClient&) {
             _lock.lock();
+            return ErrorCode::kNone;
         });
 }
 
 int32_t Session::Unlock() {
     return Evaluate(
-        [&](const UnaryUnaryJsonClient&) {
+        [=](const UnaryUnaryJsonClient&) {
             _lock.unlock();
+            return ErrorCode::kNone;
         });
 }
 
-int32_t Session::Close() {
-    // placeholder for any pre-destructor cleanup operations
-    return static_cast<int32_t>(ErrorCode::kNone);
+int32_t Session::GetError(int32_t* code, char* buffer, size_t* size) {
+    return Evaluate(
+        [=](const UnaryUnaryJsonClient&) {
+            *code = static_cast<int32_t>(_error_code);
+            if (buffer) {
+                strncpy(buffer, _error_description.c_str(), *size);
+                if (*size > _error_description.size()) {
+                    // clear error state
+                    _error_code = ErrorCode::kNone;
+                    _error_description = ni::grpc_json_client::GetErrorString(_error_code);
+                } else {
+                    buffer[*size - 1] = NULL;  // strncpy doesn't add null char
+                    _error_code = ErrorCode::kBufferSizeOutOfRangeWarning;
+                    _error_description = {
+                        "The buffer size is too small to accomodate the full error message. "
+                        "It will be truncated."
+                    };
+                    return _error_code;
+                }
+            } else {
+                *size = _error_description.size() + 1;  // include null char
+            }
+            return ErrorCode::kNone;
+        });
 }
 
-int32_t Session::GetError(Session* session, int32_t* code, char* buffer, size_t* size) {
-    string description;
-    if (session) {
-        lock_guard<recursive_mutex> lock(session->_lock);
-        *code = static_cast<int32_t>(session->_last_error_code);
-        description = session->_last_error_description;
-    } else {
-        description = GetErrorDescription(static_cast<ErrorCode>(*code));
-    }
+int32_t Session::GetErrorString(Session* session, int32_t code, char* buffer, size_t* size) {
+    string description = {
+        ni::grpc_json_client::GetErrorString(static_cast<ErrorCode>(code))
+    };
     if (buffer) {
         strncpy(buffer, description.c_str(), *size);
         if (*size <= description.size()) {
@@ -121,26 +143,29 @@ int32_t Session::GetError(Session* session, int32_t* code, char* buffer, size_t*
     return static_cast<int32_t>(ErrorCode::kNone);
 }
 
-int32_t Session::Evaluate(const function<void(UnaryUnaryJsonClient&)>& func) {
+int32_t Session::Close() {
+    // placeholder for any pre-destructor cleanup operations
+    return static_cast<int32_t>(ErrorCode::kNone);
+}
+
+int32_t Session::Evaluate(const function<ErrorCode(UnaryUnaryJsonClient&)>& func) {
     lock_guard<recursive_mutex> lock(_lock);
-    _last_error_code = ErrorCode::kNone;
-    _last_error_description = "";
     try {
-        func(_client);
+        return static_cast<int32_t>(func(_client));
     }
     catch (const JsonClientException& ex) {
-        _last_error_code = ex.error_code();
-        _last_error_description = ex.what();
+        _error_code = ex.error_code();
+        _error_description = ex.what();
     }
     catch (const exception& ex) {
-        _last_error_code = ErrorCode::kUnknownError;
-        _last_error_description = string("An unhandled exception occurred.\n\n") + ex.what();
+        _error_code = ErrorCode::kUnknownError;
+        _error_description = string("An unhandled exception occurred.\n\n") + ex.what();
     }
     catch (...) {
-        _last_error_code = ErrorCode::kUnknownError;
-        _last_error_description = "An unhandled exception occurred.\n\n";
+        _error_code = ErrorCode::kUnknownError;
+        _error_description = "An unhandled exception occurred.";
     }
-    return static_cast<int32_t>(_last_error_code);
+    return static_cast<int32_t>(_error_code);
 }
 
 }  // namespace grpc_json_client

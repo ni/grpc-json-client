@@ -32,18 +32,19 @@ class Session {
         size_t* size);
     int32_t Lock();
     int32_t Unlock();
+    int32_t GetError(int32_t* code, char* buffer, size_t* size);
+    static int32_t GetErrorString(Session* session, int32_t code, char* buffer, size_t* size);
     int32_t Close();
-    static int32_t GetError(Session* session, int32_t* code, char* buffer, size_t* size);
 
  private:
     std::recursive_mutex _lock;
     UnaryUnaryJsonClient _client;
     std::unordered_map<void*, std::string> _responses;
-    ErrorCode _last_error_code;
-    std::string _last_error_description;
+    ErrorCode _error_code;
+    std::string _error_description;
 
     // Helper function for locking access to the session and catching exceptions.
-    int32_t Evaluate(const std::function<void(UnaryUnaryJsonClient&)>& func);
+    int32_t Evaluate(const std::function<ErrorCode(UnaryUnaryJsonClient&)>& func);
 };
 
 }  // namespace grpc_json_client

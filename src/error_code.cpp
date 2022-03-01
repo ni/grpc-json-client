@@ -11,8 +11,8 @@ using std::unordered_map;
 namespace ni {
 namespace grpc_json_client {
 
-string GetErrorDescription(const ErrorCode& error_code) {
-    static const unordered_map<ErrorCode, char*> descriptions = {
+string GetErrorString(const ErrorCode& error_code) {
+    static const unordered_map<ErrorCode, char*> error_strings = {
         {ErrorCode::kBufferSizeOutOfRangeWarning, "Buffer size out of range"},
         {ErrorCode::kNone, "No error"},
         {ErrorCode::kUnknownError, "Unknown error code"},
@@ -26,10 +26,10 @@ string GetErrorDescription(const ErrorCode& error_code) {
         {ErrorCode::kBufferSizeOutOfRangeError, "Buffer size out of range"}
     };
     try {
-        return descriptions.at(error_code);
+        return error_strings.at(error_code);
     }
     catch (const out_of_range&) {
-        return descriptions.at(ErrorCode::kUnknownError);
+        return error_strings.at(ErrorCode::kUnknownError);
     }
 }
 

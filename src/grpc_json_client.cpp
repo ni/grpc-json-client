@@ -12,12 +12,12 @@ using std::unique_ptr;
 
 int32_t GrpcJsonClient_Initialize(const char* target, void** session_handle) {
     shared_ptr<ChannelCredentials> credentials = grpc::InsecureChannelCredentials();
-    unique_ptr<Session> session = std::make_unique<Session>(target, credentials);
-    int32_t error_code = session->QueryReflectionService();
-    if (error_code >= 0) {
-        *session_handle = session.release();
-    }
-    return error_code;
+    *session_handle = new Session(target, credentials);
+    return 0;
+}
+
+int32_t GrpcJsonClient_QueryReflectionService(void* session_handle) {
+    return static_cast<Session*>(session_handle)->QueryReflectionService();
 }
 
 int32_t GrpcJsonClient_StartAsyncCall(
@@ -54,12 +54,18 @@ int32_t GrpcJsonClient_UnlockSession(void* session_handle) {
     return static_cast<Session*>(session_handle)->Unlock();
 }
 
+int32_t GrpcJsonClient_GetError(void* session_handle, int32_t* code, char* buffer, size_t* size) {
+    return static_cast<Session*>(session_handle)->GetError(code, buffer, size);
+}
+
+int32_t GrpcJsonClient_GetErrorString(
+    void* session_handle, int32_t code, char* buffer, size_t* size
+) {
+    return Session::GetErrorString(static_cast<Session*>(session_handle), code, buffer, size);
+}
+
 int32_t GrpcJsonClient_Close(void* session_handle) {
     int32_t error_code = static_cast<Session*>(session_handle)->Close();
     delete session_handle;
     return error_code;
-}
-
-int32_t GrpcJsonClient_GetError(void* session_handle, int32_t* code, char* buffer, size_t* size) {
-    return Session::GetError(static_cast<Session*>(session_handle), code, buffer, size);
 }

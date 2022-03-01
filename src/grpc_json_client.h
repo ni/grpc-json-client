@@ -12,6 +12,9 @@ __declspec(dllexport) int32_t GrpcJsonClient_Initialize(
     const char* target, void** session_handle
 );
 
+// Queries the reflection service for file descriptors.
+__declspec(dllexport) int32_t GrpcJsonClient_QueryReflectionService(void* session_handle);
+
 // Starts an asynchronous call.
 __declspec(dllexport) int32_t GrpcJsonClient_StartAsyncCall(
     void* session_handle, const char* service, const char* method, const char* request, void** tag
@@ -40,13 +43,18 @@ __declspec(dllexport) int32_t GrpcJsonClient_LockSession(void* session_handle);
 // Unlocks the session.
 __declspec(dllexport) int32_t GrpcJsonClient_UnlockSession(void* session_handle);
 
-// Releases resources allocated by the session.
-__declspec(dllexport) int32_t GrpcJsonClient_Close(void* session_handle);
-
 // Gets error information.
 __declspec(dllexport) int32_t GrpcJsonClient_GetError(
     void* session_handle, int32_t* code, char* buffer, size_t* size
 );
+
+// Gets error information.
+__declspec(dllexport) int32_t GrpcJsonClient_GetErrorString(
+    void* session_handle, int32_t code, char* buffer, size_t* size
+);
+
+// Releases resources allocated by the session.
+__declspec(dllexport) int32_t GrpcJsonClient_Close(void* session_handle);
 
 #ifdef __cplusplus
 }
