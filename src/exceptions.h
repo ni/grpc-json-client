@@ -20,7 +20,6 @@ class JsonClientException : public std::exception {
 };
 
 class RemoteProcedureCallException : public JsonClientException {
- public:
     using JsonClientException::JsonClientException;
 
     ErrorCode error_code() const override {

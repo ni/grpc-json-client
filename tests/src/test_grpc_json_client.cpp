@@ -227,7 +227,9 @@ TEST_F(GrpcJsonClientTest, GetErrorStringWithoutSessionSucceeds) {
         session, "UndefinedService", "UndefinedMethod", "{}", &tag);
 
     size_t size = 0;
-    int32_t get_error_error_code = GrpcJsonClient_GetErrorString(nullptr, error_code, nullptr, &size);
+    int32_t get_error_error_code = {
+        GrpcJsonClient_GetErrorString(nullptr, error_code, nullptr, &size)
+    };
     ASSERT_EQ(get_error_error_code, 0);
     unique_ptr<char> buffer(new char[size]);
     get_error_error_code = GrpcJsonClient_GetErrorString(nullptr, error_code, buffer.get(), &size);

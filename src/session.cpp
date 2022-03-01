@@ -9,8 +9,6 @@
 using grpc::ChannelCredentials;
 using std::exception;
 using std::function;
-using std::lock_guard;
-using std::recursive_mutex;
 using std::shared_ptr;
 using std::string;
 
@@ -73,7 +71,6 @@ int32_t Session::BlockingCall(
     if (*tag) {
         return FinishAsyncCall(*tag, timeout, response, size);
     }
-    Lock();
     int32_t error_code = StartAsyncCall(service, method, request, tag);
     if (error_code >= 0) {
         int32_t next_error_code = FinishAsyncCall(*tag, timeout, response, size);
@@ -81,7 +78,6 @@ int32_t Session::BlockingCall(
             error_code = next_error_code;
         }
     }
-    Unlock();
     return error_code;
 }
 
@@ -149,7 +145,6 @@ int32_t Session::Close() {
 }
 
 int32_t Session::Evaluate(const function<ErrorCode(UnaryUnaryJsonClient&)>& func) {
-    lock_guard<recursive_mutex> lock(_lock);
     try {
         return static_cast<int32_t>(func(_client));
     }

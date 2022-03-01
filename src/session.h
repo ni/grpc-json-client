@@ -43,7 +43,7 @@ class Session {
     ErrorCode _error_code;
     std::string _error_description;
 
-    // Helper function for locking access to the session and catching exceptions.
+    // Helper function for catching exceptions.
     int32_t Evaluate(const std::function<ErrorCode(UnaryUnaryJsonClient&)>& func);
 };
 
