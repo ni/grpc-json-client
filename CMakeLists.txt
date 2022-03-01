@@ -91,6 +91,7 @@ if(GRPC_JSON_CLIENT_BUILD_TESTS)
     set(tests_protos_dir "${tests_dir}/protos/")
 
     # Add GTest submodule
+    set(BUILD_GMOCK OFF CACHE BOOL "")
     set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
     add_subdirectory("${CMAKE_SOURCE_DIR}/third_party/gtest/" "${CMAKE_BINARY_DIR}/gtest/" EXCLUDE_FROM_ALL)
 
