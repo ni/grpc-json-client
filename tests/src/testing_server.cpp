@@ -27,7 +27,7 @@ TestingServer::TestingServer(const string& address) :
     _address(address)
 {}
 
-void TestingServer::StartInsecure() {
+void TestingServer::Start() {
     grpc::reflection::InitProtoReflectionServerBuilderPlugin();
     ServerBuilder builder;
     builder.AddListeningPort(_address, grpc::InsecureServerCredentials());

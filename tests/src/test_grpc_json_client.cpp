@@ -24,16 +24,15 @@ class GrpcJsonClientTest : public testing::Test {
     static void SetUpTestSuite() {
         string address("0.0.0.0:50051");
         server = std::make_unique<TestingServer>(address);
-        server->StartInsecure();
+        server->Start();
     }
 
     static void TearDownTestSuite() {
-server->Stop();
+        server->Stop();
     }
 
     void SetUp() override {
         ASSERT_EQ(GrpcJsonClient_Initialize("localhost:50051", &session), 0);
-        ASSERT_EQ(GrpcJsonClient_FillDescriptorDatabase(session), 0);
     }
 
     void TearDown() override {
@@ -42,6 +41,14 @@ server->Stop();
 };
 
 unique_ptr<TestingServer> GrpcJsonClientTest::server;
+
+TEST_F(GrpcJsonClientTest, ResetDescriptorDatabaseSucceeds) {
+    ASSERT_EQ(GrpcJsonClient_ResetDescriptorDatabase(session), 0);
+}
+
+TEST_F(GrpcJsonClientTest, FillDescriptorDatabaseSucceeds) {
+    ASSERT_EQ(GrpcJsonClient_FillDescriptorDatabase(session), 0);
+}
 
 TEST_F(GrpcJsonClientTest, SynchronousCallsWithTimeoutsSucceed) {
     for (string string_field : { "first", "second" }) {
@@ -249,6 +256,12 @@ TEST_F(GrpcJsonClientTest, GetErrorWithSmallBufferSucceedsWithBufferSizeOutOfRan
     int32_t error_code = GrpcJsonClient_GetError(session, &queried_error_code, &buffer, &size);
 
     ASSERT_EQ(error_code, static_cast<int32_t>(ErrorCode::kBufferSizeOutOfRangeWarning));
+}
+
+TEST_F(GrpcJsonClientTest, RequestsWithoutRunningServiceFailWithRemoteProcedureCallError) {
+    server->Stop();
+    EXPECT_EQ(GrpcJsonClient_FillDescriptorDatabase(session), -2);
+    server->Start();
 }
 
 }  // namespace grpc_json_client

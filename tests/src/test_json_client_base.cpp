@@ -28,7 +28,7 @@ class JsonClientBaseTest : public testing::Test {
     static void SetUpTestSuite() {
         string address("0.0.0.0:50051");
         server = std::make_unique<TestingServer>(address);
-        server->StartInsecure();
+        server->Start();
     }
 
     static void TearDownTestSuite() {

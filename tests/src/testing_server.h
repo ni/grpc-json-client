@@ -26,7 +26,7 @@ class TestingServer {
 
  public:
     explicit TestingServer(const std::string& address);
-    void StartInsecure();
+    void Start();
     void Stop();
 };
 
