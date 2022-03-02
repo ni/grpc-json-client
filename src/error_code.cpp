@@ -17,6 +17,7 @@ string GetErrorString(const ErrorCode& error_code) {
         {ErrorCode::kNone, "No error"},
         {ErrorCode::kUnknownError, "Unknown error code"},
         {ErrorCode::kRemoteProcedureCallError, "Remote procedure call error"},
+        {ErrorCode::kReflectionServiceError, "Reflection service error"},
         {ErrorCode::kServiceNotFoundError, "Service not found"},
         {ErrorCode::kMethodNotFoundError, "Method not found"},
         {ErrorCode::kSerializationError, "Serialization error"},

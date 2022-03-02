@@ -21,7 +21,10 @@ namespace grpc_json_client {
 
 UnaryUnaryJsonClient::UnaryUnaryJsonClient(
     const std::string& target, const shared_ptr<ChannelCredentials>& credentials
-) : JsonClientBase(target, credentials), _stub(channel) {}
+) : 
+    JsonClientBase(target, credentials), 
+    _stub(channel) {
+}
 
 UnaryUnaryJsonClient::~UnaryUnaryJsonClient() {
     for (AsyncCallData* async_call : _tags) {
@@ -49,8 +52,10 @@ void* UnaryUnaryJsonClient::StartAsyncCall(
 
 string UnaryUnaryJsonClient::FinishAsyncCall(void* tag, int timeout) {
     if (!_tags.erase(static_cast<AsyncCallData*>(tag))) {
-        throw InvalidTagException(
-            "An active remote procedure call was not found for the specified tag.");
+        string message = {
+            "An active remote procedure call was not found for the specified tag."
+        };
+        throw InvalidTagException(message);
     }
     unique_ptr<AsyncCallData> async_call(static_cast<AsyncCallData*>(tag));
     ByteBuffer serialized_response;
@@ -74,13 +79,15 @@ string UnaryUnaryJsonClient::FinishAsyncCall(void* tag, int timeout) {
     case CompletionQueue::NextStatus::GOT_EVENT:
         if (next_tag != async_call.get()) {
             // each call gets it's own completion queue so this shouldn't happen
-            throw logic_error(
-                "The specified tag did not match the tag returned from the completion queue.");
+            string message = {
+                "The specified tag did not match the tag returned from the completion queue."
+            };
+            throw logic_error(message);
         }
         if (ok) {
             if (!status.ok()) {
-                string summary("An error occurred during the remote procedure call.\n\n");
-                throw RemoteProcedureCallException(summary + status.error_message());
+                string summary("An error occurred during the remote procedure call.");
+                throw RemoteProcedureCallException(status, summary);
             }
             return JsonSerializer::DeserializeMessage(
                 async_call->method_type->output_type(), &serialized_response);

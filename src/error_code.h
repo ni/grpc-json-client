@@ -11,13 +11,14 @@ enum class ErrorCode : int {
     kNone = 0,
     kUnknownError = -1,
     kRemoteProcedureCallError = -2,
-    kServiceNotFoundError = -3,
-    kMethodNotFoundError = -4,
-    kSerializationError = -5,
-    kDeserializationError = -6,
-    kInvalidTagError = -7,
-    kTimeoutError = -8,
-    kBufferSizeOutOfRangeError = -9
+    kReflectionServiceError = -3,
+    kServiceNotFoundError = -4,
+    kMethodNotFoundError = -5,
+    kSerializationError = -6,
+    kDeserializationError = -7,
+    kInvalidTagError = -8,
+    kTimeoutError = -9,
+    kBufferSizeOutOfRangeError = -10
 };
 
 std::string GetErrorString(const ErrorCode& error_code);

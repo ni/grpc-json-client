@@ -5,44 +5,78 @@
 #include <string>
 
 #include "error_code.h"
+#include "grpcpp/grpcpp.h"
 
 namespace ni {
 namespace grpc_json_client {
 
 class JsonClientException : public std::exception {
  public:
-    explicit JsonClientException(const std::string& description) :
-        std::exception(description.c_str()) {}
+    explicit JsonClientException(const std::string& message) :
+        _message(message) {}
 
-    virtual ErrorCode error_code() const {
+    virtual ErrorCode code() const {
         return ErrorCode::kUnknownError;
     }
+
+    const char* what() const override {
+        return _message.c_str();
+    }
+
+    const std::string& message() const {
+        return _message;
+    }
+
+ protected:
+    std::string _message;
 };
 
 class RemoteProcedureCallException : public JsonClientException {
-    using JsonClientException::JsonClientException;
+ public:
+    RemoteProcedureCallException(const grpc::Status& grpc_status, const std::string& summary)
+    : JsonClientException(summary), _status(grpc_status) {
+        if (!_status.ok()) {
+            _message += "\n\n";
+            _message += _status.error_message();
+        }
+    }
 
-    ErrorCode error_code() const override {
+    ErrorCode code() const override {
         return ErrorCode::kRemoteProcedureCallError;
+    }
+
+    const grpc::Status& status() const {
+        return _status;
+    }
+
+ private:
+    grpc::Status _status;
+};
+
+class ReflectionServiceException : public RemoteProcedureCallException {
+    using RemoteProcedureCallException::RemoteProcedureCallException;
+
+    ErrorCode code() const override {
+        return ErrorCode::kReflectionServiceError;
     }
 };
 
-class ServiceDescriptorNotFoundException : public JsonClientException {
+class ServiceNotFoundException : public JsonClientException {
  public:
-    explicit ServiceDescriptorNotFoundException(const std::string& name) :
+    explicit ServiceNotFoundException(const std::string& name) :
         JsonClientException("Service descriptor not found: " + name) {}
 
-    ErrorCode error_code() const override {
+    ErrorCode code() const override {
         return ErrorCode::kServiceNotFoundError;
     }
 };
 
-class MethodDescriptorNotFoundException :public JsonClientException {
+class MethodNotFoundException :public JsonClientException {
  public:
-    explicit MethodDescriptorNotFoundException(const std::string& name) :
+    explicit MethodNotFoundException(const std::string& name) :
         JsonClientException("Method descriptor not found: " + name) {}
 
-    ErrorCode error_code() const override {
+    ErrorCode code() const override {
         return ErrorCode::kMethodNotFoundError;
     }
 };
@@ -50,7 +84,7 @@ class MethodDescriptorNotFoundException :public JsonClientException {
 class SerializationException : public JsonClientException {
     using JsonClientException::JsonClientException;
 
-    ErrorCode error_code() const override {
+    ErrorCode code() const override {
         return ErrorCode::kSerializationError;
     }
 };
@@ -58,7 +92,7 @@ class SerializationException : public JsonClientException {
 class DeserializationException : public JsonClientException {
     using JsonClientException::JsonClientException;
 
-    ErrorCode error_code() const override {
+    ErrorCode code() const override {
         return ErrorCode::kDeserializationError;
     }
 };
@@ -66,7 +100,7 @@ class DeserializationException : public JsonClientException {
 class InvalidTagException : public JsonClientException {
     using JsonClientException::JsonClientException;
 
-    ErrorCode error_code() const override {
+    ErrorCode code() const override {
         return ErrorCode::kInvalidTagError;
     }
 };
@@ -74,7 +108,7 @@ class InvalidTagException : public JsonClientException {
 class TimeoutException : public JsonClientException {
     using JsonClientException::JsonClientException;
 
-    ErrorCode error_code() const override {
+    ErrorCode code() const override {
         return ErrorCode::kTimeoutError;
     }
 };
@@ -82,7 +116,7 @@ class TimeoutException : public JsonClientException {
 class BufferSizeOutOfRangeException : public JsonClientException {
     using JsonClientException::JsonClientException;
 
-    ErrorCode error_code() const override {
+    ErrorCode code() const override {
         return ErrorCode::kBufferSizeOutOfRangeError;
     }
 };

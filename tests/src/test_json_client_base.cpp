@@ -36,7 +36,7 @@ class JsonClientBaseTest : public testing::Test {
     }
 
     void SetUp() override {
-        client.QueryReflectionService();
+        client.FillDescriptorDatabase();
     }
 };
 
@@ -52,13 +52,13 @@ TEST_F(JsonClientBaseTest, FindMethodSucceedsOnValidMethod) {
 TEST_F(JsonClientBaseTest, FindMethodFailsOnUndefinedServiceName) {
     ASSERT_THROW(
         client.FindMethod("undefined.service.name", "UnaryUnaryEcho"),
-        ServiceDescriptorNotFoundException);
+        ServiceNotFoundException);
 }
 
 TEST_F(JsonClientBaseTest, FindMethodFailsOnUndefinedMethodName) {
     ASSERT_THROW(
         client.FindMethod("ni.grpc_json_client.TestingService", "UndefinedMethodName"),
-        MethodDescriptorNotFoundException);
+        MethodNotFoundException);
 }
 
 }  // namespace grpc_json_client

@@ -16,8 +16,12 @@ int32_t GrpcJsonClient_Initialize(const char* target, void** session_handle) {
     return 0;
 }
 
-int32_t GrpcJsonClient_QueryReflectionService(void* session_handle) {
-    return static_cast<Session*>(session_handle)->QueryReflectionService();
+int32_t GrpcJsonClient_ResetDescriptorDatabase(void* session_handle) {
+    return static_cast<Session*>(session_handle)->ResetDescriptorDatabase();
+}
+
+int32_t GrpcJsonClient_FillDescriptorDatabase(void* session_handle) {
+    return static_cast<Session*>(session_handle)->FillDescriptorDatabase();
 }
 
 int32_t GrpcJsonClient_StartAsyncCall(

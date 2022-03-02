@@ -21,10 +21,18 @@ Session::Session(const string& target, const shared_ptr<ChannelCredentials>& cre
     _error_description(ni::grpc_json_client::GetErrorString(ErrorCode::kNone))
 {}
 
-int32_t Session::QueryReflectionService() {
+int32_t Session::ResetDescriptorDatabase() {
     return Evaluate(
         [](UnaryUnaryJsonClient& client) {
-            client.QueryReflectionService();
+            client.ResetDescriptorDatabase();
+            return ErrorCode::kNone;
+        });
+}
+
+int32_t Session::FillDescriptorDatabase() {
+    return Evaluate(
+        [](UnaryUnaryJsonClient& client) {
+            client.FillDescriptorDatabase();
             return ErrorCode::kNone;
         });
 }
@@ -52,8 +60,10 @@ int32_t Session::FinishAsyncCall(void* tag, int32_t timeout, char* buffer, size_
                 strncpy(buffer, response.c_str(), *size);
                 _responses.erase(tag);
             } else {
-                throw BufferSizeOutOfRangeException(
-                    "The buffer size is too small to accommodate the response.");
+                string message = {
+                    "The buffer size is too small to accommodate the response."
+                };
+                throw BufferSizeOutOfRangeException(message);
             }
             return ErrorCode::kNone;
         });
@@ -149,8 +159,8 @@ int32_t Session::Evaluate(const function<ErrorCode(UnaryUnaryJsonClient&)>& func
         return static_cast<int32_t>(func(_client));
     }
     catch (const JsonClientException& ex) {
-        _error_code = ex.error_code();
-        _error_description = ex.what();
+        _error_code = ex.code();
+        _error_description = ex.message();
     }
     catch (const exception& ex) {
         _error_code = ErrorCode::kUnknownError;

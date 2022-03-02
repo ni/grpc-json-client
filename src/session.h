@@ -18,7 +18,8 @@ class Session {
     Session(
         const std::string& target, const std::shared_ptr<grpc::ChannelCredentials>& credentials);
 
-    int32_t QueryReflectionService();
+    int32_t ResetDescriptorDatabase();
+    int32_t FillDescriptorDatabase();
     int32_t StartAsyncCall(
         const char* service, const char* method, const char* request, void** tag);
     int32_t FinishAsyncCall(void* tag, int32_t timeout, char* buffer, size_t* size);

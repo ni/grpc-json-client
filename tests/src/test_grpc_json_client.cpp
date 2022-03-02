@@ -33,7 +33,7 @@ server->Stop();
 
     void SetUp() override {
         ASSERT_EQ(GrpcJsonClient_Initialize("localhost:50051", &session), 0);
-        ASSERT_EQ(GrpcJsonClient_QueryReflectionService(session), 0);
+        ASSERT_EQ(GrpcJsonClient_FillDescriptorDatabase(session), 0);
     }
 
     void TearDown() override {

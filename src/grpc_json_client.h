@@ -12,8 +12,11 @@ __declspec(dllexport) int32_t GrpcJsonClient_Initialize(
     const char* target, void** session_handle
 );
 
+// Resets the descriptor database to it's default state.
+__declspec(dllexport) int32_t GrpcJsonClient_ResetDescriptorDatabase(void* session_handle);
+
 // Queries the reflection service for file descriptors.
-__declspec(dllexport) int32_t GrpcJsonClient_QueryReflectionService(void* session_handle);
+__declspec(dllexport) int32_t GrpcJsonClient_FillDescriptorDatabase(void* session_handle);
 
 // Starts an asynchronous call.
 __declspec(dllexport) int32_t GrpcJsonClient_StartAsyncCall(
