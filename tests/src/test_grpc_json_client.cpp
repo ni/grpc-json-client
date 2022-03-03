@@ -47,7 +47,7 @@ TEST_F(GrpcJsonClientTest, ResetDescriptorDatabaseSucceeds) {
 }
 
 TEST_F(GrpcJsonClientTest, FillDescriptorDatabaseSucceeds) {
-    ASSERT_EQ(GrpcJsonClient_FillDescriptorDatabase(session), 0);
+    ASSERT_EQ(GrpcJsonClient_FillDescriptorDatabase(session, -1), 0);
 }
 
 TEST_F(GrpcJsonClientTest, SynchronousCallsWithTimeoutsSucceed) {
@@ -56,7 +56,7 @@ TEST_F(GrpcJsonClientTest, SynchronousCallsWithTimeoutsSucceed) {
         char* service = "ni.grpc_json_client.TestingService";
         void* tag = nullptr;
         int32_t error_code = GrpcJsonClient_StartAsyncCall(
-            session, service, "UnaryUnaryEcho", request.dump().c_str(), &tag);
+            session, service, "UnaryUnaryEcho", request.dump().c_str(), 100, &tag);
         ASSERT_EQ(error_code, 0);
         size_t size = 0;
         error_code = GrpcJsonClient_FinishAsyncCall(session, tag, 100, nullptr, &size);
@@ -75,7 +75,7 @@ TEST_F(GrpcJsonClientTest, SynchronousCallsWithoutTimeoutsSucceed) {
         char* service = "ni.grpc_json_client.TestingService";
         void* tag = nullptr;
         int32_t error_code = GrpcJsonClient_StartAsyncCall(
-            session, service, "UnaryUnaryEcho", request.dump().c_str(), &tag);
+            session, service, "UnaryUnaryEcho", request.dump().c_str(), -1, &tag);
         ASSERT_EQ(error_code, 0);
         size_t size = 0;
         error_code = GrpcJsonClient_FinishAsyncCall(session, tag, -1, nullptr, &size);
@@ -96,7 +96,7 @@ TEST_F(GrpcJsonClientTest, AsynchronousCallsWithTimeoutsSucceed) {
     for (size_t i = 0; i < 2; i++) {
         json request = { {"string_field", string_fields[i]} };
         int32_t error_code = GrpcJsonClient_StartAsyncCall(
-            session, service, "UnaryUnaryEcho", request.dump().c_str(), &tags[i]);
+            session, service, "UnaryUnaryEcho", request.dump().c_str(), 100, &tags[i]);
         ASSERT_EQ(error_code, 0);
     }
 
@@ -120,7 +120,7 @@ TEST_F(GrpcJsonClientTest, AsynchronousCallsWithoutTimeoutsSucceed) {
     for (size_t i = 0; i < 2; i++) {
         json request = { {"delay", 100}, {"string_field", string_fields[i]} };
         int32_t error_code = GrpcJsonClient_StartAsyncCall(
-            session, service, "UnaryUnaryEcho", request.dump().c_str(), &tags[i]);
+            session, service, "UnaryUnaryEcho", request.dump().c_str(), -1, &tags[i]);
         ASSERT_EQ(error_code, 0);
     }
 
@@ -142,11 +142,11 @@ TEST_F(GrpcJsonClientTest, BlockingCallSucceeds) {
     void* tag = nullptr;
     size_t size = 0;
     int32_t error_code = GrpcJsonClient_BlockingCall(
-        session, service, "UnaryUnaryEcho", request.dump().c_str(), &tag, 100, nullptr, &size);
+        session, service, "UnaryUnaryEcho", request.dump().c_str(), 100, &tag, nullptr, &size);
     ASSERT_EQ(error_code, 0);
     unique_ptr<char> buffer(new char[size]);
     error_code = GrpcJsonClient_BlockingCall(
-        session, nullptr, nullptr, nullptr, &tag, 100, buffer.get(), &size);
+        session, nullptr, nullptr, nullptr, 100, &tag, buffer.get(), &size);
     ASSERT_EQ(error_code, 0);
     json response = json::parse(buffer.get());
     ASSERT_EQ(response["string_field"], "BlockingCall");
@@ -155,34 +155,34 @@ TEST_F(GrpcJsonClientTest, BlockingCallSucceeds) {
 TEST_F(GrpcJsonClientTest, StartAsyncCallToUndefinedServiceFailsWithServiceNotFoundError) {
     void* tag = nullptr;
     int32_t error_code = GrpcJsonClient_StartAsyncCall(
-        session, "UndefinedService", "UndefinedMethod", "{}", &tag);
+        session, "UndefinedService", "UndefinedMethod", "{}", -1, &tag);
     ASSERT_EQ(error_code, static_cast<int32_t>(ErrorCode::kServiceNotFoundError));
 }
 
 TEST_F(GrpcJsonClientTest, StartAsyncCallToUndefinedMethodFailsWithMethodNotFoundError) {
     void* tag = nullptr;
     int32_t error_code = GrpcJsonClient_StartAsyncCall(
-        session, "ni.grpc_json_client.TestingService", "UndefinedMethod", "{}", &tag);
+        session, "ni.grpc_json_client.TestingService", "UndefinedMethod", "{}", -1, &tag);
     ASSERT_EQ(error_code, static_cast<int32_t>(ErrorCode::kMethodNotFoundError));
 }
 
 TEST_F(GrpcJsonClientTest, StartAsyncCallWithMalformedMessageFailsWithSerializationError) {
     void* tag = nullptr;
     int32_t error_code = GrpcJsonClient_StartAsyncCall(
-        session, "ni.grpc_json_client.TestingService", "UnaryUnaryEcho", "", &tag);
+        session, "ni.grpc_json_client.TestingService", "UnaryUnaryEcho", "", -1, &tag);
     ASSERT_EQ(error_code, static_cast<int32_t>(ErrorCode::kSerializationError));
 }
 
 TEST_F(GrpcJsonClientTest, FinishAsyncCallWithInvalidTagFailsWithInvalidTagError) {
     void* tag = nullptr;
     int32_t error_code = GrpcJsonClient_StartAsyncCall(
-        session, "ni.grpc_json_client.TestingService", "UnaryUnaryEcho", "{}", &tag);
+        session, "ni.grpc_json_client.TestingService", "UnaryUnaryEcho", "{}", -1, &tag);
     ASSERT_EQ(error_code, 0);
 
     size_t size = 0;
     tag = static_cast<int*>(tag) + 1;
     error_code = GrpcJsonClient_FinishAsyncCall(session, tag, 100, nullptr, &size);
-    ASSERT_EQ(error_code, static_cast<int32_t>(ErrorCode::kInvalidTagError));
+    ASSERT_EQ(error_code, static_cast<int32_t>(ErrorCode::kInvalidArgumentError));
 }
 
 TEST_F(GrpcJsonClientTest, CallWithShortTimeoutFailsWithTimeoutError) {
@@ -190,7 +190,7 @@ TEST_F(GrpcJsonClientTest, CallWithShortTimeoutFailsWithTimeoutError) {
     char* service = "ni.grpc_json_client.TestingService";
     void* tag = nullptr;
     int32_t error_code = GrpcJsonClient_StartAsyncCall(
-        session, service, "UnaryUnaryEcho", request.dump().c_str(), &tag);
+        session, service, "UnaryUnaryEcho", request.dump().c_str(), -1, &tag);
     ASSERT_EQ(error_code, 0);
 
     size_t size = 0;
@@ -201,7 +201,7 @@ TEST_F(GrpcJsonClientTest, CallWithShortTimeoutFailsWithTimeoutError) {
 TEST_F(GrpcJsonClientTest, FinishAsyncCallWithSmallBufferFailsWithBufferSizeOutOfRangeError) {
     void* tag = nullptr;
     int32_t error_code = GrpcJsonClient_StartAsyncCall(
-        session, "ni.grpc_json_client.TestingService", "UnaryUnaryEcho", "{}", &tag);
+        session, "ni.grpc_json_client.TestingService", "UnaryUnaryEcho", "{}", -1, &tag);
     ASSERT_EQ(error_code, 0);
 
     size_t size = 0;
@@ -213,7 +213,7 @@ TEST_F(GrpcJsonClientTest, FinishAsyncCallWithSmallBufferFailsWithBufferSizeOutO
 TEST_F(GrpcJsonClientTest, GetErrorSucceeds) {
     void* tag = nullptr;
     int32_t expected_error_code = GrpcJsonClient_StartAsyncCall(
-        session, "UndefinedService", "UndefinedMethod", "{}", &tag);
+        session, "UndefinedService", "UndefinedMethod", "{}", -1, &tag);
 
     int32_t queried_error_code = 0;
     size_t size = 0;
@@ -231,7 +231,7 @@ TEST_F(GrpcJsonClientTest, GetErrorSucceeds) {
 TEST_F(GrpcJsonClientTest, GetErrorStringWithoutSessionSucceeds) {
     void* tag = nullptr;
     int32_t error_code = GrpcJsonClient_StartAsyncCall(
-        session, "UndefinedService", "UndefinedMethod", "{}", &tag);
+        session, "UndefinedService", "UndefinedMethod", "{}", -1, &tag);
 
     size_t size = 0;
     int32_t get_error_error_code = {
@@ -248,7 +248,7 @@ TEST_F(GrpcJsonClientTest, GetErrorStringWithoutSessionSucceeds) {
 
 TEST_F(GrpcJsonClientTest, GetErrorWithSmallBufferSucceedsWithBufferSizeOutOfRangeWarning) {
     void* tag = nullptr;
-    GrpcJsonClient_StartAsyncCall(session, "UndefinedService", "UndefinedMethod", "{}", &tag);
+    GrpcJsonClient_StartAsyncCall(session, "UndefinedService", "UndefinedMethod", "{}", -1, &tag);
 
     int32_t queried_error_code = 0;
     char buffer = 0;
@@ -260,7 +260,7 @@ TEST_F(GrpcJsonClientTest, GetErrorWithSmallBufferSucceedsWithBufferSizeOutOfRan
 
 TEST_F(GrpcJsonClientTest, RequestsWithoutRunningServiceFailWithRemoteProcedureCallError) {
     server->Stop();
-    EXPECT_EQ(GrpcJsonClient_FillDescriptorDatabase(session), -2);
+    EXPECT_EQ(GrpcJsonClient_FillDescriptorDatabase(session, -1), -2);
     server->Start();
 }
 

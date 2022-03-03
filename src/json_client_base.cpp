@@ -1,9 +1,6 @@
 
 #include "json_client_base.h"
 
-#include <memory>
-#include <string>
-
 #include "exceptions.h"
 #include "reflection.grpc.pb.h"
 
@@ -22,6 +19,7 @@ using grpc::reflection::v1alpha::ServerReflection;
 using grpc::reflection::v1alpha::ServerReflectionRequest;
 using grpc::reflection::v1alpha::ServerReflectionResponse;
 using grpc::reflection::v1alpha::ServiceResponse;
+using std::chrono::system_clock;
 using std::shared_ptr;
 using std::string;
 using std::unique_ptr;
@@ -34,7 +32,7 @@ namespace grpc_json_client {
 
 JsonClientBase::JsonClientBase(
     const string& target, const shared_ptr<ChannelCredentials>& credentials
-) : 
+) :
     channel(CreateChannel(target, credentials)),
     _database(std::make_unique<SimpleDescriptorDatabase>()),
     _pool(std::make_unique<DescriptorPool>(_database.get())) {
@@ -45,24 +43,26 @@ void JsonClientBase::ResetDescriptorDatabase() {
     _pool = std::make_unique<DescriptorPool>(_database.get());
 }
 
-void JsonClientBase::FillDescriptorDatabase() {
+void JsonClientBase::FillDescriptorDatabase(const system_clock::time_point& deadline) {
     ServerReflectionRequest request;
     request.set_list_services("");  // content will not be checked
     ServerReflectionResponse response;
-    QueryReflectionService(request, &response);
+    QueryReflectionService(request, &response, deadline);
     RepeatedPtrField<ServiceResponse> services = response.list_services_response().service();
     for (ServiceResponse service : services) {
-        FetchFileDescriptors(service.name());
+        FetchFileDescriptors(service.name(), deadline);
     }
 }
 
 const MethodDescriptor* JsonClientBase::FindMethod(
-    const string& service_name, const string& method_name
+    const string& service_name,
+    const string& method_name,
+    const system_clock::time_point& deadline
 ) {
     const ServiceDescriptor* service_descriptor = _pool->FindServiceByName(service_name);
     if (service_descriptor == nullptr) {
         try {
-            FetchFileDescriptors(service_name);
+            FetchFileDescriptors(service_name, deadline);
         } catch (const ReflectionServiceException& ex) {
             if (ex.status().error_code() == grpc::StatusCode::NOT_FOUND) {
                 throw ServiceNotFoundException(service_name);
@@ -82,32 +82,31 @@ const MethodDescriptor* JsonClientBase::FindMethod(
 }
 
 void JsonClientBase::QueryReflectionService(
-    const ServerReflectionRequest& request, ServerReflectionResponse* response
+    const ServerReflectionRequest& request,
+    ServerReflectionResponse* response,
+    const system_clock::time_point& deadline
 ) {
     // create stream
     ServerReflection::Stub stub(channel);
     ClientContext context;
-    // todo: what happens to this var if the service isn't running?
+    context.set_deadline(deadline);
     unique_ptr<ClientReflectionReaderWriter> stream = stub.ServerReflectionInfo(&context);
 
     // send request
     if (!stream->Write(request)) {
         Status status = stream->Finish();
-        string summary = {
-            "The stream failed to initiate communication with the host. "
-            "Ensure the reflection service is running and reachable."
-        };
+        string summary("Failed to initiate communication with the reflection service.");
         throw RemoteProcedureCallException(status, summary);
     }
     stream->WritesDone();
 
     // read response
-    if (!stream->Read(response)) {
-        Status status = stream->Finish();
-        string summary("The stream with the reflection service was interrupted.");
+    bool got_response = stream->Read(response);
+    Status status = stream->Finish();
+    if (!got_response) {
+        string summary("The connection with the reflection service was interrupted.");
         throw RemoteProcedureCallException(status, summary);
     } else if (response->has_error_response()) {
-        stream->Finish();
         grpc::StatusCode status_code = {
             static_cast<grpc::StatusCode>(response->error_response().error_code())
         };
@@ -115,20 +114,20 @@ void JsonClientBase::QueryReflectionService(
         grpc::Status status(status_code, error_message);
         throw ReflectionServiceException(status, "The reflection service reported an error.");
     }
-
-    // close stream
-    Status status = stream->Finish();
     if (!status.ok()) {
         string summary("An error occurred while communicating with the reflection service.");
         throw RemoteProcedureCallException(status, summary);
     }
 }
 
-void JsonClientBase::FetchFileDescriptors(const string& symbol) {
+void JsonClientBase::FetchFileDescriptors(
+    const string& symbol,
+    const system_clock::time_point& deadline
+) {
     ServerReflectionRequest request;
     request.set_file_containing_symbol(symbol);
     ServerReflectionResponse response;
-    QueryReflectionService(request, &response);
+    QueryReflectionService(request, &response, deadline);
     const FileDescriptorResponse& file_descriptor_response = response.file_descriptor_response();
     for (string serialized_file_descriptor : file_descriptor_response.file_descriptor_proto()) {
         FileDescriptorProto file_descriptor_proto;

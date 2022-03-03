@@ -12,17 +12,15 @@ using std::logic_error;
 using std::shared_ptr;
 using std::string;
 using std::unique_ptr;
-using std::chrono::milliseconds;
 using std::chrono::system_clock;
-using std::chrono::time_point;
 
 namespace ni {
 namespace grpc_json_client {
 
 UnaryUnaryJsonClient::UnaryUnaryJsonClient(
     const std::string& target, const shared_ptr<ChannelCredentials>& credentials
-) : 
-    JsonClientBase(target, credentials), 
+) :
+    JsonClientBase(target, credentials),
     _stub(channel) {
 }
 
@@ -33,14 +31,18 @@ UnaryUnaryJsonClient::~UnaryUnaryJsonClient() {
 }
 
 void* UnaryUnaryJsonClient::StartAsyncCall(
-    const string& service_name, const string& method_name, const string& request_json
+    const string& service_name,
+    const string& method_name,
+    const string& request_json,
+    const system_clock::time_point& deadline
 ) {
     unique_ptr<AsyncCallData> async_call = std::make_unique<AsyncCallData>();
-    async_call->method_type = FindMethod(service_name, method_name);
+    async_call->method_type = FindMethod(service_name, method_name, deadline);
     string endpoint = string("/") + service_name + "/" + method_name;
     ByteBuffer serialized_request = {
         JsonSerializer::SerializeMessage(async_call->method_type->input_type(), request_json)
     };
+    async_call->context.set_deadline(deadline);
     async_call->response_reader = {
         _stub.PrepareUnaryCall(
             &async_call->context, endpoint, serialized_request, &async_call->completion_queue)
@@ -50,12 +52,12 @@ void* UnaryUnaryJsonClient::StartAsyncCall(
     return async_call.release();
 }
 
-string UnaryUnaryJsonClient::FinishAsyncCall(void* tag, int timeout) {
+string UnaryUnaryJsonClient::FinishAsyncCall(void* tag, const system_clock::time_point& deadline) {
     if (!_tags.erase(static_cast<AsyncCallData*>(tag))) {
         string message = {
             "An active remote procedure call was not found for the specified tag."
         };
-        throw InvalidTagException(message);
+        throw InvalidArgumentException(message);
     }
     unique_ptr<AsyncCallData> async_call(static_cast<AsyncCallData*>(tag));
     ByteBuffer serialized_response;
@@ -63,14 +65,9 @@ string UnaryUnaryJsonClient::FinishAsyncCall(void* tag, int timeout) {
     async_call->response_reader->Finish(&serialized_response, &status, async_call.get());
     void* next_tag = nullptr;
     bool ok = false;
-    CompletionQueue::NextStatus next_status;
-    if (timeout < 0) {
-        next_status = static_cast<CompletionQueue::NextStatus>(
-            async_call->completion_queue.Next(&next_tag, &ok));
-    } else {
-        system_clock::time_point deadline = system_clock::now() + milliseconds(timeout);
-        next_status = async_call->completion_queue.AsyncNext(&next_tag, &ok, deadline);
-    }
+    CompletionQueue::NextStatus next_status = {
+        async_call->completion_queue.AsyncNext(&next_tag, &ok, deadline)
+    };
     switch (next_status) {
     case CompletionQueue::NextStatus::SHUTDOWN:
         // we shouldn't reach this point since the completion queue
@@ -96,7 +93,7 @@ string UnaryUnaryJsonClient::FinishAsyncCall(void* tag, int timeout) {
         throw logic_error("The completion queue is shutting down unexpectedly.");
     case CompletionQueue::NextStatus::TIMEOUT:
         throw TimeoutException(
-            "Remote procedure call timed out while waiting for a response from the host.");
+            "Timed out while waiting for the remote procedure call to complete.");
     default:
         // throw exception for unhandled case
         throw logic_error("An unknown status was returned from the completion queue.");

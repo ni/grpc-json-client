@@ -15,14 +15,14 @@ string GetErrorString(const ErrorCode& error_code) {
     static const unordered_map<ErrorCode, char*> error_strings = {
         {ErrorCode::kBufferSizeOutOfRangeWarning, "Buffer size out of range"},
         {ErrorCode::kNone, "No error"},
-        {ErrorCode::kUnknownError, "Unknown error code"},
+        {ErrorCode::kUnknownError, "Unknown error"},
         {ErrorCode::kRemoteProcedureCallError, "Remote procedure call error"},
         {ErrorCode::kReflectionServiceError, "Reflection service error"},
         {ErrorCode::kServiceNotFoundError, "Service not found"},
         {ErrorCode::kMethodNotFoundError, "Method not found"},
         {ErrorCode::kSerializationError, "Serialization error"},
         {ErrorCode::kDeserializationError, "Deserialization error"},
-        {ErrorCode::kInvalidTagError, "Invalid tag"},
+        {ErrorCode::kInvalidArgumentError, "Invalid argument"},
         {ErrorCode::kTimeoutError, "Timeout"},
         {ErrorCode::kBufferSizeOutOfRangeError, "Buffer size out of range"}
     };

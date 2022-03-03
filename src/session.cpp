@@ -1,12 +1,15 @@
 
 #include "session.h"
 
+#include <chrono>
 #include <memory>
 #include <string>
 
 #include "error_code.h"
 
 using grpc::ChannelCredentials;
+using std::chrono::milliseconds;
+using std::chrono::system_clock;
 using std::exception;
 using std::function;
 using std::shared_ptr;
@@ -14,6 +17,13 @@ using std::string;
 
 namespace ni {
 namespace grpc_json_client {
+
+system_clock::time_point DeadlineFromTimeout(int32_t timeout) {
+    if (timeout < 0) {
+        return system_clock::time_point::max();
+    }
+    return system_clock::now() + milliseconds(timeout);
+}
 
 Session::Session(const string& target, const shared_ptr<ChannelCredentials>& credentials) :
     _client(target, credentials),
@@ -29,20 +39,22 @@ int32_t Session::ResetDescriptorDatabase() {
         });
 }
 
-int32_t Session::FillDescriptorDatabase() {
+int32_t Session::FillDescriptorDatabase(int32_t timeout) {
     return Evaluate(
-        [](UnaryUnaryJsonClient& client) {
-            client.FillDescriptorDatabase();
+        [=](UnaryUnaryJsonClient& client) {
+            system_clock::time_point deadline = DeadlineFromTimeout(timeout);
+            client.FillDescriptorDatabase(deadline);
             return ErrorCode::kNone;
         });
 }
 
 int32_t Session::StartAsyncCall(
-    const char* service, const char* method, const char* request, void** tag
+    const char* service, const char* method, const char* request, int32_t timeout, void** tag
 ) {
     return Evaluate(
         [=](UnaryUnaryJsonClient& client) {
-            *tag = client.StartAsyncCall(service, method, request);
+            system_clock::time_point deadline = DeadlineFromTimeout(timeout);
+            *tag = client.StartAsyncCall(service, method, request, deadline);
             return ErrorCode::kNone;
         });
 }
@@ -51,7 +63,8 @@ int32_t Session::FinishAsyncCall(void* tag, int32_t timeout, char* buffer, size_
     return Evaluate(
         [=](UnaryUnaryJsonClient& client) {
             if (!_responses.count(tag)) {
-                _responses[tag] = client.FinishAsyncCall(tag, timeout);
+                system_clock::time_point deadline = DeadlineFromTimeout(timeout);
+                _responses[tag] = client.FinishAsyncCall(tag, deadline);
             }
             const string& response = _responses[tag];
             if (!buffer) {
@@ -73,15 +86,15 @@ int32_t Session::BlockingCall(
     const char* service,
     const char* method,
     const char* request,
-    void** tag,
     int32_t timeout,
+    void** tag,
     char* response,
     size_t* size
 ) {
     if (*tag) {
         return FinishAsyncCall(*tag, timeout, response, size);
     }
-    int32_t error_code = StartAsyncCall(service, method, request, tag);
+    int32_t error_code = StartAsyncCall(service, method, request, timeout, tag);
     if (error_code >= 0) {
         int32_t next_error_code = FinishAsyncCall(*tag, timeout, response, size);
         if (next_error_code < 0) {

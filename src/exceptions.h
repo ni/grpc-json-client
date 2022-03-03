@@ -12,8 +12,9 @@ namespace grpc_json_client {
 
 class JsonClientException : public std::exception {
  public:
-    explicit JsonClientException(const std::string& message) :
-        _message(message) {}
+    explicit JsonClientException(const std::string& message) : _message(message) {}
+    explicit JsonClientException(const std::string& summary, const std::string& details) :
+        _message(summary + "\n\n" + details) {}
 
     virtual ErrorCode code() const {
         return ErrorCode::kUnknownError;
@@ -33,11 +34,11 @@ class JsonClientException : public std::exception {
 
 class RemoteProcedureCallException : public JsonClientException {
  public:
-    RemoteProcedureCallException(const grpc::Status& grpc_status, const std::string& summary)
-    : JsonClientException(summary), _status(grpc_status) {
+    RemoteProcedureCallException(const grpc::Status& status, const std::string& summary)
+    : JsonClientException(summary), _status(status) {
         if (!_status.ok()) {
-            _message += "\n\n";
-            _message += _status.error_message();
+            _message += "\n\ngRPC Error Code: " + status.error_code();
+            _message += "\ngRPC Error Message: " + _status.error_message();
         }
     }
 
@@ -64,7 +65,7 @@ class ReflectionServiceException : public RemoteProcedureCallException {
 class ServiceNotFoundException : public JsonClientException {
  public:
     explicit ServiceNotFoundException(const std::string& name) :
-        JsonClientException("Service descriptor not found: " + name) {}
+        JsonClientException("Service not found: " + name) {}
 
     ErrorCode code() const override {
         return ErrorCode::kServiceNotFoundError;
@@ -74,7 +75,7 @@ class ServiceNotFoundException : public JsonClientException {
 class MethodNotFoundException :public JsonClientException {
  public:
     explicit MethodNotFoundException(const std::string& name) :
-        JsonClientException("Method descriptor not found: " + name) {}
+        JsonClientException("Method not found: " + name) {}
 
     ErrorCode code() const override {
         return ErrorCode::kMethodNotFoundError;
@@ -97,11 +98,11 @@ class DeserializationException : public JsonClientException {
     }
 };
 
-class InvalidTagException : public JsonClientException {
+class InvalidArgumentException : public JsonClientException {
     using JsonClientException::JsonClientException;
 
     ErrorCode code() const override {
-        return ErrorCode::kInvalidTagError;
+        return ErrorCode::kInvalidArgumentError;
     }
 };
 

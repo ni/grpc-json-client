@@ -16,7 +16,7 @@ enum class ErrorCode : int {
     kMethodNotFoundError = -5,
     kSerializationError = -6,
     kDeserializationError = -7,
-    kInvalidTagError = -8,
+    kInvalidArgumentError = -8,
     kTimeoutError = -9,
     kBufferSizeOutOfRangeError = -10
 };

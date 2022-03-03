@@ -1,6 +1,7 @@
 ﻿
 #pragma once
 
+#include <chrono>
 #include <memory>
 #include <string>
 #include <unordered_set>
@@ -21,8 +22,9 @@ class UnaryUnaryJsonClient : public JsonClientBase {
     void* StartAsyncCall(
         const std::string& service_name,
         const std::string& method_name,
-        const std::string& request_json);
-    std::string FinishAsyncCall(void* tag, int timeout);
+        const std::string& request_json,
+        const std::chrono::system_clock::time_point& deadline);
+    std::string FinishAsyncCall(void* tag, const std::chrono::system_clock::time_point& deadline);
 
  private:
     class AsyncCallData {

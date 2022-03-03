@@ -20,14 +20,20 @@ int32_t GrpcJsonClient_ResetDescriptorDatabase(void* session_handle) {
     return static_cast<Session*>(session_handle)->ResetDescriptorDatabase();
 }
 
-int32_t GrpcJsonClient_FillDescriptorDatabase(void* session_handle) {
-    return static_cast<Session*>(session_handle)->FillDescriptorDatabase();
+int32_t GrpcJsonClient_FillDescriptorDatabase(void* session_handle, int32_t timeout) {
+    return static_cast<Session*>(session_handle)->FillDescriptorDatabase(timeout);
 }
 
 int32_t GrpcJsonClient_StartAsyncCall(
-    void* session_handle, const char* service, const char* method, const char* request, void** tag
+    void* session_handle,
+    const char* service,
+    const char* method,
+    const char* request,
+    int32_t timeout,
+    void** tag
 ) {
-    return static_cast<Session*>(session_handle)->StartAsyncCall(service, method, request, tag);
+    return static_cast<Session*>(session_handle)->StartAsyncCall(
+        service, method, request, timeout, tag);
 }
 
 int32_t GrpcJsonClient_FinishAsyncCall(
@@ -41,13 +47,13 @@ int32_t GrpcJsonClient_BlockingCall(
     const char* service,
     const char* method,
     const char* request,
-    void** tag,
     int32_t timeout,
+    void** tag,
     char* response,
     size_t* size
 ) {
     return static_cast<Session*>(session_handle)->BlockingCall(
-        service, method, request, tag, timeout, response, size);
+        service, method, request, timeout, tag, response, size);
 }
 
 int32_t GrpcJsonClient_LockSession(void* session_handle) {

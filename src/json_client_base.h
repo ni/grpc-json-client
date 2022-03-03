@@ -1,6 +1,7 @@
 
 #pragma once
 
+#include <chrono>
 #include <memory>
 #include <string>
 
@@ -30,18 +31,23 @@ class JsonClientBase {
 
     // Populate descriptor database with file descriptors
     // for all services exposed by the reflection service on the host.
-    void JsonClientBase::FillDescriptorDatabase();
+    void JsonClientBase::FillDescriptorDatabase(
+        const std::chrono::system_clock::time_point& deadline);
 
     // Search for a method in the descriptor database.
     const google::protobuf::MethodDescriptor* FindMethod(
-        const std::string& service_name, const std::string& method_name);
+        const std::string& service_name,
+        const std::string& method_name,
+        const std::chrono::system_clock::time_point& deadline);
 
  private:
     void QueryReflectionService(
         const grpc::reflection::v1alpha::ServerReflectionRequest& request,
-        grpc::reflection::v1alpha::ServerReflectionResponse* response);
+        grpc::reflection::v1alpha::ServerReflectionResponse* response,
+        const std::chrono::system_clock::time_point& deadline);
 
-    void FetchFileDescriptors(const std::string& symbol);
+    void FetchFileDescriptors(
+        const std::string& symbol, const std::chrono::system_clock::time_point& deadline);
 };
 
 }  // namespace grpc_json_client
