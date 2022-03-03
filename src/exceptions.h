@@ -26,7 +26,7 @@ class JsonClientException : public std::exception {
 class RemoteProcedureCallException : public JsonClientException {
  public:
     RemoteProcedureCallException(const grpc::Status& status, const std::string& summary);
-    
+
     ErrorCode code() const override;
     const grpc::Status& status() const;
 

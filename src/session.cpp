@@ -1,10 +1,6 @@
 
 #include "session.h"
 
-#include <chrono>
-#include <memory>
-#include <string>
-
 #include "error_code.h"
 
 using grpc::ChannelCredentials;

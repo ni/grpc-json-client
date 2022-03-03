@@ -1,9 +1,6 @@
 
 #include "json_serializer.h"
 
-#include <memory>
-#include <string>
-
 #include "google/protobuf/util/json_util.h"
 #include "grpcpp/impl/codegen/proto_utils.h"
 
@@ -31,9 +28,9 @@ ByteBuffer JsonSerializer::SerializeMessage(
         google::protobuf::util::JsonStringToMessage(message_json, message.get())
     };
     if (!json_status.ok()) {
-        string summary("Failed to create protobuf message from JSON string.\n\n");
+        string summary("Failed to create protobuf message from JSON string.");
         string details(json_status.message());
-        throw SerializationException(summary + details);
+        throw SerializationException(summary, details);
     }
     ByteBuffer serialized_message;
     bool own_buffer = false;
@@ -41,8 +38,8 @@ ByteBuffer JsonSerializer::SerializeMessage(
         grpc::GenericSerialize<ProtoBufferWriter, void>(*message, &serialized_message, &own_buffer)
     };
     if (!serialize_status.ok()) {
-        string summary("Failed to serialize protobuf message.\n\n");
-        throw SerializationException(summary + serialize_status.error_message());
+        string summary("Failed to serialize protobuf message.");
+        throw SerializationException(summary, serialize_status.error_message());
     }
     return serialized_message;
 }
@@ -55,8 +52,8 @@ string JsonSerializer::DeserializeMessage(
         grpc::GenericDeserialize<ProtoBufferReader, void>(serialized_message, message.get())
     };
     if (!deserialize_status.ok()) {
-        string summary("Failed to deserialize protobuf message.\n\n");
-        throw DeserializationException(summary + deserialize_status.error_message());
+        string summary("Failed to deserialize protobuf message.");
+        throw DeserializationException(summary, deserialize_status.error_message());
     }
     string response;
     JsonOptions json_options;
@@ -66,9 +63,9 @@ string JsonSerializer::DeserializeMessage(
         google::protobuf::util::MessageToJsonString(*message, &response, json_options)
     };
     if (!json_status.ok()) {
-        string summary("Failed to create JSON string from protobuf message.\n\n");
+        string summary("Failed to create JSON string from protobuf message.");
         string details(json_status.message());
-        throw DeserializationException(summary + details);
+        throw DeserializationException(summary, details);
     }
     return response;
 }

@@ -20,6 +20,7 @@ using grpc::reflection::v1alpha::ServerReflectionRequest;
 using grpc::reflection::v1alpha::ServerReflectionResponse;
 using grpc::reflection::v1alpha::ServiceResponse;
 using std::chrono::system_clock;
+using std::logic_error;
 using std::shared_ptr;
 using std::string;
 using std::unique_ptr;
@@ -72,7 +73,11 @@ const MethodDescriptor* JsonClientBase::FindMethod(
     }
     service_descriptor = _pool->FindServiceByName(service_name);
     if (service_descriptor == nullptr) {
-        throw ServiceNotFoundException(service_name);
+        string message = {
+            "The descriptor database failed to find a service descriptor for the requested "
+            "service despite a successful query for the required file descriptors."
+        };
+        throw logic_error(message);
     }
     const MethodDescriptor* method_descriptor = service_descriptor->FindMethodByName(method_name);
     if (method_descriptor == nullptr) {
