@@ -63,6 +63,7 @@ add_custom_command(
 
 set(src_files
     "${src_dir}/error_code.cpp"
+    "${src_dir}/exceptions.cpp"
     "${src_dir}/grpc_json_client.cpp"
     "${src_dir}/json_client_base.cpp"
     "${src_dir}/json_serializer.cpp"
