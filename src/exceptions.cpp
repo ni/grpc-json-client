@@ -11,10 +11,15 @@ using std::unique_ptr;
 namespace ni {
 namespace grpc_json_client {
 
-JsonClientException::JsonClientException(const std::string& message) : _message(message) {}
+JsonClientException::JsonClientException(const std::string& message) : 
+    JsonClientException(message, string()) {}
 
 JsonClientException::JsonClientException(const string& summary, const string& details) :
-    JsonClientException(summary + "\n\n" + details) {}
+    _message(summary) {
+    if (!details.empty()) {
+        _message += "\n\n" + details;
+    }
+}
 
 ErrorCode JsonClientException::code() const {
     return ErrorCode::kUnknownError;
@@ -30,7 +35,11 @@ const string& JsonClientException::message() const {
 
 RemoteProcedureCallException::RemoteProcedureCallException(
     const Status& status, const string& summary
-) : JsonClientException(summary), _status(status) {
+) : RemoteProcedureCallException(status, summary, string()) {}
+
+RemoteProcedureCallException::RemoteProcedureCallException(
+    const grpc::Status& status, const std::string& summary, const std::string& details
+) : JsonClientException(summary, details), _status(status) {
     if (!_status.ok()) {
         const char* format = "\n\ngRPC Error Code: %d\ngRPC Error Message: %s";
         int code = static_cast<int>(_status.error_code());
@@ -41,10 +50,6 @@ RemoteProcedureCallException::RemoteProcedureCallException(
         _message += buffer.get();
     }
 }
-
-RemoteProcedureCallException::RemoteProcedureCallException(
-    const grpc::Status& status, const std::string& summary, const std::string& details
-) : JsonClientException(summary, details) {}
 
 ErrorCode RemoteProcedureCallException::code() const {
     return ErrorCode::kRemoteProcedureCallError;
