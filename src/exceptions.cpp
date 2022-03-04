@@ -33,13 +33,11 @@ RemoteProcedureCallException::RemoteProcedureCallException(
         const char* format = "\n\ngRPC Error Code: %d\ngRPC Error Message: %s";
         int code = static_cast<int>(_status.error_code());
         string message = _status.error_message();
-        int size = snprintf(nullptr, 0, format, code, message.c_str());
-        size++;  // null char
+        int size = snprintf(nullptr, 0, format, code, message.c_str()) + 1;  // + null char
         unique_ptr<char> buffer(new char[size]);
         snprintf(buffer.get(), size, format, code, message.c_str());
         _message += buffer.get();
     }
-    string a = "hello" + status.error_code();
 }
 
 ErrorCode RemoteProcedureCallException::code() const {
