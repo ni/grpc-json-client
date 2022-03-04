@@ -15,6 +15,7 @@ using grpc::ChannelCredentials;
 using grpc::ClientContext;
 using grpc::ClientReaderWriter;
 using grpc::Status;
+using grpc::StatusCode;
 using grpc::reflection::v1alpha::FileDescriptorResponse;
 using grpc::reflection::v1alpha::ServerReflection;
 using grpc::reflection::v1alpha::ServerReflectionRequest;
@@ -52,7 +53,15 @@ void JsonClientBase::FillDescriptorDatabase(const system_clock::time_point& dead
     QueryReflectionService(request, &response, deadline);
     RepeatedPtrField<ServiceResponse> services = response.list_services_response().service();
     for (ServiceResponse service : services) {
-        FetchFileDescriptors(service.name(), deadline);
+        try {
+            FetchFileDescriptors(service.name(), deadline);
+        } catch (const ReflectionServiceException& ex) {
+            // some services are known to return NOT_FOUND errors from the reflection service when
+            // requesting file descriptors (such as grpc.health.v1.Health) so we ignore them here
+            if (ex.status().error_code() != StatusCode::NOT_FOUND) {
+                throw;
+            }
+        }
     }
 }
 
@@ -63,10 +72,12 @@ const MethodDescriptor* JsonClientBase::FindMethod(
 ) {
     const ServiceDescriptor* service_descriptor = _pool->FindServiceByName(service_name);
     if (service_descriptor == nullptr) {
+        // try to fetch the file descriptor for the missing service
         try {
             FetchFileDescriptors(service_name, deadline);
         } catch (const ReflectionServiceException& ex) {
-            if (ex.status().error_code() == grpc::StatusCode::NOT_FOUND) {
+            // if the file descriptor is not found rethrow as ServiceNotFoundException
+            if (ex.status().error_code() == StatusCode::NOT_FOUND) {
                 throw ServiceNotFoundException(service_name);
             }
             throw;
@@ -121,7 +132,7 @@ void JsonClientBase::QueryReflectionService(
         try {
             details = "Sent message \"" + JsonSerializer::MessageToJsonString(request) + '\"';
         } catch (SerializationException) {
-            // shouldn't let this shadow the original error if it happens
+            // shouldn't let this hide the original error if it happens
         }
         string summary("The reflection service reported an error.");
         throw ReflectionServiceException(status, summary, details);
@@ -144,6 +155,7 @@ void JsonClientBase::FetchFileDescriptors(
     for (string serialized_file_descriptor : file_descriptor_response.file_descriptor_proto()) {
         FileDescriptorProto file_descriptor_proto;
         file_descriptor_proto.ParseFromString(serialized_file_descriptor);
+        // the database will dump warning strings to stdout if a file already exists
         bool file_descriptor_in_database = {
             _database->FindFileByName(file_descriptor_proto.name(), &file_descriptor_proto)
         };
