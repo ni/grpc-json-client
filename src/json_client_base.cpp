@@ -117,13 +117,14 @@ void JsonClientBase::QueryReflectionService(
             static_cast<grpc::StatusCode>(response->error_response().error_code()),
             response->error_response().error_message()
         };
-        string message("The reflection service reported an error.");
+        string details;
         try {
-            message += "\n\nSent message \"" + JsonSerializer::MessageToJsonString(request) + '\"';
+            details = "Sent message \"" + JsonSerializer::MessageToJsonString(request) + '\"';
         } catch (SerializationException) {
             // shouldn't let this shadow the original error if it happens
         }
-        throw ReflectionServiceException(status, message);
+        string summary("The reflection service reported an error.");
+        throw ReflectionServiceException(status, summary, details);
     }
     if (!status.ok()) {
         string summary("An error occurred while communicating with the reflection service.");

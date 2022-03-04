@@ -40,6 +40,10 @@ RemoteProcedureCallException::RemoteProcedureCallException(
     }
 }
 
+RemoteProcedureCallException::RemoteProcedureCallException(
+    const grpc::Status& status, const std::string& summary, const std::string& details
+) : JsonClientException(summary, details) {}
+
 ErrorCode RemoteProcedureCallException::code() const {
     return ErrorCode::kRemoteProcedureCallError;
 }
