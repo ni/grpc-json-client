@@ -1,28 +1,15 @@
 
 #include "exceptions.h"
 
-using std::string;
+#include <cstdio>
+#include <memory>
+
 using grpc::Status;
+using std::string;
+using std::unique_ptr;
 
 namespace ni {
 namespace grpc_json_client {
-
-RemoteProcedureCallException::RemoteProcedureCallException(
-    const Status& status, const string& summary
-) : JsonClientException(summary), _status(status) {
-    if (!_status.ok()) {
-        _message += "\n\ngRPC Error Code: " + status.error_code();
-        _message += "\ngRPC Error Message: " + _status.error_message();
-    }
-}
-
-ErrorCode RemoteProcedureCallException::code() const {
-    return ErrorCode::kRemoteProcedureCallError;
-}
-
-const Status& RemoteProcedureCallException::status() const {
-    return _status;
-}
 
 JsonClientException::JsonClientException(const string& summary, const string& details) :
     _message(summary + "\n\n" + details) {}
@@ -37,6 +24,30 @@ const char* JsonClientException::what() const {
 
 const string& JsonClientException::message() const {
     return _message;
+}
+
+RemoteProcedureCallException::RemoteProcedureCallException(
+    const Status& status, const string& summary
+) : JsonClientException(summary), _status(status) {
+    if (!_status.ok()) {
+        const char* format = "\n\ngRPC Error Code: %d\ngRPC Error Message: %s";
+        int code = static_cast<int>(_status.error_code());
+        string message = _status.error_message();
+        int size = snprintf(nullptr, 0, format, code, message.c_str());
+        size++;  // null char
+        unique_ptr<char> buffer(new char[size]);
+        snprintf(buffer.get(), size, format, code, message.c_str());
+        _message += buffer.get();
+    }
+    string a = "hello" + status.error_code();
+}
+
+ErrorCode RemoteProcedureCallException::code() const {
+    return ErrorCode::kRemoteProcedureCallError;
+}
+
+const Status& RemoteProcedureCallException::status() const {
+    return _status;
 }
 
 ErrorCode ReflectionServiceException::code() const {
