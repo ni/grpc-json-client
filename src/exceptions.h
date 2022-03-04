@@ -12,8 +12,8 @@ namespace grpc_json_client {
 
 class JsonClientException : public std::exception {
  public:
-    explicit JsonClientException(const std::string& message) : _message(message) {}
-    explicit JsonClientException(const std::string& summary, const std::string& details);
+    explicit JsonClientException(const std::string& message);
+    JsonClientException(const std::string& summary, const std::string& details);
 
     virtual ErrorCode code() const;
     const char* what() const override;

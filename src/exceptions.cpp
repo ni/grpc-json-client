@@ -11,8 +11,10 @@ using std::unique_ptr;
 namespace ni {
 namespace grpc_json_client {
 
+JsonClientException::JsonClientException(const std::string& message) : _message(message) {}
+
 JsonClientException::JsonClientException(const string& summary, const string& details) :
-    _message(summary + "\n\n" + details) {}
+    JsonClientException(summary + "\n\n" + details) {}
 
 ErrorCode JsonClientException::code() const {
     return ErrorCode::kUnknownError;
