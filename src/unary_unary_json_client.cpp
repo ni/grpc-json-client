@@ -38,7 +38,7 @@ void* UnaryUnaryJsonClient::StartAsyncCall(
 ) {
     unique_ptr<AsyncCallData> async_call = std::make_unique<AsyncCallData>();
     async_call->method_type = FindMethod(service_name, method_name, deadline);
-    string endpoint = string("/") + service_name + "/" + method_name;
+    string endpoint = "/" + service_name + "/" + method_name;
     ByteBuffer serialized_request = {
         JsonSerializer::SerializeMessage(async_call->method_type->input_type(), request_json)
     };

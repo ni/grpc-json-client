@@ -2,6 +2,7 @@
 #include "json_client_base.h"
 
 #include "exceptions.h"
+#include "json_serializer.h"
 #include "reflection.grpc.pb.h"
 
 using google::protobuf::DescriptorPool;
@@ -112,12 +113,17 @@ void JsonClientBase::QueryReflectionService(
         string summary("The connection with the reflection service was interrupted.");
         throw RemoteProcedureCallException(status, summary);
     } else if (response->has_error_response()) {
-        grpc::StatusCode status_code = {
-            static_cast<grpc::StatusCode>(response->error_response().error_code())
+        grpc::Status status = {
+            static_cast<grpc::StatusCode>(response->error_response().error_code()),
+            response->error_response().error_message()
         };
-        const string& error_message = response->error_response().error_message();
-        grpc::Status status(status_code, error_message);
-        throw ReflectionServiceException(status, "The reflection service reported an error.");
+        string message("The reflection service reported an error.");
+        try {
+            message += "\n\nSent message \"" + JsonSerializer::MessageToJsonString(request) + '\"';
+        } catch (SerializationException) {
+            // shouldn't let this shadow the original error if it happens
+        }
+        throw ReflectionServiceException(status, message);
     }
     if (!status.ok()) {
         string summary("An error occurred while communicating with the reflection service.");

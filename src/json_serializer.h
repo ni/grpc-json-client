@@ -17,9 +17,14 @@ class JsonSerializer {
     static google::protobuf::DynamicMessageFactory factory;
 
  public:
+    static void JsonStringToMessage(
+        const std::string& json, google::protobuf::Message* message);
+
     // Deserialize a protobuf message from a JSON string then serialize it into a byte buffer.
     static grpc::ByteBuffer SerializeMessage(
         const google::protobuf::Descriptor* message_type, const std::string& message_json);
+
+    static std::string MessageToJsonString(const google::protobuf::Message& message);
 
     // Deserialize a message from a byte buffer then serialize it into a JSON string.
     static std::string DeserializeMessage(
