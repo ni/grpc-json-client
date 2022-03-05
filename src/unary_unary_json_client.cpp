@@ -10,7 +10,7 @@ using grpc::ByteBuffer;
 using grpc::CompletionQueue;
 using grpc::ChannelCredentials;
 using grpc::Status;
-using std::logic_error;
+using std::runtime_error;
 using std::shared_ptr;
 using std::string;
 using std::unique_ptr;
@@ -74,14 +74,14 @@ string UnaryUnaryJsonClient::FinishAsyncCall(void* tag, const system_clock::time
     case CompletionQueue::NextStatus::SHUTDOWN:
         // we shouldn't reach this point since the completion queue
         // should only be drained in the destructor
-        throw logic_error("The completion queue shut down unexpectedly.");
+        throw runtime_error("The completion queue shut down unexpectedly.");
     case CompletionQueue::NextStatus::GOT_EVENT:
         if (next_tag != async_call.get()) {
             // each call gets it's own completion queue so this shouldn't happen
             string message = {
                 "The specified tag did not match the tag returned from the completion queue."
             };
-            throw logic_error(message);
+            throw runtime_error(message);
         }
         if (ok) {
             if (!status.ok()) {
@@ -92,13 +92,13 @@ string UnaryUnaryJsonClient::FinishAsyncCall(void* tag, const system_clock::time
                 async_call->method_type->output_type(), &serialized_response);
         }
         // if we reach this point then the completion queue is shutting down
-        throw logic_error("The completion queue is shutting down unexpectedly.");
+        throw runtime_error("The completion queue is shutting down unexpectedly.");
     case CompletionQueue::NextStatus::TIMEOUT:
         throw TimeoutException(
             "Timed out while waiting for the remote procedure call to complete.");
     default:
         // throw exception for unhandled case
-        throw logic_error("An unknown status was returned from the completion queue.");
+        throw runtime_error("An unknown status was returned from the completion queue.");
     }
 }
 
