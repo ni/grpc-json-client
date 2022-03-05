@@ -19,7 +19,7 @@ std::string FormatString(const std::string& format, const Arguments&... args) {
     return buffer.get();
 }
 
-JsonClientException::JsonClientException(const std::string& message) : 
+JsonClientException::JsonClientException(const std::string& message) :
     JsonClientException(message, string()) {}
 
 JsonClientException::JsonClientException(const string& summary, const string& details) {

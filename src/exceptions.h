@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include <stdexcept>
+#include <exception>
 #include <string>
 
 #include "error_code.h"

@@ -3,6 +3,8 @@
 
 #include <memory>
 
+#include "grpcpp/grpcpp.h"
+
 #include "session.h"
 
 using grpc::ChannelCredentials;

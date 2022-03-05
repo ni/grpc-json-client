@@ -1,10 +1,10 @@
 
 #include "session.h"
 
+#include <cstring>
+#include <exception>
 #include <chrono>
-#include <stdexcept>
 
-#include "error_code.h"
 #include "exceptions.h"
 
 using grpc::ChannelCredentials;
@@ -27,8 +27,7 @@ system_clock::time_point DeadlineFromTimeout(int32_t timeout) {
 }
 
 // Builds an error message from nested exceptions.
-string BuildErrorMessage(const exception& ex)
-{
+string BuildErrorMessage(const exception& ex) {
     string message = ex.what();
     try {
         std::rethrow_if_nested(ex);

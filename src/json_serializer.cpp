@@ -1,6 +1,7 @@
 
 #include "json_serializer.h"
 
+#include "google/protobuf/stubs/status.h"
 #include "google/protobuf/util/json_util.h"
 #include "grpcpp/impl/codegen/proto_utils.h"
 
@@ -20,8 +21,7 @@ namespace grpc_json_client {
 
 google::protobuf::DynamicMessageFactory JsonSerializer::factory;
 
-void JsonSerializer::JsonStringToMessage(const string& json, Message* message)
-{
+void JsonSerializer::JsonStringToMessage(const string& json, Message* message) {
     google::protobuf::util::Status status = {
         google::protobuf::util::JsonStringToMessage(json, message)
     };
@@ -49,8 +49,7 @@ ByteBuffer JsonSerializer::SerializeMessage(
     return serialized_message;
 }
 
-string JsonSerializer::MessageToJsonString(const Message& message)
-{
+string JsonSerializer::MessageToJsonString(const Message& message) {
     string json;
     JsonOptions options;
     options.always_print_primitive_fields = true;
