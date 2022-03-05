@@ -1,7 +1,11 @@
 
 #include "session.h"
 
+#include <chrono>
+#include <stdexcept>
+
 #include "error_code.h"
+#include "exceptions.h"
 
 using grpc::ChannelCredentials;
 using std::chrono::milliseconds;
@@ -14,6 +18,7 @@ using std::string;
 namespace ni {
 namespace grpc_json_client {
 
+// Converts a timeout to a deadline.
 system_clock::time_point DeadlineFromTimeout(int32_t timeout) {
     if (timeout < 0) {
         return system_clock::time_point::max();
@@ -21,10 +26,23 @@ system_clock::time_point DeadlineFromTimeout(int32_t timeout) {
     return system_clock::now() + milliseconds(timeout);
 }
 
+// Builds an error message from nested exceptions.
+string BuildErrorMessage(const exception& ex)
+{
+    string message = ex.what();
+    try {
+        std::rethrow_if_nested(ex);
+    } catch (const exception& nested) {
+        message += "\n\nThe above exception was directly caused by:\n\n";
+        message += BuildErrorMessage(nested);
+    }
+    return message;
+}
+
 Session::Session(const string& target, const shared_ptr<ChannelCredentials>& credentials) :
     _client(target, credentials),
     _error_code(ErrorCode::kNone),
-    _error_description(ni::grpc_json_client::GetErrorString(ErrorCode::kNone))
+    _error_message(ni::grpc_json_client::GetErrorString(ErrorCode::kNone))
 {}
 
 int32_t Session::ResetDescriptorDatabase() {
@@ -121,22 +139,22 @@ int32_t Session::GetError(int32_t* code, char* buffer, size_t* size) {
         [=](const UnaryUnaryJsonClient&) {
             *code = static_cast<int32_t>(_error_code);
             if (buffer) {
-                strncpy(buffer, _error_description.c_str(), *size);
-                if (*size > _error_description.size()) {
+                strncpy(buffer, _error_message.c_str(), *size);
+                if (*size > _error_message.size()) {
                     // clear error state
                     _error_code = ErrorCode::kNone;
-                    _error_description = ni::grpc_json_client::GetErrorString(_error_code);
+                    _error_message = ni::grpc_json_client::GetErrorString(_error_code);
                 } else {
                     buffer[*size - 1] = NULL;  // strncpy doesn't add null char
                     _error_code = ErrorCode::kBufferSizeOutOfRangeWarning;
-                    _error_description = {
+                    _error_message = {
                         "The buffer size is too small to accomodate the full error message. "
                         "It will be truncated."
                     };
                     return _error_code;
                 }
             } else {
-                *size = _error_description.size() + 1;  // include null char
+                *size = _error_message.size() + 1;  // include null char
             }
             return ErrorCode::kNone;
         });
@@ -169,15 +187,15 @@ int32_t Session::Evaluate(const function<ErrorCode(UnaryUnaryJsonClient&)>& func
     }
     catch (const JsonClientException& ex) {
         _error_code = ex.code();
-        _error_description = ex.message();
+        _error_message = BuildErrorMessage(ex);
     }
     catch (const exception& ex) {
         _error_code = ErrorCode::kUnknownError;
-        _error_description = string("An unhandled exception occurred.\n\n") + ex.what();
+        _error_message = "An unhandled exception occurred.\n\n" + BuildErrorMessage(ex);
     }
     catch (...) {
         _error_code = ErrorCode::kUnknownError;
-        _error_description = "An unhandled exception occurred.";
+        _error_message = "An unhandled exception occurred.";
     }
     return static_cast<int32_t>(_error_code);
 }

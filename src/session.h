@@ -1,20 +1,20 @@
 
 #pragma once
 
-#include <chrono>
+#include <cstdint>
+#include <functional>
 #include <memory>
+#include <mutex>
 #include <string>
 #include <unordered_map>
 
 #include "grpcpp/grpcpp.h"
 
-#include "exceptions.h"
+#include "error_code.h"
 #include "unary_unary_json_client.h"
 
 namespace ni {
 namespace grpc_json_client {
-
-std::chrono::system_clock::time_point DeadlineFromTimeout(int32_t timeout);
 
 class Session {
  public:
@@ -45,7 +45,7 @@ class Session {
     UnaryUnaryJsonClient _client;
     std::unordered_map<const void*, std::string> _responses;
     ErrorCode _error_code;
-    std::string _error_description;
+    std::string _error_message;
 
     // Helper function for catching exceptions.
     int32_t Evaluate(const std::function<ErrorCode(UnaryUnaryJsonClient&)>& func);

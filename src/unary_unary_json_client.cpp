@@ -1,6 +1,8 @@
 ﻿
 #include "unary_unary_json_client.h"
 
+#include <stdexcept>
+
 #include "exceptions.h"
 #include "json_serializer.h"
 

@@ -11,11 +11,20 @@ using std::unique_ptr;
 namespace ni {
 namespace grpc_json_client {
 
+template <typename... Arguments>
+std::string FormatString(const std::string& format, const Arguments&... args) {
+    int size = snprintf(nullptr, 0, format.c_str(), args...) + 1;  // + null char
+    std::unique_ptr<char> buffer(new char[size]);
+    snprintf(buffer.get(), size, format.c_str(), args...);
+    return buffer.get();
+}
+
 JsonClientException::JsonClientException(const std::string& message) : 
     JsonClientException(message, string()) {}
 
-JsonClientException::JsonClientException(const string& summary, const string& details) :
-    _message(summary) {
+JsonClientException::JsonClientException(const string& summary, const string& details) {
+    const char* format = "Error Code: %d\nError Message:\n%s";
+    _message = FormatString(format, static_cast<int>(code()), summary);
     if (!details.empty()) {
         _message += "\n\n" + details;
     }
@@ -41,13 +50,10 @@ RemoteProcedureCallException::RemoteProcedureCallException(
     const grpc::Status& status, const std::string& summary, const std::string& details
 ) : JsonClientException(summary, details), _status(status) {
     if (!_status.ok()) {
-        const char* format = "\n\ngRPC Error Code: %d\ngRPC Error Message: %s";
-        int code = static_cast<int>(_status.error_code());
-        string message = _status.error_message();
-        int size = snprintf(nullptr, 0, format, code, message.c_str()) + 1;  // + null char
-        unique_ptr<char> buffer(new char[size]);
-        snprintf(buffer.get(), size, format, code, message.c_str());
-        _message += buffer.get();
+        const char* format = "\n\ngRPC Error Code: %d\ngRPC Error Message:\n%s";
+        _message += {
+            FormatString(format, static_cast<int>(_status.error_code()), _status.error_message())
+        };
     }
 }
 
@@ -64,14 +70,14 @@ ErrorCode ReflectionServiceException::code() const {
 }
 
 ServiceNotFoundException::ServiceNotFoundException(const string& name) :
-    JsonClientException("Service not found: " + name) {}
+    JsonClientException("The service \"" + name + "\" was not found.") {}
 
 ErrorCode ServiceNotFoundException::code() const {
     return ErrorCode::kServiceNotFoundError;
 }
 
 MethodNotFoundException::MethodNotFoundException(const string& name) :
-    JsonClientException("Method not found: " + name) {}
+    JsonClientException("The method \"" + name + "\" was not found.") {}
 
 ErrorCode MethodNotFoundException::code() const {
     return ErrorCode::kMethodNotFoundError;

@@ -53,15 +53,7 @@ void JsonClientBase::FillDescriptorDatabase(const system_clock::time_point& dead
     QueryReflectionService(request, &response, deadline);
     RepeatedPtrField<ServiceResponse> services = response.list_services_response().service();
     for (ServiceResponse service : services) {
-        try {
-            FetchFileDescriptors(service.name(), deadline);
-        } catch (const ReflectionServiceException& ex) {
-            // some services are known to return NOT_FOUND errors from the reflection service when
-            // requesting file descriptors (such as grpc.health.v1.Health) so we ignore them here
-            if (ex.status().error_code() != StatusCode::NOT_FOUND) {
-                throw;
-            }
-        }
+        FetchFileDescriptors(service.name(), deadline);
     }
 }
 
@@ -72,13 +64,13 @@ const MethodDescriptor* JsonClientBase::FindMethod(
 ) {
     const ServiceDescriptor* service_descriptor = _pool->FindServiceByName(service_name);
     if (service_descriptor == nullptr) {
-        // try to fetch the file descriptor for the missing service
+        // try to fetch the file descriptors for the missing service
         try {
             FetchFileDescriptors(service_name, deadline);
         } catch (const ReflectionServiceException& ex) {
             // if the file descriptor is not found rethrow as ServiceNotFoundException
             if (ex.status().error_code() == StatusCode::NOT_FOUND) {
-                throw ServiceNotFoundException(service_name);
+                std::throw_with_nested(ServiceNotFoundException(service_name));
             }
             throw;
         }
@@ -109,21 +101,22 @@ void JsonClientBase::QueryReflectionService(
     context.set_deadline(deadline);
     unique_ptr<ClientReflectionReaderWriter> stream = stub.ServerReflectionInfo(&context);
 
-    // send request
-    if (!stream->Write(request)) {
-        Status status = stream->Finish();
+    // query
+    bool sent_request = stream->Write(request);
+    stream->WritesDone();
+    bool got_response = stream->Read(response);
+    Status status = stream->Finish();
+
+    // check results
+    if (!sent_request) {
         string summary("Failed to initiate communication with the reflection service.");
         throw RemoteProcedureCallException(status, summary);
     }
-    stream->WritesDone();
-
-    // read response
-    bool got_response = stream->Read(response);
-    Status status = stream->Finish();
     if (!got_response) {
         string summary("The connection with the reflection service was interrupted.");
         throw RemoteProcedureCallException(status, summary);
-    } else if (response->has_error_response()) {
+    }
+    if (response->has_error_response()) {
         grpc::Status status = {
             static_cast<grpc::StatusCode>(response->error_response().error_code()),
             response->error_response().error_message()
@@ -155,7 +148,8 @@ void JsonClientBase::FetchFileDescriptors(
     for (string serialized_file_descriptor : file_descriptor_response.file_descriptor_proto()) {
         FileDescriptorProto file_descriptor_proto;
         file_descriptor_proto.ParseFromString(serialized_file_descriptor);
-        // the database will dump warning strings to stdout if a file already exists
+        // the database will dump warning strings to stdout if a file descriptor already exists
+        // so we avoid that by checking if we already have the file descriptor before adding it
         bool file_descriptor_in_database = {
             _database->FindFileByName(file_descriptor_proto.name(), &file_descriptor_proto)
         };

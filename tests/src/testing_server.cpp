@@ -28,7 +28,6 @@ TestingServer::TestingServer(const string& address) :
 {}
 
 void TestingServer::Start() {
-    grpc::EnableDefaultHealthCheckService(true);
     grpc::reflection::InitProtoReflectionServerBuilderPlugin();
     ServerBuilder builder;
     builder.AddListeningPort(_address, grpc::InsecureServerCredentials());
