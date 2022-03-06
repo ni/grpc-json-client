@@ -12,78 +12,140 @@ namespace grpc_json_client {
 
 class JsonClientException : public std::exception {
  public:
-    explicit JsonClientException(const std::string& message);
-    JsonClientException(const std::string& summary, const std::string& details);
+    explicit JsonClientException(const std::string& message) :
+        JsonClientException(ErrorCode::kUnknownError, message, std::string()) {}
 
-    virtual ErrorCode code() const;
+    JsonClientException(const std::string& summary, const std::string& details) :
+        JsonClientException(ErrorCode::kUnknownError, summary, details) {}
+
+    ErrorCode code() const;
     const char* what() const override;
     const std::string& message() const;
 
  protected:
+    JsonClientException(ErrorCode code, const std::string& message) :
+        JsonClientException(code, message, std::string()) {}
+
+    JsonClientException(ErrorCode code, const std::string& summary, const std::string& details) :
+        _code(code), _message(FormatMessage(code, summary, details)) {}
+
+
+ private:
+    static std::string FormatMessage(
+        ErrorCode code, const std::string& summary, const std::string& details);
+
+    ErrorCode _code;
     std::string _message;
 };
 
 class RemoteProcedureCallException : public JsonClientException {
  public:
-    RemoteProcedureCallException(const grpc::Status& status, const std::string& summary);
-    RemoteProcedureCallException(
-        const grpc::Status& status, const std::string& summary, const std::string& details);
+    RemoteProcedureCallException(const grpc::Status& status, const std::string& message) :
+        RemoteProcedureCallException(
+            ErrorCode::kRemoteProcedureCallError, status, message, std::string()) {}
 
-    ErrorCode code() const override;
+    RemoteProcedureCallException(
+        const grpc::Status& status,
+        const std::string& summary,
+        const std::string& details) : RemoteProcedureCallException(
+            ErrorCode::kRemoteProcedureCallError,
+            status,
+            summary,
+            details) {}
+
     const grpc::Status& status() const;
 
+ protected:
+    RemoteProcedureCallException(
+        ErrorCode code,
+        const grpc::Status& status,
+        const std::string& summary,
+        const std::string& details) :
+        JsonClientException(
+            code, summary, AppendStatusDetails(status, details)),
+        _status(status) {}
+
  private:
+    static std::string AppendStatusDetails(const grpc::Status& status, std::string message);
+
     grpc::Status _status;
 };
 
 class ReflectionServiceException : public RemoteProcedureCallException {
-    using RemoteProcedureCallException::RemoteProcedureCallException;
+ public:
+    ReflectionServiceException(const grpc::Status& status, const std::string& message) :
+        RemoteProcedureCallException(
+            ErrorCode::kReflectionServiceError, status, message, std::string()) {}
 
-    ErrorCode code() const override;
+    ReflectionServiceException(
+        const grpc::Status& status,
+        const std::string& summary,
+        const std::string& details) :
+        RemoteProcedureCallException(
+            ErrorCode::kReflectionServiceError, status, summary, details) {}
 };
 
 class ServiceNotFoundException : public JsonClientException {
  public:
-    explicit ServiceNotFoundException(const std::string& name);
+    explicit ServiceNotFoundException(const std::string& message) :
+        JsonClientException(ErrorCode::kServiceNotFoundError, message) {}
 
-    ErrorCode code() const override;
+    ServiceNotFoundException(const std::string& summary, const std::string& details) :
+        JsonClientException(ErrorCode::kServiceNotFoundError, summary, details) {}
 };
 
 class MethodNotFoundException :public JsonClientException {
  public:
-    explicit MethodNotFoundException(const std::string& name);
+    explicit MethodNotFoundException(const std::string& message) :
+        JsonClientException(ErrorCode::kMethodNotFoundError, message) {}
 
-    ErrorCode code() const override;
+    MethodNotFoundException(const std::string& summary, const std::string& details) :
+        JsonClientException(ErrorCode::kMethodNotFoundError, summary, details) {}
 };
 
 class SerializationException : public JsonClientException {
-    using JsonClientException::JsonClientException;
+ public:
+    explicit SerializationException(const std::string& message) :
+        JsonClientException(ErrorCode::kSerializationError, message) {}
 
-    ErrorCode code() const override;
+    SerializationException(const std::string& summary, const std::string& details) :
+        JsonClientException(ErrorCode::kSerializationError, summary, details) {}
 };
 
 class DeserializationException : public JsonClientException {
-    using JsonClientException::JsonClientException;
+ public:
+    explicit DeserializationException(const std::string& message) :
+        JsonClientException(ErrorCode::kDeserializationError, message) {}
 
-    ErrorCode code() const override;
+    DeserializationException(const std::string& summary, const std::string& details) :
+        JsonClientException(ErrorCode::kDeserializationError, summary, details) {}
 };
 
 class InvalidArgumentException : public JsonClientException {
-    using JsonClientException::JsonClientException;
+ public:
+    explicit InvalidArgumentException(const std::string& message) :
+        JsonClientException(ErrorCode::kInvalidArgumentError, message) {}
 
-    ErrorCode code() const override;
+    InvalidArgumentException(const std::string& summary, const std::string& details) :
+        JsonClientException(ErrorCode::kInvalidArgumentError, summary, details) {}
 };
 
 class TimeoutException : public JsonClientException {
-    using JsonClientException::JsonClientException;
+ public:
+    explicit TimeoutException(const std::string& message) :
+        JsonClientException(ErrorCode::kTimeoutError, message) {}
 
-    ErrorCode code() const override;
+    TimeoutException(const std::string& summary, const std::string& details) :
+        JsonClientException(ErrorCode::kTimeoutError, summary, details) {}
 };
 
 class BufferSizeOutOfRangeException : public JsonClientException {
-    using JsonClientException::JsonClientException;
+ public:
+    explicit BufferSizeOutOfRangeException(const std::string& message) :
+        JsonClientException(ErrorCode::kBufferSizeOutOfRangeError, message) {}
 
-    ErrorCode code() const override;
+    BufferSizeOutOfRangeException(const std::string& summary, const std::string& details) :
+        JsonClientException(ErrorCode::kBufferSizeOutOfRangeError, summary, details) {}
 };
 
 }  // namespace grpc_json_client
