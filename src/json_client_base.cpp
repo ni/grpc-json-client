@@ -44,8 +44,8 @@ JsonClientBase::JsonClientBase(
 ) :
     channel(CreateChannel(target, credentials)),
     _database(std::make_unique<SimpleDescriptorDatabase>()),
-    _pool(std::make_unique<DescriptorPool>(_database.get())) {
-}
+    _pool(std::make_unique<DescriptorPool>(_database.get()))
+{}
 
 void JsonClientBase::ResetDescriptorDatabase() {
     _database = std::make_unique<SimpleDescriptorDatabase>();

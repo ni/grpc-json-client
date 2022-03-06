@@ -23,8 +23,8 @@ UnaryUnaryJsonClient::UnaryUnaryJsonClient(
     const std::string& target, const shared_ptr<ChannelCredentials>& credentials
 ) :
     JsonClientBase(target, credentials),
-    _stub(channel) {
-}
+    _stub(channel)
+{}
 
 UnaryUnaryJsonClient::~UnaryUnaryJsonClient() {
     for (AsyncCallData* async_call : _tags) {
