@@ -58,5 +58,13 @@ const Status& RemoteProcedureCallException::status() const {
     return _status;
 }
 
+ServiceNotFoundException::ServiceNotFoundException(const std::string& name) : JsonClientException(
+    ErrorCode::kServiceNotFoundError, "The service \"" + name + "\" was not found."
+) {}
+
+MethodNotFoundException::MethodNotFoundException(const std::string& name) : JsonClientException(
+    ErrorCode::kServiceNotFoundError, "The method \"" + name + "\" was not found."
+) {}
+
 }  // namespace grpc_json_client
 }  // namespace ni

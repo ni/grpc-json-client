@@ -87,20 +87,12 @@ class ReflectionServiceException : public RemoteProcedureCallException {
 
 class ServiceNotFoundException : public JsonClientException {
  public:
-    explicit ServiceNotFoundException(const std::string& message) :
-        JsonClientException(ErrorCode::kServiceNotFoundError, message) {}
-
-    ServiceNotFoundException(const std::string& summary, const std::string& details) :
-        JsonClientException(ErrorCode::kServiceNotFoundError, summary, details) {}
+    explicit ServiceNotFoundException(const std::string& name);
 };
 
 class MethodNotFoundException :public JsonClientException {
  public:
-    explicit MethodNotFoundException(const std::string& message) :
-        JsonClientException(ErrorCode::kMethodNotFoundError, message) {}
-
-    MethodNotFoundException(const std::string& summary, const std::string& details) :
-        JsonClientException(ErrorCode::kMethodNotFoundError, summary, details) {}
+    explicit MethodNotFoundException(const std::string& name);
 };
 
 class SerializationException : public JsonClientException {
