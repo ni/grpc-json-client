@@ -10,73 +10,87 @@
 using grpc::ChannelCredentials;
 using ni::grpc_json_client::Session;
 using std::shared_ptr;
+using std::unique_ptr;
 
-int32_t GrpcJsonClient_Initialize(const char* target, void** session_handle) {
+int32_t GrpcJsonClient_Initialize(const char* target, intptr_t* session_handle) {
     shared_ptr<ChannelCredentials> credentials = grpc::InsecureChannelCredentials();
-    *session_handle = new Session(target, credentials);
+    *session_handle = reinterpret_cast<intptr_t>(new Session(target, credentials));
     return 0;
 }
 
-int32_t GrpcJsonClient_ResetDescriptorDatabase(void* session_handle) {
-    return static_cast<Session*>(session_handle)->ResetDescriptorDatabase();
+int32_t GrpcJsonClient_ResetDescriptorDatabase(intptr_t session_handle) {
+    Session* session = reinterpret_cast<Session*>(session_handle);
+    return session->ResetDescriptorDatabase();
 }
 
-int32_t GrpcJsonClient_FillDescriptorDatabase(void* session_handle, int32_t timeout) {
-    return static_cast<Session*>(session_handle)->FillDescriptorDatabase(timeout);
+int32_t GrpcJsonClient_FillDescriptorDatabase(intptr_t session_handle, int32_t timeout) {
+    Session* session = reinterpret_cast<Session*>(session_handle);
+    return session->FillDescriptorDatabase(timeout);
 }
 
 int32_t GrpcJsonClient_StartAsyncCall(
-    void* session_handle,
+    intptr_t session_handle,
     const char* service,
     const char* method,
     const char* request,
     int32_t timeout,
-    void** tag
+    intptr_t* tag
 ) {
-    return static_cast<Session*>(session_handle)->StartAsyncCall(
-        service, method, request, timeout, tag);
+    Session* session = reinterpret_cast<Session*>(session_handle);
+    void** reinterpreted_tag = reinterpret_cast<void**>(tag);
+    return session->StartAsyncCall(service, method, request, timeout, reinterpreted_tag);
 }
 
 int32_t GrpcJsonClient_FinishAsyncCall(
-    void* session_handle, void* tag, int32_t timeout, char* buffer, size_t* size
+    intptr_t session_handle, intptr_t tag, int32_t timeout, char* buffer, size_t* size
 ) {
-    return static_cast<Session*>(session_handle)->FinishAsyncCall(tag, timeout, buffer, size);
+    Session* session = reinterpret_cast<Session*>(session_handle);
+    void* reinterpreted_tag = reinterpret_cast<void*>(tag);
+    return session->FinishAsyncCall(reinterpreted_tag, timeout, buffer, size);
 }
 
 int32_t GrpcJsonClient_BlockingCall(
-    void* session_handle,
+    intptr_t session_handle,
     const char* service,
     const char* method,
     const char* request,
     int32_t timeout,
-    void** tag,
+    intptr_t* tag,
     char* response,
     size_t* size
 ) {
-    return static_cast<Session*>(session_handle)->BlockingCall(
-        service, method, request, timeout, tag, response, size);
+    Session* session = reinterpret_cast<Session*>(session_handle);
+    void** reinterpreted_tag = reinterpret_cast<void**>(tag);
+    return session->BlockingCall(
+        service, method, request, timeout, reinterpreted_tag, response, size);
 }
 
-int32_t GrpcJsonClient_LockSession(void* session_handle) {
-    return static_cast<Session*>(session_handle)->Lock();
+int32_t GrpcJsonClient_LockSession(intptr_t session_handle) {
+    Session* session = reinterpret_cast<Session*>(session_handle);
+    return session->Lock();
 }
 
-int32_t GrpcJsonClient_UnlockSession(void* session_handle) {
-    return static_cast<Session*>(session_handle)->Unlock();
+int32_t GrpcJsonClient_UnlockSession(intptr_t session_handle) {
+    Session* session = reinterpret_cast<Session*>(session_handle);
+    return session->Unlock();
 }
 
-int32_t GrpcJsonClient_GetError(void* session_handle, int32_t* code, char* buffer, size_t* size) {
-    return static_cast<Session*>(session_handle)->GetError(code, buffer, size);
+int32_t GrpcJsonClient_GetError(
+    intptr_t session_handle, int32_t* code, char* buffer, size_t* size
+) {
+    Session* session = reinterpret_cast<Session*>(session_handle);
+    return session->GetError(code, buffer, size);
 }
 
 int32_t GrpcJsonClient_GetErrorString(
-    void* session_handle, int32_t code, char* buffer, size_t* size
+    intptr_t session_handle, int32_t code, char* buffer, size_t* size
 ) {
-    return Session::GetErrorString(static_cast<Session*>(session_handle), code, buffer, size);
+    Session* session = reinterpret_cast<Session*>(session_handle);
+    return Session::GetErrorString(session, code, buffer, size);
 }
 
-int32_t GrpcJsonClient_Close(void* session_handle) {
-    int32_t error_code = static_cast<Session*>(session_handle)->Close();
-    delete session_handle;
+int32_t GrpcJsonClient_Close(intptr_t session_handle) {
+    unique_ptr<Session> session(reinterpret_cast<Session*>(session_handle));
+    int32_t error_code = session->Close();
     return error_code;
 }
