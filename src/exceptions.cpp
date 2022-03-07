@@ -65,7 +65,7 @@ ServiceNotFoundException::ServiceNotFoundException(const std::string& name) :
 
 MethodNotFoundException::MethodNotFoundException(const std::string& name) :
     JsonClientException(
-        ErrorCode::kServiceNotFoundError, "The method \"" + name + "\" was not found.")
+        ErrorCode::kMethodNotFoundError, "The method \"" + name + "\" was not found.")
 {}
 
 }  // namespace grpc_json_client
