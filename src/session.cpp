@@ -170,6 +170,13 @@ int32_t Session::GetErrorString(Session* session, int32_t code, char* buffer, si
         strncpy(buffer, description.c_str(), *size);
         if (*size <= description.size()) {
             buffer[*size - 1] = NULL;  // strncpy doesn't add null char
+            if (session) {
+                session->_error_code = ErrorCode::kBufferSizeOutOfRangeWarning;
+                session->_error_message = {
+                    "The buffer size is too small to accomodate the full error message. "
+                    "It will be truncated."
+                };
+            }
             return static_cast<int32_t>(ErrorCode::kBufferSizeOutOfRangeWarning);
         }
     } else {
