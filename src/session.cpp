@@ -32,7 +32,7 @@ string BuildErrorMessage(const exception& ex) {
     try {
         std::rethrow_if_nested(ex);
     } catch (const exception& nested) {
-        message += "\n\nThe above exception was directly caused by:\n\n";
+        message += "\n\nThe above error was directly caused by the following error:\n\n";
         message += BuildErrorMessage(nested);
     }
     return message;
@@ -108,13 +108,14 @@ int32_t Session::BlockingCall(
         return FinishAsyncCall(*tag, timeout, response, size);
     }
     int32_t error_code = StartAsyncCall(service, method, request, timeout, tag);
-    if (error_code >= 0) {
-        int32_t next_error_code = FinishAsyncCall(*tag, timeout, response, size);
-        if (next_error_code < 0) {
-            error_code = next_error_code;
-        }
+    if (error_code < 0) {
+        return error_code;
     }
-    return error_code;
+    int32_t next_error_code = FinishAsyncCall(*tag, timeout, response, size);
+    if (next_error_code < 0) {
+        return next_error_code;
+    }
+    return error_code > 0 ? error_code : next_error_code;
 }
 
 int32_t Session::Lock() {
