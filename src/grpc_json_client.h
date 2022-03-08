@@ -8,7 +8,8 @@ extern "C" {
 #endif
 
 // Initializes a session with an insecure channel.
-__declspec(dllexport) int32_t GrpcJsonClient_Initialize(const char* target, intptr_t* session_handle);
+__declspec(dllexport) int32_t GrpcJsonClient_Initialize(
+    const char* target, intptr_t* session_handle);
 
 // Resets the descriptor database to it's default state.
 __declspec(dllexport) int32_t GrpcJsonClient_ResetDescriptorDatabase(intptr_t session_handle);
