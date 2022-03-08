@@ -1,3 +1,5 @@
+# BUILDING
+
 ## Dependencies
 
 1. Install [CMake](https://cmake.org/) and add it to `path`.
