@@ -136,7 +136,9 @@ int32_t Session::Unlock() {
 int32_t Session::GetError(int32_t* code, char* buffer, size_t* size) {
     return Evaluate(
         [=](const UnaryUnaryJsonClient&) {
-            *code = static_cast<int32_t>(_error_code);
+            if (code) {
+                *code = static_cast<int32_t>(_error_code);
+            }
             if (buffer) {
                 strncpy(buffer, _error_message.c_str(), *size);
                 if (*size > _error_message.size()) {
