@@ -37,10 +37,10 @@ DLLEXPORT int32_t GrpcJsonClient_FinishAsyncCall(
     intptr_t session_handle, intptr_t tag, int32_t timeout, char* response, size_t* size);
 
 // Performs a blocking unary unary RPC call. This function is equivalent to calling
-// GrpcJsonClient_StartAsyncCall followed by GrpcJsonClient_FinishAsyncCall. Initialize tag to zero
-// on the first call. The returned tag is a unique identifier that should be passed to sebsequent
-// calls. See GrpcJsonClient_StartAsyncCall and GrpcJsonClient_FinishAsyncCall for additional
-// parameter semantics.
+// GrpcJsonClient_StartAsyncCall followed by GrpcJsonClient_FinishAsyncCall. Initialize the tag
+// argument to zero on the first call to this function. The returned tag is a unique identifier
+// that should be passed to sebsequent calls to this function. See GrpcJsonClient_StartAsyncCall
+// and GrpcJsonClient_FinishAsyncCall for additional parameter semantics.
 DLLEXPORT int32_t GrpcJsonClient_BlockingCall(
     intptr_t session_handle,
     const char* service,
@@ -64,7 +64,7 @@ DLLEXPORT int32_t GrpcJsonClient_LockSession(
 DLLEXPORT int32_t GrpcJsonClient_UnlockSession(intptr_t session_handle);
 
 // Gets and clears error information from the session. Sessions store the most recent error or
-// warning that occures. Pass null as the response argument to query the function for the minimum
+// warning that occures. Pass null as the buffer argument to query the function for the minimum
 // buffer size.
 DLLEXPORT int32_t GrpcJsonClient_GetError(
     intptr_t session_handle, int32_t* code, char* buffer, size_t* size);
@@ -72,7 +72,7 @@ DLLEXPORT int32_t GrpcJsonClient_GetError(
 // Gets the corresponding generic error message for the specified error code. Pass null as the
 // session_handle argument to prevent the session from updating it's error state should an error
 // occur while calling this function. GrpcJsonClient_GetError should generally be preferred over
-// this function since it provides context specific error messages. Pass null as the response
+// this function since it provides context specific error messages. Pass null as the buffer
 // argument to query the function for the minimum buffer size.
 DLLEXPORT int32_t GrpcJsonClient_GetErrorString(
     intptr_t session_handle, int32_t code, char* buffer, size_t* size);
