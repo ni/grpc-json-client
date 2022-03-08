@@ -3,6 +3,8 @@
 This project aims to enable languages that don't have native gRPC support (LabVIEW, MATLAB, etc.)
 to communicate with gRPC services using JSON via a shared C/C++ library.
 
+Languages that have their own protobuf compilers should not use this library.
+
 ## Sister Projects
 
 [grpc-json-client-matlab](https://github.com/ni/grpc-json-client-matlab) - MATLAB implementation
