@@ -118,10 +118,11 @@ int32_t Session::BlockingCall(
     return error_code > 0 ? error_code : next_error_code;
 }
 
-int32_t Session::Lock() {
+int32_t Session::Lock(int32_t timeout, uint8_t* has_lock) {
     return Evaluate(
         [=](const UnaryUnaryJsonClient&) {
-            _lock.lock();
+            system_clock::time_point deadline = DeadlineFromTimeout(timeout);
+            *has_lock = _lock.try_lock_until(deadline);
             return ErrorCode::kNone;
         });
 }

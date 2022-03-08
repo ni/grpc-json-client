@@ -65,9 +65,9 @@ int32_t GrpcJsonClient_BlockingCall(
         service, method, request, timeout, reinterpreted_tag, response, size);
 }
 
-int32_t GrpcJsonClient_LockSession(intptr_t session_handle) {
+int32_t GrpcJsonClient_LockSession(intptr_t session_handle, int32_t timeout, uint8_t* has_lock) {
     Session* session = reinterpret_cast<Session*>(session_handle);
-    return session->Lock();
+    return session->Lock(timeout, has_lock);
 }
 
 int32_t GrpcJsonClient_UnlockSession(intptr_t session_handle) {

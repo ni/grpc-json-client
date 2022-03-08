@@ -125,7 +125,6 @@ if(GRPC_JSON_CLIENT_BUILD_TESTS)
     # Add test executable
     add_executable(tests
         "${tests_src_dir}/test_grpc_json_client.cpp"
-        "${tests_src_dir}/test_json_client_base.cpp"
         "${tests_src_dir}/test_json_serializer.cpp"
         "${tests_src_dir}/testing_server.cpp"
         ${src_files}

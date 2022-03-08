@@ -34,14 +34,14 @@ class Session {
         void** tag,
         char* response,
         size_t* size);
-    int32_t Lock();
+    int32_t Lock(int32_t timeout, uint8_t* has_lock);
     int32_t Unlock();
     int32_t GetError(int32_t* code, char* buffer, size_t* size);
     static int32_t GetErrorString(Session* session, int32_t code, char* buffer, size_t* size);
     int32_t Close();
 
  private:
-    std::recursive_mutex _lock;
+    std::recursive_timed_mutex _lock;
     UnaryUnaryJsonClient _client;
     std::unordered_map<const void*, std::string> _responses;
     ErrorCode _error_code;
