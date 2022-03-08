@@ -72,24 +72,26 @@ TEST_F(GrpcJsonClientOfflineTest, ResetDescriptorDatabaseSucceeds) {
 }
 
 TEST_F(GrpcJsonClientOfflineTest, FillDescriptorDatabaseFailsWithRemoteProcedureCallError) {
-    int expected_code = static_cast<int>(ErrorCode::kRemoteProcedureCallError);
+    int32_t expected_code = static_cast<int32_t>(ErrorCode::kRemoteProcedureCallError);
     ASSERT_EQ(GrpcJsonClient_FillDescriptorDatabase(session, -1), expected_code);
 }
 
 TEST_F(GrpcJsonClientOfflineTest, StartAsyncCallFailsWithRemoteProcedureCallError) {
-    int expected_code = static_cast<int>(ErrorCode::kRemoteProcedureCallError);
+    int32_t expected_code = static_cast<int32_t>(ErrorCode::kRemoteProcedureCallError);
     ASSERT_EQ(GrpcJsonClient_StartAsyncCall(session, "", "", "", -1, 0), expected_code);
 }
 
 TEST_F(GrpcJsonClientOfflineTest, FinishAsyncCallFailsWithInvalidTagError) {
-    int expected_code = static_cast<int>(ErrorCode::kInvalidArgumentError);
+    int32_t expected_code = static_cast<int32_t>(ErrorCode::kInvalidArgumentError);
     ASSERT_EQ(GrpcJsonClient_FinishAsyncCall(session, 0, -1, nullptr, nullptr), expected_code);
 }
 
 TEST_F(GrpcJsonClientOfflineTest, BlockingCallFailsWithRemoteProcedureCallError) {
     intptr_t tag = 0;
-    int expected_code = static_cast<int>(ErrorCode::kRemoteProcedureCallError);
-    ASSERT_EQ(GrpcJsonClient_BlockingCall(session, "", "", "", -1, &tag, nullptr, nullptr), expected_code);
+    int32_t error_code = GrpcJsonClient_BlockingCall(
+        session, "", "", "", -1, &tag, nullptr, nullptr);
+    int32_t expected_code = static_cast<int32_t>(ErrorCode::kRemoteProcedureCallError);
+    ASSERT_EQ(error_code, expected_code);
 }
 
 TEST_F(GrpcJsonClientOfflineTest, LockAndUnlockSessionSucceeds) {
