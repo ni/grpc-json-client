@@ -30,7 +30,7 @@ string GetErrorString(const ErrorCode& error_code) {
         return error_strings.at(error_code);
     }
     catch (const out_of_range&) {
-        return error_strings.at(ErrorCode::kUnknownError);
+        return "Undefined error code";
     }
 }
 
