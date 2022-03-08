@@ -16,20 +16,13 @@ using std::unique_ptr;
 namespace ni {
 namespace grpc_json_client {
 
-class GrpcJsonClientTest : public testing::Test {
+class GrpcJsonClientOfflineTest : public testing::Test {
  protected:
-    static unique_ptr<TestingServer> server;
     intptr_t session;
 
-    static void SetUpTestSuite() {
-        string address("0.0.0.0:50051");
-        server = std::make_unique<TestingServer>(address);
-        server->Start();
-    }
-
-    static void TearDownTestSuite() {
-        server->Stop();
-    }
+    GrpcJsonClientOfflineTest() :
+        session(0)
+    {}
 
     void SetUp() override {
         ASSERT_EQ(GrpcJsonClient_Initialize("localhost:50051", &session), 0);
@@ -40,10 +33,114 @@ class GrpcJsonClientTest : public testing::Test {
     }
 };
 
-unique_ptr<TestingServer> GrpcJsonClientTest::server;
+class GrpcJsonClientTest : public GrpcJsonClientOfflineTest {
+ protected:
+    static unique_ptr<TestingServer> server;
+    static const char* testing_service;
 
-TEST_F(GrpcJsonClientTest, ResetDescriptorDatabaseSucceeds) {
+    static void SetUpTestSuite() {
+        string address("0.0.0.0:50051");
+        server = std::make_unique<TestingServer>(address);
+        server->Start();
+    }
+
+    static void TearDownTestSuite() {
+        server->Stop();
+    }
+};
+
+unique_ptr<TestingServer> GrpcJsonClientTest::server;
+const char* GrpcJsonClientTest::testing_service = "ni.grpc_json_client.TestingService";
+
+int32_t GetErrorHelper(intptr_t session, int32_t* code, string* message) {
+    size_t size = 0;
+    int32_t error_code = GrpcJsonClient_GetError(session, nullptr, nullptr, &size);
+    if (error_code < 0) {
+        return error_code;
+    }
+    unique_ptr<char> buffer(new char[size]);
+    int32_t next_error_code = GrpcJsonClient_GetError(session, code, buffer.get(), &size);
+    if (next_error_code < 0) {
+        return next_error_code;
+    }
+    *message = buffer.get();
+    return error_code > 0 ? error_code : next_error_code;
+}
+
+TEST_F(GrpcJsonClientOfflineTest, ResetDescriptorDatabaseSucceeds) {
     ASSERT_EQ(GrpcJsonClient_ResetDescriptorDatabase(session), 0);
+}
+
+TEST_F(GrpcJsonClientOfflineTest, FillDescriptorDatabaseFailsWithRemoteProcedureCallError) {
+    int expected_code = static_cast<int>(ErrorCode::kRemoteProcedureCallError);
+    ASSERT_EQ(GrpcJsonClient_FillDescriptorDatabase(session, -1), expected_code);
+}
+
+TEST_F(GrpcJsonClientOfflineTest, StartAsyncCallFailsWithRemoteProcedureCallError) {
+    int expected_code = static_cast<int>(ErrorCode::kRemoteProcedureCallError);
+    ASSERT_EQ(GrpcJsonClient_StartAsyncCall(session, "", "", "", -1, 0), expected_code);
+}
+
+TEST_F(GrpcJsonClientOfflineTest, FinishAsyncCallFailsWithInvalidTagError) {
+    int expected_code = static_cast<int>(ErrorCode::kInvalidArgumentError);
+    ASSERT_EQ(GrpcJsonClient_FinishAsyncCall(session, 0, -1, nullptr, nullptr), expected_code);
+}
+
+TEST_F(GrpcJsonClientOfflineTest, BlockingCallFailsWithRemoteProcedureCallError) {
+    intptr_t tag = 0;
+    int expected_code = static_cast<int>(ErrorCode::kRemoteProcedureCallError);
+    ASSERT_EQ(GrpcJsonClient_BlockingCall(session, "", "", "", -1, &tag, nullptr, nullptr), expected_code);
+}
+
+TEST_F(GrpcJsonClientOfflineTest, LockAndUnlockSessionSucceeds) {
+    ASSERT_EQ(GrpcJsonClient_LockSession(session), 0);
+    ASSERT_EQ(GrpcJsonClient_UnlockSession(session), 0);
+}
+
+TEST_F(GrpcJsonClientOfflineTest, RecursiveLockingSucceeds) {
+    ASSERT_EQ(GrpcJsonClient_LockSession(session), 0);
+    ASSERT_EQ(GrpcJsonClient_LockSession(session), 0);
+    ASSERT_EQ(GrpcJsonClient_UnlockSession(session), 0);
+    ASSERT_EQ(GrpcJsonClient_UnlockSession(session), 0);
+}
+
+TEST_F(GrpcJsonClientOfflineTest, GetErrorWithNoErrorSucceeds) {
+    int32_t code = 0;
+    string message;
+    ASSERT_EQ(GetErrorHelper(session, &code, &message), 0);
+    ASSERT_EQ(code, 0);
+    ASSERT_EQ(message, "No error");
+}
+
+TEST_F(GrpcJsonClientOfflineTest, GetErrorStringWithNoErrorSucceeds) {
+    int32_t code = 0;
+    size_t size = 0;
+    ASSERT_EQ(GrpcJsonClient_GetErrorString(session, code, nullptr, &size), 0);
+    unique_ptr<char> buffer(new char[size]);
+    ASSERT_EQ(GrpcJsonClient_GetErrorString(session, code, buffer.get(), &size), 0);
+    ASSERT_EQ(code, 0);
+    ASSERT_STREQ(buffer.get(), "No error");
+}
+
+TEST_F(GrpcJsonClientOfflineTest, GetErrorStringWithErrorSucceeds) {
+    int32_t code = -1;
+    size_t size = 0;
+    ASSERT_EQ(GrpcJsonClient_GetErrorString(session, code, nullptr, &size), 0);
+    unique_ptr<char> buffer(new char[size]);
+    ASSERT_EQ(GrpcJsonClient_GetErrorString(session, code, buffer.get(), &size), 0);
+    ASSERT_STREQ(buffer.get(), "Unknown error");
+}
+
+TEST_F(
+    GrpcJsonClientOfflineTest,
+    GetErrorStringWithOutOfRangeErrorCodeReturnsUndefinedErrorCodeMessage
+) {
+    int32_t code = INT32_MIN;
+    size_t size = 0;
+    ASSERT_EQ(GrpcJsonClient_GetErrorString(session, code, nullptr, &size), 0);
+    unique_ptr<char> buffer(new char[size]);
+    ASSERT_EQ(GrpcJsonClient_GetErrorString(session, code, buffer.get(), &size), 0);
+    ASSERT_STREQ(buffer.get(), "Undefined error code");
 }
 
 TEST_F(GrpcJsonClientTest, FillDescriptorDatabaseSucceeds) {
@@ -255,12 +352,6 @@ TEST_F(GrpcJsonClientTest, GetErrorWithSmallBufferSucceedsWithBufferSizeOutOfRan
     int32_t error_code = GrpcJsonClient_GetError(session, &queried_error_code, &buffer, &size);
 
     ASSERT_EQ(error_code, static_cast<int32_t>(ErrorCode::kBufferSizeOutOfRangeWarning));
-}
-
-TEST_F(GrpcJsonClientTest, RequestsWithoutRunningServiceFailWithRemoteProcedureCallError) {
-    server->Stop();
-    EXPECT_EQ(GrpcJsonClient_FillDescriptorDatabase(session, -1), -2);
-    server->Start();
 }
 
 }  // namespace grpc_json_client
