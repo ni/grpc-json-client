@@ -55,13 +55,14 @@ void* UnaryUnaryJsonClient::StartAsyncCall(
 }
 
 string UnaryUnaryJsonClient::FinishAsyncCall(void* tag, const system_clock::time_point& deadline) {
-    if (!_tags.erase(static_cast<AsyncCallData*>(tag))) {
+    unique_ptr<AsyncCallData> async_call(static_cast<AsyncCallData*>(tag));
+    if (!_tags.erase(async_call.get())) {
+        async_call.release();  // don't delete whatever it is we're holding
         string message = {
             "An active remote procedure call was not found for the specified tag."
         };
         throw InvalidArgumentException(message);
     }
-    unique_ptr<AsyncCallData> async_call(static_cast<AsyncCallData*>(tag));
     ByteBuffer serialized_response;
     Status status;
     async_call->response_reader->Finish(&serialized_response, &status, async_call.get());
