@@ -109,18 +109,32 @@ void JsonClientBase::QueryReflectionService(
 
     // query
     bool sent_request = stream->Write(request);
-    stream->WritesDone();
+    bool sent_writes_done = stream->WritesDone();
     bool got_response = stream->Read(response);
     Status status = stream->Finish();
 
-    // check results
+    // check for errors
     if (!sent_request) {
-        string summary("Failed to initiate communication with the reflection service.");
+        string summary("Failed to initiate communication with the host.");
+        throw RemoteProcedureCallException(status, summary);
+    }
+    if (!sent_writes_done) {
+        string summary("The connection with the host was interrupted.");
+        throw RemoteProcedureCallException(status, summary);
+    }
+    if (status.error_code() == StatusCode::UNIMPLEMENTED) {
+        string summary("The reflection service is not running on the host.");
+        throw RemoteProcedureCallException(status, summary);
+    }
+    if (!status.ok()) {
+        string summary("An error occurred while communicating with the host.");
         throw RemoteProcedureCallException(status, summary);
     }
     if (!got_response) {
-        string summary("The connection with the reflection service was interrupted.");
-        throw RemoteProcedureCallException(status, summary);
+        // failsafe to make sure we don't continue if we got StatusCode OK but somehow didn't get a
+        // response
+        string message("Failed to receive a response from the host despite gRPC StatusCode OK.");
+        throw runtime_error(message);
     }
     if (response->has_error_response()) {
         grpc::Status status = {
@@ -135,10 +149,6 @@ void JsonClientBase::QueryReflectionService(
         }
         string summary("The reflection service reported an error.");
         throw ReflectionServiceException(status, summary, details);
-    }
-    if (!status.ok()) {
-        string summary("An error occurred while communicating with the reflection service.");
-        throw RemoteProcedureCallException(status, summary);
     }
 }
 

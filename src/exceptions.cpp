@@ -47,6 +47,7 @@ string RemoteProcedureCallException::AppendStatusDetails(const Status& status, s
         if (!message.empty()) {
             message += "\n\n";
         }
+        message += "Additional error details reported by gRPC:\n\n";
         string format("gRPC Error Code: %d\ngRPC Error Message: %s");
         int code_as_int = static_cast<int>(status.error_code());
         message += FormatString(format, code_as_int, status.error_message().c_str());
