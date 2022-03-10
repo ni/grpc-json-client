@@ -92,12 +92,13 @@ if(GRPC_JSON_CLIENT_BUILD_TESTS)
     set(tests_protos_dir "${tests_dir}/protos/")
 
     # Add GTest submodule
-    set(BUILD_GMOCK OFF CACHE BOOL "")
+    set(INSTALL_GTEST OFF CACHE BOOL "")
     set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
     add_subdirectory("${CMAKE_SOURCE_DIR}/third_party/gtest/" "${CMAKE_BINARY_DIR}/gtest/" EXCLUDE_FROM_ALL)
 
     set(_GTEST GTest::gtest)
     set(_GTEST_MAIN GTest::gtest_main)
+    set(_GMOCK GTest::gmock)
 
     # Add JSON submodule
     set(JSON_BuildTests OFF CACHE INTERNAL "")
@@ -140,6 +141,7 @@ if(GRPC_JSON_CLIENT_BUILD_TESTS)
         ${_GRPC_LIBS}
         ${_GTEST}
         ${_GTEST_MAIN}
+        ${_GMOCK}
         ${_JSON}
     )
 
