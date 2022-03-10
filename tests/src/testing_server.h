@@ -23,9 +23,11 @@ class TestingServer {
     std::string _address;
     TestingServiceImpl _service;
     std::unique_ptr<grpc::Server> _server;
+    bool _reflection_enabled;
 
  public:
     explicit TestingServer(const std::string& address);
+    void EnableReflection();
     void Start();
     void Stop();
 };

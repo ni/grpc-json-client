@@ -97,7 +97,6 @@ if(GRPC_JSON_CLIENT_BUILD_TESTS)
     add_subdirectory("${CMAKE_SOURCE_DIR}/third_party/gtest/" "${CMAKE_BINARY_DIR}/gtest/" EXCLUDE_FROM_ALL)
 
     set(_GTEST GTest::gtest)
-    set(_GTEST_MAIN GTest::gtest_main)
     set(_GMOCK GTest::gmock)
 
     # Add JSON submodule
@@ -128,6 +127,7 @@ if(GRPC_JSON_CLIENT_BUILD_TESTS)
         "${tests_src_dir}/test_grpc_json_client.cpp"
         "${tests_src_dir}/test_json_serializer.cpp"
         "${tests_src_dir}/testing_server.cpp"
+        "${tests_src_dir}/tests.cpp"
         ${src_files}
         ${testing_service_pb_src}
         ${testing_service_grpc_src}
@@ -140,7 +140,6 @@ if(GRPC_JSON_CLIENT_BUILD_TESTS)
     target_link_libraries(tests
         ${_GRPC_LIBS}
         ${_GTEST}
-        ${_GTEST_MAIN}
         ${_GMOCK}
         ${_JSON}
     )
