@@ -142,8 +142,9 @@ void JsonClientBase::QueryReflectionService(
             response->error_response().error_message()
         };
         string details;
+        JsonSerializer serializer;
         try {
-            details = "Sent message \"" + JsonSerializer::MessageToJsonString(request) + '\"';
+            details = "Sent message \"" + serializer.MessageToJsonString(request) + '\"';
         } catch (SerializationException) {
             // shouldn't let this hide the original error if it happens
         }

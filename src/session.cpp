@@ -202,8 +202,7 @@ int32_t Session::Evaluate(const function<ErrorCode(UnaryUnaryJsonClient&)>& func
     return static_cast<int32_t>(_error_code);
 }
 
-int32_t Session::RaiseWarning(Session* session, ErrorCode warning_code, const string& message)
-{
+int32_t Session::RaiseWarning(Session* session, ErrorCode warning_code, const string& message) {
     if (session) {
         session->_error_code = warning_code;
         session->_error_message = {
@@ -213,8 +212,7 @@ int32_t Session::RaiseWarning(Session* session, ErrorCode warning_code, const st
     return static_cast<int>(warning_code);
 }
 
-int32_t Session::RaiseBufferSizeOutOfRangeWarning(Session* session)
-{
+int32_t Session::RaiseBufferSizeOutOfRangeWarning(Session* session) {
     string message = {
         "The buffer size is too small to accomodate the entire string. "
         "It will be truncated."

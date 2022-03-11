@@ -19,8 +19,6 @@ using std::unique_ptr;
 namespace ni  {
 namespace grpc_json_client {
 
-google::protobuf::DynamicMessageFactory JsonSerializer::factory;
-
 void JsonSerializer::JsonStringToMessage(const string& json, Message* message) {
     google::protobuf::util::Status status = {
         google::protobuf::util::JsonStringToMessage(json, message)

@@ -15,25 +15,24 @@ namespace grpc_json_client {
 // Contains utilities for serializing messages to and from JSON.
 class JsonSerializer {
  private:
-    static google::protobuf::DynamicMessageFactory factory;
+    google::protobuf::DynamicMessageFactory factory;
 
  public:
-    static void JsonStringToMessage(
-        const std::string& json, google::protobuf::Message* message);
+    void JsonStringToMessage(const std::string& json, google::protobuf::Message* message);
 
     // Deserialize a protobuf message from a JSON string then serialize it into a byte buffer.
-    static grpc::ByteBuffer SerializeMessage(
+    grpc::ByteBuffer SerializeMessage(
         const google::protobuf::Descriptor* message_type, const std::string& message_json);
 
-    static std::string MessageToJsonString(const google::protobuf::Message& message);
+    std::string MessageToJsonString(const google::protobuf::Message& message);
 
     // Deserialize a message from a byte buffer then serialize it into a JSON string.
-    static std::string DeserializeMessage(
+    std::string DeserializeMessage(
         const google::protobuf::Descriptor* message_type, grpc::ByteBuffer* serialized_message);
 
  private:
     // Create a message instance from a message type.
-    static std::unique_ptr<google::protobuf::Message> CreateMessage(
+    std::unique_ptr<google::protobuf::Message> CreateMessage(
         const google::protobuf::Descriptor* message_type);
 };
 

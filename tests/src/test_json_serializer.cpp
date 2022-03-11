@@ -14,67 +14,66 @@ using std::string;
 namespace ni {
 namespace grpc_json_client {
 
-TEST(JsonSerializerTest, SerializesJsonObject) {
+class JsonSerializerTest : public testing::Test {
+ protected:
+    JsonSerializer serializer;
+};
+
+TEST_F(JsonSerializerTest, SerializesJsonObject) {
     const Descriptor* message_type = ServerReflectionRequest::GetDescriptor();
     string valid_json("{\"host\":\"localhost\",\"file_by_filename\":\"session.proto\"}");
-    ASSERT_NO_THROW(
-        JsonSerializer::SerializeMessage(message_type, valid_json));
+    ASSERT_NO_THROW(serializer.SerializeMessage(message_type, valid_json));
 }
 
-TEST(JsonSerializerTest, SerializesEmptyJsonObject) {
+TEST_F(JsonSerializerTest, SerializesEmptyJsonObject) {
     const Descriptor* message_type = ServerReflectionRequest::GetDescriptor();
-    ASSERT_NO_THROW(
-        JsonSerializer::SerializeMessage(message_type, "{}"));
+    ASSERT_NO_THROW(serializer.SerializeMessage(message_type, "{}"));
 }
 
-TEST(JsonSerializerTest, SerializeFailsOnEmptyString) {
+TEST_F(JsonSerializerTest, SerializeFailsOnEmptyString) {
     const Descriptor* message_type = ServerReflectionRequest::GetDescriptor();
-    ASSERT_THROW(
-        JsonSerializer::SerializeMessage(message_type, ""),
-        SerializationException);
+    ASSERT_THROW(serializer.SerializeMessage(message_type, ""), SerializationException);
 }
 
-TEST(JsonSerializerTest, SerializeFailsWithMalformedString) {
+TEST_F(JsonSerializerTest, SerializeFailsWithMalformedString) {
     const Descriptor* message_type = ServerReflectionRequest::GetDescriptor();
     string missing_last_curly_brace = {
         "{\"host\":\"localhost\",\"file_by_filename\":\"session.proto\""
     };
     ASSERT_THROW(
-        JsonSerializer::SerializeMessage(message_type, missing_last_curly_brace),
+        serializer.SerializeMessage(message_type, missing_last_curly_brace),
         SerializationException);
 }
 
-TEST(JsonSerializerTest, SerializeFailsWithInvalidProperty) {
+TEST_F(JsonSerializerTest, SerializeFailsWithInvalidProperty) {
     const Descriptor* message_type = ServerReflectionRequest::GetDescriptor();
     string has_extra_name_field = {
         "{\"host\":\"localhost\",\"file_by_filename\":\"session.proto\",\"name\":\"ni\"}"
     };
     ASSERT_THROW(
-        JsonSerializer::SerializeMessage(message_type, has_extra_name_field),
+        serializer.SerializeMessage(message_type, has_extra_name_field),
         SerializationException);
 }
 
-TEST(JsonSerializerTest, SerializeFailsOnInvalidMessageType) {
+TEST_F(JsonSerializerTest, SerializeFailsOnInvalidMessageType) {
     const Descriptor* message_type = FileDescriptorResponse::GetDescriptor();
     string request("{\"host\":\"localhost\",\"file_by_filename\":\"session.proto\"}");
-    ASSERT_THROW(
-        JsonSerializer::SerializeMessage(message_type, request),
-        SerializationException);
+    ASSERT_THROW(serializer.SerializeMessage(message_type, request), SerializationException);
 }
 
-TEST(JsonSerializerTest, DeserializeSucceedsWithValidByteBuffer) {
+TEST_F(JsonSerializerTest, DeserializeSucceedsWithValidByteBuffer) {
     const Descriptor* message_type = ServerReflectionRequest::GetDescriptor();
     string request("{\"host\":\"localhost\",\"file_by_filename\":\"session.proto\"}");
-    ByteBuffer buffer = JsonSerializer::SerializeMessage(message_type, request);
-    string response = JsonSerializer::DeserializeMessage(message_type, &buffer);
+    ByteBuffer buffer = serializer.SerializeMessage(message_type, request);
+    string response = serializer.DeserializeMessage(message_type, &buffer);
     ASSERT_EQ(request, response);
 }
 
-TEST(JsonSerializerTest, DeserializeFailsWithEmptyByteBuffer) {
+TEST_F(JsonSerializerTest, DeserializeFailsWithEmptyByteBuffer) {
     const Descriptor* response_type = FileDescriptorResponse::GetDescriptor();
     ByteBuffer empty_buffer;
     ASSERT_THROW(
-        JsonSerializer::DeserializeMessage(response_type, &empty_buffer),
+        serializer.DeserializeMessage(response_type, &empty_buffer),
         DeserializationException);
 }
 

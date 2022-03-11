@@ -41,8 +41,9 @@ void* UnaryUnaryJsonClient::StartAsyncCall(
     unique_ptr<AsyncCallData> async_call = std::make_unique<AsyncCallData>();
     async_call->method_type = FindMethod(service_name, method_name, deadline);
     string endpoint = "/" + service_name + "/" + method_name;
+    JsonSerializer serializer;
     ByteBuffer serialized_request = {
-        JsonSerializer::SerializeMessage(async_call->method_type->input_type(), request_json)
+        serializer.SerializeMessage(async_call->method_type->input_type(), request_json)
     };
     async_call->context.set_deadline(deadline);
     async_call->response_reader = {
@@ -89,7 +90,8 @@ string UnaryUnaryJsonClient::FinishAsyncCall(void* tag, const system_clock::time
                 string summary("An error occurred during the remote procedure call.");
                 throw RemoteProcedureCallException(status, summary);
             }
-            return JsonSerializer::DeserializeMessage(
+            JsonSerializer serializer;
+            return serializer.DeserializeMessage(
                 async_call->method_type->output_type(), &serialized_response);
         }
         // if we reach this point then the completion queue is shutting down
