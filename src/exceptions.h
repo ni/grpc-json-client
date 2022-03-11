@@ -20,6 +20,9 @@ class JsonClientException : public std::exception {
         JsonClientException(ErrorCode::kUnknownError, summary, details)
     {}
 
+    static std::string FormatErrorMessage(
+        ErrorCode code, const std::string& summary, const std::string& details);
+
     ErrorCode code() const;
     const char* what() const override;
     const std::string& message() const;
@@ -30,13 +33,10 @@ class JsonClientException : public std::exception {
     {}
 
     JsonClientException(ErrorCode code, const std::string& summary, const std::string& details) :
-        _code(code), _message(FormatMessage(code, summary, details))
+        _code(code), _message(FormatErrorMessage(code, summary, details))
     {}
 
  private:
-    static std::string FormatMessage(
-        ErrorCode code, const std::string& summary, const std::string& details);
-
     ErrorCode _code;
     std::string _message;
 };

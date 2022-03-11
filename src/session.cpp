@@ -151,12 +151,7 @@ int32_t Session::GetError(int32_t* code, char* buffer, size_t* size) {
                     if (*size > 0) {
                         buffer[*size - 1] = NULL;  // strncpy doesn't add null char
                     }
-                    _error_code = ErrorCode::kBufferSizeOutOfRangeWarning;
-                    _error_message = {
-                        "The buffer size is too small to accomodate the full error message. "
-                        "It will be truncated."
-                    };
-                    return _error_code;
+                    return static_cast<ErrorCode>(RaiseBufferSizeOutOfRangeWarning(this));
                 }
             } else {
                 *size = _error_message.size() + 1;  // include null char
@@ -175,14 +170,7 @@ int32_t Session::GetErrorString(Session* session, int32_t code, char* buffer, si
             if (*size > 0) {
                 buffer[*size - 1] = NULL;  // strncpy doesn't add null char
             }
-            if (session) {
-                session->_error_code = ErrorCode::kBufferSizeOutOfRangeWarning;
-                session->_error_message = {
-                    "The buffer size is too small to accomodate the full error message. "
-                    "It will be truncated."
-                };
-            }
-            return static_cast<int32_t>(ErrorCode::kBufferSizeOutOfRangeWarning);
+            return RaiseBufferSizeOutOfRangeWarning(session);
         }
     } else {
         *size = description.size() + 1;  // include null char
@@ -212,6 +200,26 @@ int32_t Session::Evaluate(const function<ErrorCode(UnaryUnaryJsonClient&)>& func
         _error_message = "An unhandled exception occurred.";
     }
     return static_cast<int32_t>(_error_code);
+}
+
+int32_t Session::RaiseWarning(Session* session, ErrorCode warning_code, const string& message)
+{
+    if (session) {
+        session->_error_code = warning_code;
+        session->_error_message = {
+            JsonClientException::FormatErrorMessage(warning_code, message, "")
+        };
+    }
+    return static_cast<int>(warning_code);
+}
+
+int32_t Session::RaiseBufferSizeOutOfRangeWarning(Session* session)
+{
+    string message = {
+        "The buffer size is too small to accomodate the entire string. "
+        "It will be truncated."
+    };
+    return RaiseWarning(session, ErrorCode::kBufferSizeOutOfRangeWarning, message);
 }
 
 }  // namespace grpc_json_client

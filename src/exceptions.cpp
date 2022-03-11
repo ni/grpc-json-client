@@ -4,6 +4,8 @@
 #include <cstdio>
 #include <memory>
 
+#include "common.h"
+
 using grpc::Status;
 using std::string;
 using std::unique_ptr;
@@ -11,12 +13,15 @@ using std::unique_ptr;
 namespace ni {
 namespace grpc_json_client {
 
-template <typename... Arguments>
-std::string FormatString(const std::string& format, const Arguments&... args) {
-    int size = snprintf(nullptr, 0, format.c_str(), args...) + 1;  // + null char
-    std::unique_ptr<char> buffer(new char[size]);
-    snprintf(buffer.get(), size, format.c_str(), args...);
-    return buffer.get();
+string JsonClientException::FormatErrorMessage(
+    ErrorCode code, const string& summary, const string& details
+) {
+    string format("Error Code: %d\nError Message: %s");
+    string message = FormatString(format, static_cast<int>(code), summary.c_str());
+    if (!details.empty()) {
+        message += "\n\n" + details;
+    }
+    return message;
 }
 
 ErrorCode JsonClientException::code() const {
@@ -29,17 +34,6 @@ const char* JsonClientException::what() const {
 
 const string& JsonClientException::message() const {
     return _message;
-}
-
-string JsonClientException::FormatMessage(
-    ErrorCode code, const string& summary, const string& details
-) {
-    string format("Error Code: %d\nError Message: %s");
-    string message = FormatString(format, static_cast<int>(code), summary.c_str());
-    if (!details.empty()) {
-        message += "\n\n" + details;
-    }
-    return message;
 }
 
 string RemoteProcedureCallException::AppendStatusDetails(const Status& status, string message) {
