@@ -148,7 +148,9 @@ int32_t Session::GetError(int32_t* code, char* buffer, size_t* size) {
                     _error_code = ErrorCode::kNone;
                     _error_message = ni::grpc_json_client::GetErrorString(_error_code);
                 } else {
-                    buffer[*size - 1] = NULL;  // strncpy doesn't add null char
+                    if (*size > 0) {
+                        buffer[*size - 1] = NULL;  // strncpy doesn't add null char
+                    }
                     _error_code = ErrorCode::kBufferSizeOutOfRangeWarning;
                     _error_message = {
                         "The buffer size is too small to accomodate the full error message. "
@@ -170,7 +172,9 @@ int32_t Session::GetErrorString(Session* session, int32_t code, char* buffer, si
     if (buffer) {
         strncpy(buffer, description.c_str(), *size);
         if (*size <= description.size()) {
-            buffer[*size - 1] = NULL;  // strncpy doesn't add null char
+            if (*size > 0) {
+                buffer[*size - 1] = NULL;  // strncpy doesn't add null char
+            }
             if (session) {
                 session->_error_code = ErrorCode::kBufferSizeOutOfRangeWarning;
                 session->_error_message = {
