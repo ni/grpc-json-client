@@ -27,13 +27,13 @@ system_clock::time_point DeadlineFromTimeout(int32_t timeout) {
 }
 
 // Builds an error message from nested exceptions.
-string BuildErrorMessage(const exception& ex) {
+string TraceExceptions(const exception& ex) {
     string message = ex.what();
     try {
         std::rethrow_if_nested(ex);
     } catch (const exception& nested) {
         message += "\n\nThe above error was directly caused by the following error:\n\n";
-        message += BuildErrorMessage(nested);
+        message += TraceExceptions(nested);
     }
     return message;
 }
@@ -187,28 +187,29 @@ int32_t Session::Close() {
 
 int32_t Session::Evaluate(const function<ErrorCode(UnaryUnaryJsonClient&)>& func) {
     try {
-        return static_cast<int32_t>(func(_client));
+        try {
+            return static_cast<int32_t>(func(_client));
+        }
+        catch (const JsonClientException& ex) {
+            throw;
+        }
+        catch (const exception& ex) {
+            throw JsonClientException("An unhandled exception occurred.", ex.what());
+        }
+        catch (...) {
+            throw JsonClientException("An unhandled exception occurred.");
+        }
     }
     catch (const JsonClientException& ex) {
         _error_code = ex.code();
-        _error_message = BuildErrorMessage(ex);
-    }
-    catch (const exception& ex) {
-        _error_code = ErrorCode::kUnknownError;
-        _error_message = "An unhandled exception occurred.\n\n" + BuildErrorMessage(ex);
-    }
-    catch (...) {
-        _error_code = ErrorCode::kUnknownError;
-        _error_message = "An unhandled exception occurred.";
+        _error_message = TraceExceptions(ex);
     }
     return static_cast<int32_t>(_error_code);
 }
 
 int32_t Session::RaiseWarning(ErrorCode warning_code, const string& message) {
     _error_code = warning_code;
-    _error_message = {
-        JsonClientException::FormatErrorMessage(warning_code, message, "")
-    };
+    _error_message = JsonClientException::FormatErrorMessage(warning_code, message, "");
     return static_cast<int>(warning_code);
 }
 
