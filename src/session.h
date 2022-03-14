@@ -49,9 +49,8 @@ class Session {
 
     // Helper function for catching exceptions.
     int32_t Evaluate(const std::function<ErrorCode(UnaryUnaryJsonClient&)>& func);
-    static int32_t RaiseWarning(
-        Session* session, ErrorCode warning_code, const std::string& message);
-    static int32_t RaiseBufferSizeOutOfRangeWarning(Session* session);
+    int32_t RaiseWarning(ErrorCode warning_code, const std::string& message);
+    int32_t RaiseBufferSizeOutOfRangeWarning();
 };
 
 }  // namespace grpc_json_client

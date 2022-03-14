@@ -151,7 +151,7 @@ int32_t Session::GetError(int32_t* code, char* buffer, size_t* size) {
                     if (*size > 0) {
                         buffer[*size - 1] = NULL;  // strncpy doesn't add null char
                     }
-                    return static_cast<ErrorCode>(RaiseBufferSizeOutOfRangeWarning(this));
+                    return static_cast<ErrorCode>(RaiseBufferSizeOutOfRangeWarning());
                 }
             } else {
                 *size = _error_message.size() + 1;  // include null char
@@ -170,7 +170,9 @@ int32_t Session::GetErrorString(Session* session, int32_t code, char* buffer, si
             if (*size > 0) {
                 buffer[*size - 1] = NULL;  // strncpy doesn't add null char
             }
-            return RaiseBufferSizeOutOfRangeWarning(session);
+            if (session) {
+                return session->RaiseBufferSizeOutOfRangeWarning();
+            }
         }
     } else {
         *size = description.size() + 1;  // include null char
@@ -202,22 +204,20 @@ int32_t Session::Evaluate(const function<ErrorCode(UnaryUnaryJsonClient&)>& func
     return static_cast<int32_t>(_error_code);
 }
 
-int32_t Session::RaiseWarning(Session* session, ErrorCode warning_code, const string& message) {
-    if (session) {
-        session->_error_code = warning_code;
-        session->_error_message = {
-            JsonClientException::FormatErrorMessage(warning_code, message, "")
-        };
-    }
+int32_t Session::RaiseWarning(ErrorCode warning_code, const string& message) {
+    _error_code = warning_code;
+    _error_message = {
+        JsonClientException::FormatErrorMessage(warning_code, message, "")
+    };
     return static_cast<int>(warning_code);
 }
 
-int32_t Session::RaiseBufferSizeOutOfRangeWarning(Session* session) {
+int32_t Session::RaiseBufferSizeOutOfRangeWarning() {
     string message = {
         "The buffer size is too small to accomodate the entire string. "
         "It will be truncated."
     };
-    return RaiseWarning(session, ErrorCode::kBufferSizeOutOfRangeWarning, message);
+    return RaiseWarning(ErrorCode::kBufferSizeOutOfRangeWarning, message);
 }
 
 }  // namespace grpc_json_client
