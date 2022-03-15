@@ -4,8 +4,8 @@
 #include <exception>
 #include <stdexcept>
 
-#include "google/protobuf/descriptor.pb.h"
-#include "google/protobuf/repeated_field.h"
+#include <google/protobuf/descriptor.pb.h>
+#include <google/protobuf/repeated_field.h>
 
 #include "exceptions.h"
 #include "json_serializer.h"

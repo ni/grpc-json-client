@@ -4,7 +4,7 @@
 #include <string>
 #include <memory>
 
-#include "grpcpp/grpcpp.h"
+#include <grpcpp/grpcpp.h>
 
 #include "testing_service.grpc.pb.h"
 

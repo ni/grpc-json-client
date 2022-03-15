@@ -4,8 +4,9 @@
 #include <exception>
 #include <string>
 
+#include <grpcpp/grpcpp.h>
+
 #include "error_code.h"
-#include "grpcpp/grpcpp.h"
 
 namespace ni {
 namespace grpc_json_client {

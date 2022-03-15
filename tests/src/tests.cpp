@@ -1,6 +1,6 @@
 
-#include "grpcpp/ext/proto_server_reflection_plugin.h"
-#include "gtest/gtest.h"
+#include <grpcpp/ext/proto_server_reflection_plugin.h>
+#include <gtest/gtest.h>
 
 int main(int argc, char** argv) {
     grpc::reflection::InitProtoReflectionServerBuilderPlugin();

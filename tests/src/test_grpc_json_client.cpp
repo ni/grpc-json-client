@@ -2,12 +2,14 @@
 #include <memory>
 #include <string>
 
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
-#include "nlohmann/json.hpp"
+#include <gmock/gmock.h>
+#include <gtest/gtest.h>
+#include <nlohmann/json.hpp>
 
+#include "common.h"
 #include "error_code.h"
 #include "grpc_json_client.h"
+
 #include "testing_server.h"
 
 using nlohmann::json;

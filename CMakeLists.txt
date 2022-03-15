@@ -41,20 +41,19 @@ endif()
 
 # Paths
 set(src_dir "${CMAKE_SOURCE_DIR}/src")
-set(generated_dir "${CMAKE_SOURCE_DIR}/generated/")
 set(reflection_protos_dir "${CMAKE_SOURCE_DIR}/third_party/grpc/src/proto/grpc/reflection/v1alpha/")
 set(reflection_proto_path "${reflection_protos_dir}/reflection.proto")
 
 # Generate sources
-set(reflection_pb_hdr "${generated_dir}/reflection.pb.h")
-set(reflection_pb_src "${generated_dir}/reflection.pb.cc")
-set(reflection_grpc_hdr "${generated_dir}/reflection.grpc.pb.h")
-set(reflection_grpc_src "${generated_dir}/reflection.grpc.pb.cc")
+set(reflection_pb_hdr "${src_dir}/reflection.pb.h")
+set(reflection_pb_src "${src_dir}/reflection.pb.cc")
+set(reflection_grpc_hdr "${src_dir}/reflection.grpc.pb.h")
+set(reflection_grpc_src "${src_dir}/reflection.grpc.pb.cc")
 add_custom_command(
     OUTPUT ${reflection_pb_hdr} ${reflection_pb_src} ${reflection_grpc_hdr} ${reflection_grpc_src}
     COMMAND ${_PROTOBUF_PROTOC}
-    ARGS --grpc_out ${generated_dir}
-         --cpp_out ${generated_dir}
+    ARGS --grpc_out ${src_dir}
+         --cpp_out ${src_dir}
          -I ${reflection_protos_dir}
          --plugin=protoc-gen-grpc=${_GRPC_CPP_PLUGIN_EXECUTABLE}
          ${reflection_proto_path}
@@ -80,7 +79,6 @@ set(_GRPC_LIBS
 
 # Add shared library
 add_library(grpc_json_client SHARED ${src_files})
-target_include_directories(grpc_json_client PRIVATE ${generated_dir})
 target_link_libraries(grpc_json_client ${_GRPC_LIBS})
 
 # Build tests
@@ -88,7 +86,6 @@ if(GRPC_JSON_CLIENT_BUILD_TESTS)
     # Paths
     set(tests_dir "${CMAKE_SOURCE_DIR}/tests/")
     set(tests_src_dir "${tests_dir}/src/")
-    set(tests_generated_dir "${tests_dir}/generated/")
     set(tests_protos_dir "${tests_dir}/protos/")
 
     # Add GTest submodule
@@ -107,15 +104,15 @@ if(GRPC_JSON_CLIENT_BUILD_TESTS)
 
     # Generate sources
     set(testing_service_proto_path "${tests_protos_dir}/testing_service.proto")
-    set(testing_service_pb_hdr "${tests_generated_dir}/testing_service.pb.h")
-    set(testing_service_pb_src "${tests_generated_dir}/testing_service.pb.cc")
-    set(testing_service_grpc_hdr "${tests_generated_dir}/testing_service.grpc.pb.h")
-    set(testing_service_grpc_src "${tests_generated_dir}/testing_service.grpc.pb.cc")
+    set(testing_service_pb_hdr "${tests_src_dir}/testing_service.pb.h")
+    set(testing_service_pb_src "${tests_src_dir}/testing_service.pb.cc")
+    set(testing_service_grpc_hdr "${tests_src_dir}/testing_service.grpc.pb.h")
+    set(testing_service_grpc_src "${tests_src_dir}/testing_service.grpc.pb.cc")
     add_custom_command(
         OUTPUT ${testing_service_pb_hdr} ${testing_service_pb_src} ${testing_service_grpc_hdr} ${testing_service_grpc_src}
         COMMAND ${_PROTOBUF_PROTOC}
-        ARGS --grpc_out ${tests_generated_dir}
-             --cpp_out ${tests_generated_dir}
+        ARGS --grpc_out ${tests_src_dir}
+             --cpp_out ${tests_src_dir}
              -I ${tests_protos_dir}
              --plugin=protoc-gen-grpc=${_GRPC_CPP_PLUGIN_EXECUTABLE}
              ${testing_service_proto_path}
@@ -133,9 +130,7 @@ if(GRPC_JSON_CLIENT_BUILD_TESTS)
         ${testing_service_grpc_src}
     )
     target_include_directories(tests PRIVATE
-        ${generated_dir}
         ${src_dir}
-        ${tests_generated_dir}
     )
     target_link_libraries(tests
         ${_GRPC_LIBS}
