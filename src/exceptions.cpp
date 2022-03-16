@@ -2,7 +2,13 @@
 #include "exceptions.h"
 
 #include <cstdio>
+#include <exception>
 #include <memory>
+#include <string>
+
+#include <grpcpp/grpcpp.h>
+
+#include "error_code.h"
 
 using grpc::Status;
 using std::string;

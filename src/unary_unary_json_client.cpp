@@ -1,9 +1,18 @@
 ﻿
 #include "unary_unary_json_client.h"
 
+#include <chrono>
+#include <memory>
 #include <stdexcept>
+#include <string>
+#include <unordered_set>
+
+#include <google/protobuf/descriptor.h>
+#include <grpcpp/grpcpp.h>
+#include <grpcpp/generic/generic_stub.h>
 
 #include "exceptions.h"
+#include "json_client_base.h"
 #include "json_serializer.h"
 
 using grpc::ByteBuffer;

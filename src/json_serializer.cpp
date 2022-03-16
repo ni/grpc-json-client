@@ -1,8 +1,15 @@
 
 #include "json_serializer.h"
 
+#include <memory>
+#include <string>
+
+#include <google/protobuf/descriptor.h>
+#include <google/protobuf/dynamic_message.h>
+#include <google/protobuf/message.h>
 #include <google/protobuf/stubs/status.h>
 #include <google/protobuf/util/json_util.h>
+#include <grpcpp/grpcpp.h>
 #include <grpcpp/impl/codegen/proto_utils.h>
 
 #include "exceptions.h"

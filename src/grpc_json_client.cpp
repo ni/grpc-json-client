@@ -2,6 +2,7 @@
 #include <grpcjsonclient/grpc_json_client.h>
 
 #include <chrono>
+#include <cstdint>
 #include <memory>
 
 #include <grpcpp/grpcpp.h>

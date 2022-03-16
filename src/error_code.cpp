@@ -2,6 +2,7 @@
 #include "error_code.h"
 
 #include <stdexcept>
+#include <string>
 #include <unordered_map>
 
 using std::out_of_range;

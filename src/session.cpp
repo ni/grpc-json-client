@@ -2,10 +2,20 @@
 #include "session.h"
 
 #include <chrono>
+#include <cstdint>
 #include <cstring>
 #include <exception>
+#include <functional>
+#include <memory>
+#include <mutex>
+#include <string>
+#include <unordered_map>
 
+#include <grpcpp/grpcpp.h>
+
+#include "error_code.h"
 #include "exceptions.h"
+#include "unary_unary_json_client.h"
 
 using grpc::ChannelCredentials;
 using std::chrono::system_clock;
