@@ -25,9 +25,9 @@ class Session {
     int32_t ResetDescriptorDatabase();
     int32_t FillDescriptorDatabase(const std::chrono::system_clock::time_point& deadline);
     int32_t StartAsyncCall(
-        const std::string& service,
-        const std::string& method,
-        const std::string& request,
+        const char* service,
+        const char* method,
+        const char* request,
         const std::chrono::system_clock::time_point& deadline,
         void** tag);
     int32_t FinishAsyncCall(
@@ -36,9 +36,9 @@ class Session {
         char* buffer,
         size_t* size);
     int32_t BlockingCall(
-        const std::string& service,
-        const std::string& method,
-        const std::string& request,
+        const char* service,
+        const char* method,
+        const char* request,
         const std::chrono::system_clock::time_point& deadline,
         void** tag,
         char* response,

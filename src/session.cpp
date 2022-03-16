@@ -52,14 +52,14 @@ int32_t Session::FillDescriptorDatabase(const system_clock::time_point& deadline
 }
 
 int32_t Session::StartAsyncCall(
-    const string& service,
-    const string& method,
-    const string& request,
+    const char* service,
+    const char* method,
+    const char* request,
     const system_clock::time_point& deadline,
     void** tag
 ) {
     return Evaluate(
-        [&](UnaryUnaryJsonClient& client) {
+        [=, &deadline](UnaryUnaryJsonClient& client) {
             *tag = client.StartAsyncCall(service, method, request, deadline);
             return ErrorCode::kNone;
         });
@@ -69,7 +69,7 @@ int32_t Session::FinishAsyncCall(
     void* tag, const system_clock::time_point& deadline, char* buffer, size_t* size
 ) {
     return Evaluate(
-        [&](UnaryUnaryJsonClient& client) {
+        [=, &deadline](UnaryUnaryJsonClient& client) {
             if (!_responses.count(tag)) {
                 _responses[tag] = client.FinishAsyncCall(tag, deadline);
             }
@@ -90,10 +90,10 @@ int32_t Session::FinishAsyncCall(
 }
 
 int32_t Session::BlockingCall(
-    const std::string& service,
-    const std::string& method,
-    const std::string& request,
-    const std::chrono::system_clock::time_point& deadline,
+    const char* service,
+    const char* method,
+    const char* request,
+    const system_clock::time_point& deadline,
     void** tag,
     char* response,
     size_t* size
@@ -114,7 +114,7 @@ int32_t Session::BlockingCall(
 
 int32_t Session::Lock(const std::chrono::system_clock::time_point& deadline, uint8_t* has_lock) {
     return Evaluate(
-        [&](const UnaryUnaryJsonClient&) {
+        [=, &deadline](const UnaryUnaryJsonClient&) {
             *has_lock = _lock.try_lock_until(deadline);
             return ErrorCode::kNone;
         });
