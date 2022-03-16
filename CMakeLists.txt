@@ -126,22 +126,34 @@ if(GRPC_JSON_CLIENT_BUILD_TESTS)
 
     # Add test executable
     add_executable(tests
-        "${tests_src_dir}/test_grpc_json_client.cpp"
-        "${tests_src_dir}/test_json_serializer.cpp"
-        "${tests_src_dir}/testing_server.cpp"
-        "${tests_src_dir}/tests.cpp"
-        ${src_files}
         ${testing_service_pb_src}
         ${testing_service_grpc_src}
-    )
-    target_include_directories(tests PRIVATE
-        ${src_dir}
+        ${tests_src_dir}/grpc_json_client_no_reflection_test.cpp
+        ${tests_src_dir}/grpc_json_client_offline_test.cpp
+        ${tests_src_dir}/grpc_json_client_serializer_test.cpp
+        ${tests_src_dir}/grpc_json_client_test.cpp
+        ${tests_src_dir}/grpc_json_client_test_base.cpp
+        ${tests_src_dir}/helpers.cpp
+        ${tests_src_dir}/testing_server.cpp
+        ${tests_src_dir}/testing_service.cpp
+        ${tests_src_dir}/tests.cpp
     )
     target_link_libraries(tests
         ${_GRPC_LIBS}
         ${_GTEST}
         ${_GMOCK}
         ${_JSON}
+        grpc_json_client
     )
     gtest_discover_tests(tests)
+
+    # Add standalone testing server executable
+    add_executable(standalone_testing_server
+        ${testing_service_pb_src}
+        ${testing_service_grpc_src}
+        ${tests_src_dir}/standalone_testing_server.cpp
+        ${tests_src_dir}/testing_server.cpp
+        ${tests_src_dir}/testing_service.cpp
+    )
+    target_link_libraries(standalone_testing_server ${_GRPC_LIBS})    
 endif()

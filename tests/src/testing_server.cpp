@@ -1,34 +1,24 @@
 
 #include "testing_server.h"
 
-#include <chrono>
-#include <thread>
+#include <memory>
+#include <string>
 #include <vector>
 
+#include <grpcpp/grpcpp.h>
 #include <grpcpp/ext/proto_server_reflection_plugin.h>
 
 using grpc::ChannelArguments;
 using grpc::ServerBuilder;
 using grpc::ServerBuilderOption;
 using grpc::ServerBuilderPlugin;
-using grpc::ServerContext;
-using grpc::Status;
 using grpc::reflection::ProtoServerReflectionPlugin;
-using std::chrono::milliseconds;
 using std::string;
 using std::vector;
 using std::unique_ptr;
 
 namespace ni {
 namespace grpc_json_client {
-
-Status TestingServiceImpl::UnaryUnaryEcho(
-    ServerContext* context, const UnaryUnaryEchoMessage* request, UnaryUnaryEchoMessage* response
-) {
-    std::this_thread::sleep_for(milliseconds(request->delay()));
-    *response = *request;
-    return Status::OK;
-}
 
 class RemoveReflectionPlugin : public ServerBuilderOption {
     void UpdateArguments(ChannelArguments* args) override {}
@@ -62,6 +52,10 @@ void TestingServer::Start() {
         builder.SetOption(std::make_unique<RemoveReflectionPlugin>());
     }
     _server = builder.BuildAndStart();
+}
+
+void TestingServer::Wait() {
+    _server->Wait();
 }
 
 void TestingServer::Stop() {

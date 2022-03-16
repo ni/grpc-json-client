@@ -6,17 +6,10 @@
 
 #include <grpcpp/grpcpp.h>
 
-#include "testing_service.grpc.pb.h"
+#include "testing_service.h"
 
 namespace ni {
 namespace grpc_json_client {
-
-class TestingServiceImpl final : public TestingService::Service {
-    grpc::Status UnaryUnaryEcho(
-        grpc::ServerContext* context,
-        const UnaryUnaryEchoMessage* request,
-        UnaryUnaryEchoMessage* response) override;
-};
 
 class TestingServer {
  private:
@@ -29,6 +22,7 @@ class TestingServer {
     explicit TestingServer(const std::string& address);
     void EnableReflection();
     void Start();
+    void Wait();
     void Stop();
 };
 
