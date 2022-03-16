@@ -17,6 +17,28 @@ using std::unique_ptr;
 namespace ni {
 namespace grpc_json_client {
 
+int32_t FinishAsyncCallHelper(
+    intptr_t session,
+    intptr_t tag,
+    int32_t timeout,
+    string* response
+) {
+    size_t size = 0;
+    int32_t error_code = GrpcJsonClient_FinishAsyncCall(session, tag, timeout, nullptr, &size);
+    if (error_code < 0) {
+        return error_code;
+    }
+    unique_ptr<char> buffer(new char[size]);
+    int32_t next_error_code = GrpcJsonClient_FinishAsyncCall(session, tag, 0, buffer.get(), &size);
+    if (next_error_code < 0) {
+        return next_error_code;
+    }
+    if (response) {
+        *response = buffer.get();
+    }
+    return error_code > 0 ? error_code : next_error_code;
+}   
+
 int32_t BlockingCallHelper(
     intptr_t session,
     const string& service,
@@ -38,7 +60,9 @@ int32_t BlockingCallHelper(
     if (next_error_code < 0) {
         return next_error_code;
     }
-    *response = buffer.get();
+    if (response) {
+        *response = buffer.get();
+    }
     return error_code > 0 ? error_code : next_error_code;
 }
 
