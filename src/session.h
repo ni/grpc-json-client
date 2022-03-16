@@ -1,6 +1,7 @@
 
 #pragma once
 
+#include <chrono>
 #include <cstdint>
 #include <functional>
 #include <memory>
@@ -22,19 +23,27 @@ class Session {
         const std::string& target, const std::shared_ptr<grpc::ChannelCredentials>& credentials);
 
     int32_t ResetDescriptorDatabase();
-    int32_t FillDescriptorDatabase(int32_t timeout);
+    int32_t FillDescriptorDatabase(const std::chrono::system_clock::time_point& deadline);
     int32_t StartAsyncCall(
-        const char* service, const char* method, const char* request, int32_t timeout, void** tag);
-    int32_t FinishAsyncCall(void* tag, int32_t timeout, char* buffer, size_t* size);
+        const std::string& service,
+        const std::string& method,
+        const std::string& request,
+        const std::chrono::system_clock::time_point& deadline,
+        void** tag);
+    int32_t FinishAsyncCall(
+        void* tag,
+        const std::chrono::system_clock::time_point& deadline,
+        char* buffer,
+        size_t* size);
     int32_t BlockingCall(
-        const char* service,
-        const char* method,
-        const char* request,
-        int32_t timeout,
+        const std::string& service,
+        const std::string& method,
+        const std::string& request,
+        const std::chrono::system_clock::time_point& deadline,
         void** tag,
         char* response,
         size_t* size);
-    int32_t Lock(int32_t timeout, uint8_t* has_lock);
+    int32_t Lock(const std::chrono::system_clock::time_point& deadline, uint8_t* has_lock);
     int32_t Unlock();
     int32_t GetError(int32_t* code, char* buffer, size_t* size);
     static int32_t GetErrorString(Session* session, int32_t code, char* buffer, size_t* size);

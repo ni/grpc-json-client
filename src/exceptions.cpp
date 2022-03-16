@@ -4,14 +4,20 @@
 #include <cstdio>
 #include <memory>
 
-#include "common.h"
-
 using grpc::Status;
 using std::string;
 using std::unique_ptr;
 
 namespace ni {
 namespace grpc_json_client {
+
+template <typename... Arguments>
+string FormatString(const string& format, const Arguments&... args) {
+    int size = snprintf(nullptr, 0, format.c_str(), args...) + 1;  // + null char
+    unique_ptr<char> buffer(new char[size]);
+    snprintf(buffer.get(), size, format.c_str(), args...);
+    return buffer.get();
+}
 
 string JsonClientException::FormatErrorMessage(
     ErrorCode code, const string& summary, const string& details

@@ -1,6 +1,7 @@
 
-#include "grpc_json_client.h"
+#include <grpcjsonclient/grpc_json_client.h>
 
+#include <chrono>
 #include <memory>
 
 #include <grpcpp/grpcpp.h>
@@ -9,8 +10,18 @@
 
 using grpc::ChannelCredentials;
 using ni::grpc_json_client::Session;
+using std::chrono::milliseconds;
+using std::chrono::system_clock;
 using std::shared_ptr;
 using std::unique_ptr;
+
+// Converts a timeout to a deadline.
+system_clock::time_point DeadlineFromTimeout(int32_t timeout) {
+    if (timeout < 0) {
+        return system_clock::time_point::max();
+    }
+    return system_clock::now() + milliseconds(timeout);
+}
 
 int32_t GrpcJsonClient_Initialize(const char* target, intptr_t* session_handle) {
     shared_ptr<ChannelCredentials> credentials = grpc::InsecureChannelCredentials();
@@ -25,7 +36,8 @@ int32_t GrpcJsonClient_ResetDescriptorDatabase(intptr_t session_handle) {
 
 int32_t GrpcJsonClient_FillDescriptorDatabase(intptr_t session_handle, int32_t timeout) {
     Session* session = reinterpret_cast<Session*>(session_handle);
-    return session->FillDescriptorDatabase(timeout);
+    system_clock::time_point deadline = DeadlineFromTimeout(timeout);
+    return session->FillDescriptorDatabase(deadline);
 }
 
 int32_t GrpcJsonClient_StartAsyncCall(
@@ -37,8 +49,9 @@ int32_t GrpcJsonClient_StartAsyncCall(
     intptr_t* tag
 ) {
     Session* session = reinterpret_cast<Session*>(session_handle);
+    system_clock::time_point deadline = DeadlineFromTimeout(timeout);
     void** reinterpreted_tag = reinterpret_cast<void**>(tag);
-    return session->StartAsyncCall(service, method, request, timeout, reinterpreted_tag);
+    return session->StartAsyncCall(service, method, request, deadline, reinterpreted_tag);
 }
 
 int32_t GrpcJsonClient_FinishAsyncCall(
@@ -46,7 +59,8 @@ int32_t GrpcJsonClient_FinishAsyncCall(
 ) {
     Session* session = reinterpret_cast<Session*>(session_handle);
     void* reinterpreted_tag = reinterpret_cast<void*>(tag);
-    return session->FinishAsyncCall(reinterpreted_tag, timeout, buffer, size);
+    system_clock::time_point deadline = DeadlineFromTimeout(timeout);
+    return session->FinishAsyncCall(reinterpreted_tag, deadline, buffer, size);
 }
 
 int32_t GrpcJsonClient_BlockingCall(
@@ -60,14 +74,16 @@ int32_t GrpcJsonClient_BlockingCall(
     size_t* size
 ) {
     Session* session = reinterpret_cast<Session*>(session_handle);
+    system_clock::time_point deadline = DeadlineFromTimeout(timeout);
     void** reinterpreted_tag = reinterpret_cast<void**>(tag);
     return session->BlockingCall(
-        service, method, request, timeout, reinterpreted_tag, response, size);
+        service, method, request, deadline, reinterpreted_tag, response, size);
 }
 
 int32_t GrpcJsonClient_LockSession(intptr_t session_handle, int32_t timeout, uint8_t* has_lock) {
     Session* session = reinterpret_cast<Session*>(session_handle);
-    return session->Lock(timeout, has_lock);
+    system_clock::time_point deadline = DeadlineFromTimeout(timeout);
+    return session->Lock(deadline, has_lock);
 }
 
 int32_t GrpcJsonClient_UnlockSession(intptr_t session_handle) {

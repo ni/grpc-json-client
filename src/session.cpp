@@ -1,14 +1,13 @@
 
 #include "session.h"
 
+#include <chrono>
 #include <cstring>
 #include <exception>
-#include <chrono>
 
 #include "exceptions.h"
 
 using grpc::ChannelCredentials;
-using std::chrono::milliseconds;
 using std::chrono::system_clock;
 using std::exception;
 using std::function;
@@ -17,14 +16,6 @@ using std::string;
 
 namespace ni {
 namespace grpc_json_client {
-
-// Converts a timeout to a deadline.
-system_clock::time_point DeadlineFromTimeout(int32_t timeout) {
-    if (timeout < 0) {
-        return system_clock::time_point::max();
-    }
-    return system_clock::now() + milliseconds(timeout);
-}
 
 // Builds an error message from nested exceptions.
 string TraceExceptions(const exception& ex) {
@@ -52,31 +43,34 @@ int32_t Session::ResetDescriptorDatabase() {
         });
 }
 
-int32_t Session::FillDescriptorDatabase(int32_t timeout) {
+int32_t Session::FillDescriptorDatabase(const system_clock::time_point& deadline) {
     return Evaluate(
-        [=](UnaryUnaryJsonClient& client) {
-            system_clock::time_point deadline = DeadlineFromTimeout(timeout);
+        [&](UnaryUnaryJsonClient& client) {
             client.FillDescriptorDatabase(deadline);
             return ErrorCode::kNone;
         });
 }
 
 int32_t Session::StartAsyncCall(
-    const char* service, const char* method, const char* request, int32_t timeout, void** tag
+    const string& service,
+    const string& method,
+    const string& request,
+    const system_clock::time_point& deadline,
+    void** tag
 ) {
     return Evaluate(
-        [=](UnaryUnaryJsonClient& client) {
-            system_clock::time_point deadline = DeadlineFromTimeout(timeout);
+        [&](UnaryUnaryJsonClient& client) {
             *tag = client.StartAsyncCall(service, method, request, deadline);
             return ErrorCode::kNone;
         });
 }
 
-int32_t Session::FinishAsyncCall(void* tag, int32_t timeout, char* buffer, size_t* size) {
+int32_t Session::FinishAsyncCall(
+    void* tag, const system_clock::time_point& deadline, char* buffer, size_t* size
+) {
     return Evaluate(
-        [=](UnaryUnaryJsonClient& client) {
+        [&](UnaryUnaryJsonClient& client) {
             if (!_responses.count(tag)) {
-                system_clock::time_point deadline = DeadlineFromTimeout(timeout);
                 _responses[tag] = client.FinishAsyncCall(tag, deadline);
             }
             const string& response = _responses[tag];
@@ -96,32 +90,31 @@ int32_t Session::FinishAsyncCall(void* tag, int32_t timeout, char* buffer, size_
 }
 
 int32_t Session::BlockingCall(
-    const char* service,
-    const char* method,
-    const char* request,
-    int32_t timeout,
+    const std::string& service,
+    const std::string& method,
+    const std::string& request,
+    const std::chrono::system_clock::time_point& deadline,
     void** tag,
     char* response,
     size_t* size
 ) {
     if (*tag) {
-        return FinishAsyncCall(*tag, timeout, response, size);
+        return FinishAsyncCall(*tag, deadline, response, size);
     }
-    int32_t error_code = StartAsyncCall(service, method, request, timeout, tag);
+    int32_t error_code = StartAsyncCall(service, method, request, deadline, tag);
     if (error_code < 0) {
         return error_code;
     }
-    int32_t next_error_code = FinishAsyncCall(*tag, timeout, response, size);
+    int32_t next_error_code = FinishAsyncCall(*tag, deadline, response, size);
     if (next_error_code < 0) {
         return next_error_code;
     }
     return error_code > 0 ? error_code : next_error_code;
 }
 
-int32_t Session::Lock(int32_t timeout, uint8_t* has_lock) {
+int32_t Session::Lock(const std::chrono::system_clock::time_point& deadline, uint8_t* has_lock) {
     return Evaluate(
-        [=](const UnaryUnaryJsonClient&) {
-            system_clock::time_point deadline = DeadlineFromTimeout(timeout);
+        [&](const UnaryUnaryJsonClient&) {
             *has_lock = _lock.try_lock_until(deadline);
             return ErrorCode::kNone;
         });
