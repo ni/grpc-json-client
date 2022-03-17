@@ -20,6 +20,6 @@ To build the project from source, follow the instructions in
 ## Usage
 
 The library entrypoints are detailed in
-[grpc_json_client.h](https://github.com/ni/grpc-json-client/blob/main/src/grpc_json_client.h).
+[grpc_json_client.h](https://github.com/ni/grpc-json-client/blob/main/include/grpcjsonclient/grpc_json_client.h).
 Place the shared library in a location where your program can load it then use your language's C
 interop tools to make the appropriate library calls.
