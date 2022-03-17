@@ -120,7 +120,7 @@ int32_t Session::BlockingCall(
     return error_code > 0 ? error_code : next_error_code;
 }
 
-int32_t Session::Lock(const std::chrono::system_clock::time_point& deadline, uint8_t* has_lock) {
+int32_t Session::Lock(const system_clock::time_point& deadline, uint8_t* has_lock) {
     return Evaluate(
         [=, &deadline](const UnaryUnaryJsonClient&) {
             *has_lock = _lock.try_lock_until(deadline);
@@ -132,6 +132,31 @@ int32_t Session::Unlock() {
     return Evaluate(
         [=](const UnaryUnaryJsonClient&) {
             _lock.unlock();
+            return ErrorCode::kNone;
+        });
+}
+
+int32_t Session::GetDefaultRequest(
+    const char* service,
+    const char* method,
+    const system_clock::time_point& deadline,
+    char* buffer,
+    size_t* size) {
+    return Evaluate(
+        [=, &deadline](UnaryUnaryJsonClient& client) {
+            string request = client.GetDefaultRequest(service, method, deadline);
+            if (!buffer) {
+                *size = request.size() + 1;  // include null char
+            }
+            else if (*size > request.size()) {  // null char
+                strncpy(buffer, request.c_str(), *size);
+            }
+            else {
+                string message = {
+                    "The buffer size is too small to accommodate the response."
+                };
+                throw BufferSizeOutOfRangeException(message);
+            }
             return ErrorCode::kNone;
         });
 }

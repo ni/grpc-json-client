@@ -45,6 +45,12 @@ class Session {
         size_t* size);
     int32_t Lock(const std::chrono::system_clock::time_point& deadline, uint8_t* has_lock);
     int32_t Unlock();
+    int32_t GetDefaultRequest(
+        const char* service,
+        const char* method,
+        const std::chrono::system_clock::time_point& deadline,
+        char* buffer,
+        size_t* size);
     int32_t GetError(int32_t* code, char* buffer, size_t* size);
     static int32_t GetErrorString(Session* session, int32_t code, char* buffer, size_t* size);
     int32_t Close();

@@ -25,22 +25,25 @@ using std::unique_ptr;
 namespace ni  {
 namespace grpc_json_client {
 
-void JsonSerializer::JsonStringToMessage(const string& json, Message* message) {
+unique_ptr<Message> JsonSerializer::JsonStringToMessage(
+    const string& json, const Descriptor* message_type
+) {
+    unique_ptr<Message> message = CreateMessage(message_type);
     google::protobuf::util::Status status = {
-        google::protobuf::util::JsonStringToMessage(json, message)
+        google::protobuf::util::JsonStringToMessage(json, message.get())
     };
     if (!status.ok()) {
         string summary("Failed to create protobuf message from JSON string.");
         string details(status.message());
         throw SerializationException(summary, details);
     }
+    return message;
 }
 
 ByteBuffer JsonSerializer::SerializeMessage(
     const Descriptor* message_type, const string& message_json
 ) {
-    unique_ptr<Message> message = CreateMessage(message_type);
-    JsonStringToMessage(message_json, message.get());
+    unique_ptr<Message> message = JsonStringToMessage(message_json, message_type);
     ByteBuffer serialized_message;
     bool own_buffer = false;
     grpc::Status status = {

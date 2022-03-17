@@ -9,6 +9,7 @@
 #include "google/protobuf/descriptor.h"
 #include "google/protobuf/descriptor.pb.h"
 #include "google/protobuf/descriptor_database.h"
+#include "google/protobuf/message.h"
 #include "google/protobuf/repeated_field.h"
 #include "grpcpp/grpcpp.h"
 
@@ -19,6 +20,7 @@
 
 using google::protobuf::DescriptorPool;
 using google::protobuf::FileDescriptorProto;
+using google::protobuf::Message;
 using google::protobuf::MethodDescriptor;
 using google::protobuf::RepeatedPtrField;
 using google::protobuf::ServiceDescriptor;
@@ -100,6 +102,17 @@ const MethodDescriptor* JsonClientBase::FindMethod(
         throw MethodNotFoundException(method_name);
     }
     return method_descriptor;
+}
+
+string JsonClientBase::GetDefaultRequest(
+    const string& service_name, const string& method_name, const system_clock::time_point& deadline
+) {
+    const MethodDescriptor* method_descriptor = FindMethod(service_name, method_name, deadline);
+    JsonSerializer serializer;
+    unique_ptr<Message> message = {
+        serializer.JsonStringToMessage("{}", method_descriptor->input_type())
+    };
+    return serializer.MessageToJsonString(*message);
 }
 
 void JsonClientBase::QueryReflectionService(

@@ -92,6 +92,19 @@ int32_t GrpcJsonClient_UnlockSession(intptr_t session_handle) {
     return session->Unlock();
 }
 
+int32_t GrpcJsonClient_GetDefaultRequest(
+    intptr_t session_handle,
+    const char* service,
+    const char* method,
+    int32_t timeout,
+    char* buffer,
+    size_t* size
+) {
+    Session* session = reinterpret_cast<Session*>(session_handle);
+    system_clock::time_point deadline = DeadlineFromTimeout(timeout);
+    return session->GetDefaultRequest(service, method, deadline, buffer, size);
+}
+
 int32_t GrpcJsonClient_GetError(
     intptr_t session_handle, int32_t* code, char* buffer, size_t* size
 ) {
