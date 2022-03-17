@@ -7,11 +7,11 @@
 #include <stdexcept>
 #include <string>
 
-#include <google/protobuf/descriptor.h>
-#include <google/protobuf/descriptor.pb.h>
-#include <google/protobuf/descriptor_database.h>
-#include <google/protobuf/repeated_field.h>
-#include <grpcpp/grpcpp.h>
+#include "google/protobuf/descriptor.h"
+#include "google/protobuf/descriptor.pb.h"
+#include "google/protobuf/descriptor_database.h"
+#include "google/protobuf/repeated_field.h"
+#include "grpcpp/grpcpp.h"
 
 #include "exceptions.h"
 #include "json_serializer.h"

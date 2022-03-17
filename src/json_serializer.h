@@ -4,10 +4,10 @@
 #include <memory>
 #include <string>
 
-#include <google/protobuf/descriptor.h>
-#include <google/protobuf/dynamic_message.h>
-#include <google/protobuf/message.h>
-#include <grpcpp/grpcpp.h>
+#include "google/protobuf/descriptor.h"
+#include "google/protobuf/dynamic_message.h"
+#include "google/protobuf/message.h"
+#include "grpcpp/grpcpp.h"
 
 namespace ni {
 namespace grpc_json_client {

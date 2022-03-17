@@ -3,9 +3,9 @@
 
 #include <memory>
 
-#include <gtest/gtest.h>
+#include "gtest/gtest.h"
 
-#include <grpcjsonclient/grpc_json_client.h>
+#include "grpcjsonclient/grpc_json_client.h"
 #include "testing_server.h"
 
 using std::unique_ptr;

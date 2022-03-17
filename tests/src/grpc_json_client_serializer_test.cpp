@@ -1,9 +1,9 @@
 
 #include <cstdint>
 
-#include <gtest/gtest.h>
+#include "gtest/gtest.h"
 
-#include <grpcjsonclient/grpc_json_client.h>
+#include "grpcjsonclient/grpc_json_client.h"
 #include "grpc_json_client_test.h"
 #include "helpers.h"
 

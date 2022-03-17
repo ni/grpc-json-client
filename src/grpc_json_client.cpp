@@ -5,7 +5,7 @@
 #include <cstdint>
 #include <memory>
 
-#include <grpcpp/grpcpp.h>
+#include "grpcpp/grpcpp.h"
 
 #include "session.h"
 

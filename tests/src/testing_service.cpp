@@ -4,7 +4,7 @@
 #include <chrono>
 #include <thread>
 
-#include <grpcpp/grpcpp.h>
+#include "grpcpp/grpcpp.h"
 
 using grpc::ServerContext;
 using grpc::Status;

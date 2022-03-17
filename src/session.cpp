@@ -11,7 +11,7 @@
 #include <string>
 #include <unordered_map>
 
-#include <grpcpp/grpcpp.h>
+#include "grpcpp/grpcpp.h"
 
 #include "error_code.h"
 #include "exceptions.h"

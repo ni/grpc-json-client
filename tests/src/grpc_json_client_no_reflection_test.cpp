@@ -5,9 +5,9 @@
 #include <memory>
 #include <string>
 
-#include <gtest/gtest.h>
+#include "gtest/gtest.h"
 
-#include <grpcjsonclient/grpc_json_client.h>
+#include "grpcjsonclient/grpc_json_client.h"
 #include "helpers.h"
 
 using std::string;

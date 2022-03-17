@@ -5,8 +5,8 @@
 #include <string>
 #include <vector>
 
-#include <grpcpp/grpcpp.h>
-#include <grpcpp/ext/proto_server_reflection_plugin.h>
+#include "grpcpp/grpcpp.h"
+#include "grpcpp/ext/proto_server_reflection_plugin.h"
 
 using grpc::ChannelArguments;
 using grpc::ServerBuilder;

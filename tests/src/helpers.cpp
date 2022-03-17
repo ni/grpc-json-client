@@ -6,10 +6,10 @@
 #include <memory>
 #include <string>
 
-#include <gmock/gmock.h>
-#include <gtest/gtest.h>
+#include "gmock/gmock.h"
+#include "gtest/gtest.h"
 
-#include <grpcjsonclient/grpc_json_client.h>
+#include "grpcjsonclient/grpc_json_client.h"
 
 using std::string;
 using std::unique_ptr;
@@ -37,7 +37,7 @@ int32_t FinishAsyncCallHelper(
         *response = buffer.get();
     }
     return error_code > 0 ? error_code : next_error_code;
-}   
+}
 
 int32_t BlockingCallHelper(
     intptr_t session,
@@ -90,8 +90,7 @@ void CheckErrorMessageHelper(
     snprintf(buffer.get(), size, format, code, message_core.c_str());
     if (starts_with) {
         EXPECT_THAT(message_body, testing::StartsWith(buffer.get()));
-    }
-    else {
+    } else {
         EXPECT_EQ(message_body, buffer.get());
     }
 }

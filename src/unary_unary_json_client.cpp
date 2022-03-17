@@ -7,9 +7,9 @@
 #include <string>
 #include <unordered_set>
 
-#include <google/protobuf/descriptor.h>
-#include <grpcpp/grpcpp.h>
-#include <grpcpp/generic/generic_stub.h>
+#include "google/protobuf/descriptor.h"
+#include "grpcpp/grpcpp.h"
+#include "grpcpp/generic/generic_stub.h"
 
 #include "exceptions.h"
 #include "json_client_base.h"

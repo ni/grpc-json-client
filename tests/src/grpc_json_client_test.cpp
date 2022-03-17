@@ -5,10 +5,10 @@
 #include <memory>
 #include <string>
 
-#include <gtest/gtest.h>
-#include <nlohmann/json.hpp>
+#include "gtest/gtest.h"
+#include "nlohmann/json.hpp"
 
-#include <grpcjsonclient/grpc_json_client.h>
+#include "grpcjsonclient/grpc_json_client.h"
 #include "helpers.h"
 
 using nlohmann::json;
@@ -196,7 +196,8 @@ TEST_F(GrpcJsonClientTest, GetErrorSucceeds) {
 
     EXPECT_EQ(error_code, expected_code);  // returns most recent code
     string expected_message("The service \"UndefinedService\" was not found.");
-    EXPECT_NO_FATAL_FAILURE(CheckErrorMessageHelper(error_code, buffer.get(), expected_message, true));
+    EXPECT_NO_FATAL_FAILURE(CheckErrorMessageHelper(
+        error_code, buffer.get(), expected_message, true));
 }
 
 TEST_F(GrpcJsonClientTest, GetErrorWithSmallBufferSucceedsWithBufferSizeOutOfRangeWarning) {
