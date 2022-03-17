@@ -2,7 +2,6 @@
 #include "exceptions.h"
 
 #include <cstdio>
-#include <exception>
 #include <memory>
 #include <string>
 

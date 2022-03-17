@@ -2,7 +2,6 @@
 #include "json_client_base.h"
 
 #include <chrono>
-#include <exception>
 #include <memory>
 #include <stdexcept>
 #include <string>
@@ -172,8 +171,8 @@ void JsonClientBase::FetchFileDescriptors(
     for (string serialized_file_descriptor : file_descriptor_response.file_descriptor_proto()) {
         FileDescriptorProto file_descriptor_proto;
         file_descriptor_proto.ParseFromString(serialized_file_descriptor);
-        // the database will dump warning strings to stdout if a file descriptor already exists
-        // so we avoid that by checking if we already have the file descriptor before adding it
+        // the database will dump warning strings to stdout if a file descriptor already exists so
+        // we avoid that by checking if we already have the file descriptor before adding it
         bool file_descriptor_in_database = {
             _database->FindFileByName(file_descriptor_proto.name(), &file_descriptor_proto)
         };

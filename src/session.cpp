@@ -7,9 +7,7 @@
 #include <exception>
 #include <functional>
 #include <memory>
-#include <mutex>
 #include <string>
-#include <unordered_map>
 
 #include "grpcpp/grpcpp.h"
 
@@ -212,14 +210,13 @@ int32_t Session::Evaluate(const function<ErrorCode(UnaryUnaryJsonClient&)>& func
 
 int32_t Session::RaiseWarning(ErrorCode warning_code, const string& message) {
     _error_code = warning_code;
-    _error_message = JsonClientException::FormatErrorMessage(warning_code, message, "");
+    _error_message = JsonClientException::FormatErrorMessage(warning_code, message, string());
     return static_cast<int>(warning_code);
 }
 
 int32_t Session::RaiseBufferSizeOutOfRangeWarning() {
     string message = {
-        "The buffer size is too small to accomodate the entire string. "
-        "It will be truncated."
+        "The buffer size is too small to accomodate the entire string. It will be truncated."
     };
     return RaiseWarning(ErrorCode::kBufferSizeOutOfRangeWarning, message);
 }

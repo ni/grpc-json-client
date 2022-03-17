@@ -5,7 +5,6 @@
 #include <string>
 
 #include "google/protobuf/descriptor.h"
-#include "google/protobuf/dynamic_message.h"
 #include "google/protobuf/message.h"
 #include "google/protobuf/stubs/status.h"
 #include "google/protobuf/util/json_util.h"
@@ -74,12 +73,12 @@ string JsonSerializer::DeserializeMessage(
     const Descriptor* message_type, ByteBuffer* serialized_message
 ) {
     unique_ptr<Message> message = CreateMessage(message_type);
-    grpc::Status deserialize_status = {
+    grpc::Status status = {
         grpc::GenericDeserialize<ProtoBufferReader, void>(serialized_message, message.get())
     };
-    if (!deserialize_status.ok()) {
+    if (!status.ok()) {
         string summary("Failed to deserialize protobuf message.");
-        throw DeserializationException(summary, deserialize_status.error_message());
+        throw DeserializationException(summary, status.error_message());
     }
     return MessageToJsonString(*message);
 }

@@ -7,9 +7,7 @@
 #include <string>
 #include <unordered_set>
 
-#include "google/protobuf/descriptor.h"
 #include "grpcpp/grpcpp.h"
-#include "grpcpp/generic/generic_stub.h"
 
 #include "exceptions.h"
 #include "json_client_base.h"
@@ -83,8 +81,8 @@ string UnaryUnaryJsonClient::FinishAsyncCall(void* tag, const system_clock::time
     };
     switch (next_status) {
     case CompletionQueue::NextStatus::SHUTDOWN:
-        // we shouldn't reach this point since the completion queue
-        // should only be drained in the destructor
+        // we shouldn't reach this point since the completion queue should only be drained in the
+        // destructor
         throw runtime_error("The completion queue shut down unexpectedly.");
     case CompletionQueue::NextStatus::GOT_EVENT:
         if (next_tag != async_call.get()) {
