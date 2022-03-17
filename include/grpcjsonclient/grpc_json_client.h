@@ -31,16 +31,17 @@ DLLEXPORT int32_t GrpcJsonClient_StartAsyncCall(
     int32_t timeout,
     intptr_t* tag);
 
-// Finishes an asynchronous call started by GrpcJsonClient_StartAsyncCall. Pass null as the
-// response argument to query the function for the minimum buffer size.
+// Finishes an asynchronous call started by GrpcJsonClient_StartAsyncCall. Pass null as the response
+// argument to query the function for the minimum buffer size.
 DLLEXPORT int32_t GrpcJsonClient_FinishAsyncCall(
     intptr_t session_handle, intptr_t tag, int32_t timeout, char* response, size_t* size);
 
 // Performs a blocking unary unary RPC call. This function is equivalent to calling
-// GrpcJsonClient_StartAsyncCall followed by GrpcJsonClient_FinishAsyncCall. Initialize the tag
-// argument to zero on the first call to this function. The returned tag is a unique identifier
-// that should be passed to sebsequent calls to this function. See GrpcJsonClient_StartAsyncCall
-// and GrpcJsonClient_FinishAsyncCall for additional parameter semantics.
+// GrpcJsonClient_StartAsyncCall followed by GrpcJsonClient_FinishAsyncCall but with a global
+// timeout. Initialize the tag argument to zero on the first call to this function. The returned tag
+// is a unique identifier that should be passed to sebsequent calls to this function. See
+// GrpcJsonClient_StartAsyncCall and GrpcJsonClient_FinishAsyncCall for additional parameter
+// semantics.
 DLLEXPORT int32_t GrpcJsonClient_BlockingCall(
     intptr_t session_handle,
     const char* service,
