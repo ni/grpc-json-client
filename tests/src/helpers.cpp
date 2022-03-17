@@ -66,6 +66,27 @@ int32_t BlockingCallHelper(
     return error_code > 0 ? error_code : next_error_code;
 }
 
+int32_t GetDefaultRequestHelper(
+    intptr_t session, const string& service, const string& method, int32_t timeout, string* request
+) {
+    size_t size = 0;
+    int32_t error_code = GrpcJsonClient_GetDefaultRequest(
+        session, service.c_str(), method.c_str(), timeout, nullptr, &size);
+    if (error_code < 0) {
+        return error_code;
+    }
+    unique_ptr<char> buffer(new char[size]);
+    int32_t next_error_code = GrpcJsonClient_GetDefaultRequest(
+        session, service.c_str(), method.c_str(), timeout, buffer.get(), &size);
+    if (next_error_code < 0) {
+        return next_error_code;
+    }
+    if (request) {
+        *request = buffer.get();
+    }
+    return error_code > 0 ? error_code : next_error_code;
+}
+
 int32_t GetErrorHelper(intptr_t session, int32_t* code, string* message) {
     size_t size = 0;
     int32_t error_code = GrpcJsonClient_GetError(session, nullptr, nullptr, &size);

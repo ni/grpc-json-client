@@ -183,6 +183,14 @@ TEST_F(GrpcJsonClientTest, FinishAsyncCallWithSmallBufferFailsWithBufferSizeOutO
     EXPECT_NO_FATAL_FAILURE(CheckErrorMessageHelper(session, expected_message));
 }
 
+TEST_F(GrpcJsonClientTest, GetDefaultRequestSucceeds) {
+    string request;
+    EXPECT_NO_FATAL_FAILURE(GetDefaultRequestHelper(session, service, echo, -1, &request));
+
+    string expected = R"({"delay":0})";
+    EXPECT_EQ(request, expected);
+}
+
 TEST_F(GrpcJsonClientTest, GetErrorSucceeds) {
     intptr_t tag = 0;
     int32_t expected_code = GrpcJsonClient_StartAsyncCall(

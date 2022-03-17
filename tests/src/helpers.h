@@ -19,6 +19,12 @@ int32_t BlockingCallHelper(
     const std::string& request,
     int32_t timeout,
     std::string* response);
+int32_t GetDefaultRequestHelper(
+    intptr_t session,
+    const std::string& service,
+    const std::string& method,
+    int32_t timeout,
+    std::string* request);
 int32_t GetErrorHelper(intptr_t session, int32_t* code, std::string* message);
 void CheckErrorMessageHelper(
     int32_t code,
