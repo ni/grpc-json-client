@@ -64,8 +64,9 @@ DLLEXPORT int32_t GrpcJsonClient_LockSession(
 // prevent deadlock.
 DLLEXPORT int32_t GrpcJsonClient_UnlockSession(intptr_t session_handle);
 
-// Returns the default request string for the specified method. Pass null as the buffer argument
-// to query the function for the minimum buffer size.
+// Returns the default request string for the specified method. Some gRPC fields (such as oneof)
+// default to an empty value and are thus unpopulated. Pass null as the buffer argument to query
+// the function for the minimum buffer size.
 DLLEXPORT int32_t GrpcJsonClient_GetDefaultRequest(
     intptr_t session_handle,
     const char* service,
