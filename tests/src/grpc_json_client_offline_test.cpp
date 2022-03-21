@@ -38,7 +38,7 @@ TEST_F(GrpcJsonClientOfflineTest, StartAsyncCallFailsWithRemoteProcedureCallErro
 
 TEST_F(GrpcJsonClientOfflineTest, FinishAsyncCallFailsWithInvalidTagError) {
     int32_t error_code = GrpcJsonClient_FinishAsyncCall(session, 0, -1, nullptr, nullptr);
-    ASSERT_EQ(error_code, -8);  // ErrorCode::kInvalidArgumentError
+    EXPECT_EQ(error_code, -8);  // ErrorCode::kInvalidArgumentError
 
     string expected_message("An active remote procedure call was not found for the specified tag.");
     EXPECT_NO_FATAL_FAILURE(CheckErrorMessageHelper(session, expected_message));
@@ -49,7 +49,7 @@ TEST_F(GrpcJsonClientOfflineTest, BlockingCallFailsWithRemoteProcedureCallError)
     int32_t error_code = {
         GrpcJsonClient_BlockingCall(session, "", "", "", -1, &tag, nullptr, nullptr)
     };
-    ASSERT_EQ(error_code, -2);  // ErrorCode::kRemoteProcedureCallError
+    EXPECT_EQ(error_code, -2);  // ErrorCode::kRemoteProcedureCallError
 
     string expected_message("Failed to initiate communication with the host.");
     EXPECT_NO_FATAL_FAILURE(CheckErrorMessageHelper(session, expected_message, true));
