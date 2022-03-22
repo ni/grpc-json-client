@@ -26,13 +26,14 @@ int32_t GetDefaultRequestHelper(
     int32_t timeout,
     std::string* request);
 int32_t GetErrorHelper(intptr_t session, int32_t* code, std::string* message);
-void CheckErrorMessageHelper(
-    int32_t code,
-    const std::string& message_body,
+int32_t GetErrorStringHelper(intptr_t session, int32_t code, std::string* message);
+void CheckGetErrorHelper(
+    intptr_t session,
+    int32_t expected_code,
     const std::string& message_core,
     bool starts_with = false);
-void CheckErrorMessageHelper(
-    intptr_t session, const std::string& message_core, bool starts_with = false);
+void CheckGetErrorStringHelper(
+    intptr_t session, int32_t code, const std::string& message_core, bool starts_with = false);
 
 }  // namespace grpc_json_client
 }  // namespace ni

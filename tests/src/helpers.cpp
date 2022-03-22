@@ -93,16 +93,39 @@ int32_t GetErrorHelper(intptr_t session, int32_t* code, string* message) {
     if (error_code < 0) {
         return error_code;
     }
+    int32_t queried_code = 0;
     unique_ptr<char> buffer(new char[size]);
-    int32_t next_error_code = GrpcJsonClient_GetError(session, code, buffer.get(), &size);
+    int32_t next_error_code = GrpcJsonClient_GetError(session, &queried_code, buffer.get(), &size);
     if (next_error_code < 0) {
         return next_error_code;
     }
-    *message = buffer.get();
+    if (code) {
+        *code = queried_code;
+    }
+    if (message) {
+        *message = buffer.get();
+    }
     return error_code > 0 ? error_code : next_error_code;
 }
 
-void CheckErrorMessageHelper(
+int32_t GetErrorStringHelper(intptr_t session, int32_t code, string* message) {
+    size_t size;
+    int32_t error_code = GrpcJsonClient_GetErrorString(session, code, nullptr, &size);
+    if (error_code < 0) {
+        return error_code;
+    }
+    unique_ptr<char> buffer(new char[size]);
+    int32_t next_error_code = GrpcJsonClient_GetErrorString(session, code, buffer.get(), &size);
+    if (next_error_code < 0) {
+        return next_error_code;
+    }
+    if (message) {
+        *message = buffer.get();
+    }
+    return error_code > 0 ? error_code : next_error_code;
+}
+
+void CheckErrorMessage(
     int32_t code, const string& message_body, const string& message_core, bool starts_with
 ) {
     const char* format = "Error Code: %d\nError Message: %s";
@@ -116,11 +139,22 @@ void CheckErrorMessageHelper(
     }
 }
 
-void CheckErrorMessageHelper(intptr_t session, const string& message_core, bool starts_with) {
+void CheckGetErrorHelper(
+    intptr_t session, int32_t expected_code, const string& message_core, bool starts_with
+) {
     int32_t code = 0;
     string message;
-    ASSERT_FALSE(GetErrorHelper(session, &code, &message));
-    EXPECT_NO_FATAL_FAILURE(CheckErrorMessageHelper(code, message, message_core, starts_with));
+    EXPECT_FALSE(GetErrorHelper(session, &code, &message));
+    EXPECT_EQ(code, expected_code);
+    EXPECT_NO_FATAL_FAILURE(CheckErrorMessage(code, message, message_core, starts_with));
+}
+
+void CheckGetErrorStringHelper(
+    intptr_t session, int32_t code, const string& message_core, bool starts_with
+) {
+    string message;
+    EXPECT_FALSE(GetErrorStringHelper(session, code, &message));
+    EXPECT_NO_FATAL_FAILURE(CheckErrorMessage(code, message, message_core, starts_with));
 }
 
 }  // namespace grpc_json_client
