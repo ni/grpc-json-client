@@ -37,7 +37,7 @@ static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_testing_5fservice_2
 static constexpr ::PROTOBUF_NAMESPACE_ID::EnumDescriptor const** file_level_enum_descriptors_testing_5fservice_2eproto = nullptr;
 static constexpr ::PROTOBUF_NAMESPACE_ID::ServiceDescriptor const** file_level_service_descriptors_testing_5fservice_2eproto = nullptr;
 
-const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_testing_5fservice_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
+const uint32_t TableStruct_testing_5fservice_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::ni::grpc_json_client::UnaryUnaryEchoMessage, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -124,7 +124,7 @@ UnaryUnaryEchoMessage::UnaryUnaryEchoMessage(const UnaryUnaryEchoMessage& from)
   // @@protoc_insertion_point(copy_constructor:ni.grpc_json_client.UnaryUnaryEchoMessage)
 }
 
-void UnaryUnaryEchoMessage::SharedCtor() {
+inline void UnaryUnaryEchoMessage::SharedCtor() {
 delay_ = 0;
 clear_has_field_types();
 }
@@ -178,7 +178,7 @@ void UnaryUnaryEchoMessage::clear_field_types() {
 
 void UnaryUnaryEchoMessage::Clear() {
 // @@protoc_insertion_point(message_clear_start:ni.grpc_json_client.UnaryUnaryEchoMessage)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -190,20 +190,20 @@ void UnaryUnaryEchoMessage::Clear() {
 const char* UnaryUnaryEchoMessage::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
   while (!ctx->Done(&ptr)) {
-    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    uint32_t tag;
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
     switch (tag >> 3) {
       // int32 delay = 1;
       case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
-          delay_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 8)) {
+          delay_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
           CHK_(ptr);
         } else
           goto handle_unusual;
         continue;
       // string string_field = 2;
       case 2:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 18)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 18)) {
           auto str = _internal_mutable_string_field();
           ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
           CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "ni.grpc_json_client.UnaryUnaryEchoMessage.string_field"));
@@ -213,15 +213,15 @@ const char* UnaryUnaryEchoMessage::_InternalParse(const char* ptr, ::PROTOBUF_NA
         continue;
       // int32 int32_field = 3;
       case 3:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 24)) {
-          _internal_set_int32_field(::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr));
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 24)) {
+          _internal_set_int32_field(::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr));
           CHK_(ptr);
         } else
           goto handle_unusual;
         continue;
       // double double_field = 4;
       case 4:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 33)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 33)) {
           _internal_set_double_field(::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<double>(ptr));
           ptr += sizeof(double);
         } else
@@ -250,10 +250,10 @@ failure:
 #undef CHK_
 }
 
-::PROTOBUF_NAMESPACE_ID::uint8* UnaryUnaryEchoMessage::_InternalSerialize(
-    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+uint8_t* UnaryUnaryEchoMessage::_InternalSerialize(
+    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:ni.grpc_json_client.UnaryUnaryEchoMessage)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   // int32 delay = 1;
@@ -296,7 +296,7 @@ size_t UnaryUnaryEchoMessage::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:ni.grpc_json_client.UnaryUnaryEchoMessage)
   size_t total_size = 0;
 
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -346,7 +346,7 @@ void UnaryUnaryEchoMessage::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message* to,
 void UnaryUnaryEchoMessage::MergeFrom(const UnaryUnaryEchoMessage& from) {
 // @@protoc_insertion_point(class_specific_merge_from_start:ni.grpc_json_client.UnaryUnaryEchoMessage)
   GOOGLE_DCHECK_NE(&from, this);
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   if (from._internal_delay() != 0) {

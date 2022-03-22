@@ -129,7 +129,7 @@ static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_reflection_2eproto[
 static constexpr ::PROTOBUF_NAMESPACE_ID::EnumDescriptor const** file_level_enum_descriptors_reflection_2eproto = nullptr;
 static constexpr ::PROTOBUF_NAMESPACE_ID::ServiceDescriptor const** file_level_service_descriptors_reflection_2eproto = nullptr;
 
-const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_reflection_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
+const uint32_t TableStruct_reflection_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::grpc::reflection::v1alpha::ServerReflectionRequest, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -315,6 +315,9 @@ ServerReflectionRequest::ServerReflectionRequest(const ServerReflectionRequest& 
   : ::PROTOBUF_NAMESPACE_ID::Message() {
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   host_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    host_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
   if (!from._internal_host().empty()) {
     host_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_host(), 
       GetArenaForAllocation());
@@ -348,8 +351,11 @@ ServerReflectionRequest::ServerReflectionRequest(const ServerReflectionRequest& 
   // @@protoc_insertion_point(copy_constructor:grpc.reflection.v1alpha.ServerReflectionRequest)
 }
 
-void ServerReflectionRequest::SharedCtor() {
+inline void ServerReflectionRequest::SharedCtor() {
 host_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  host_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
 clear_has_message_request();
 }
 
@@ -413,7 +419,7 @@ void ServerReflectionRequest::clear_message_request() {
 
 void ServerReflectionRequest::Clear() {
 // @@protoc_insertion_point(message_clear_start:grpc.reflection.v1alpha.ServerReflectionRequest)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -425,12 +431,12 @@ void ServerReflectionRequest::Clear() {
 const char* ServerReflectionRequest::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
   while (!ctx->Done(&ptr)) {
-    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    uint32_t tag;
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
     switch (tag >> 3) {
       // string host = 1;
       case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 10)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 10)) {
           auto str = _internal_mutable_host();
           ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
           CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "grpc.reflection.v1alpha.ServerReflectionRequest.host"));
@@ -440,7 +446,7 @@ const char* ServerReflectionRequest::_InternalParse(const char* ptr, ::PROTOBUF_
         continue;
       // string file_by_filename = 3;
       case 3:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 26)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 26)) {
           auto str = _internal_mutable_file_by_filename();
           ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
           CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "grpc.reflection.v1alpha.ServerReflectionRequest.file_by_filename"));
@@ -450,7 +456,7 @@ const char* ServerReflectionRequest::_InternalParse(const char* ptr, ::PROTOBUF_
         continue;
       // string file_containing_symbol = 4;
       case 4:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 34)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 34)) {
           auto str = _internal_mutable_file_containing_symbol();
           ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
           CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "grpc.reflection.v1alpha.ServerReflectionRequest.file_containing_symbol"));
@@ -460,7 +466,7 @@ const char* ServerReflectionRequest::_InternalParse(const char* ptr, ::PROTOBUF_
         continue;
       // .grpc.reflection.v1alpha.ExtensionRequest file_containing_extension = 5;
       case 5:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 42)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 42)) {
           ptr = ctx->ParseMessage(_internal_mutable_file_containing_extension(), ptr);
           CHK_(ptr);
         } else
@@ -468,7 +474,7 @@ const char* ServerReflectionRequest::_InternalParse(const char* ptr, ::PROTOBUF_
         continue;
       // string all_extension_numbers_of_type = 6;
       case 6:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 50)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 50)) {
           auto str = _internal_mutable_all_extension_numbers_of_type();
           ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
           CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "grpc.reflection.v1alpha.ServerReflectionRequest.all_extension_numbers_of_type"));
@@ -478,7 +484,7 @@ const char* ServerReflectionRequest::_InternalParse(const char* ptr, ::PROTOBUF_
         continue;
       // string list_services = 7;
       case 7:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 58)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 58)) {
           auto str = _internal_mutable_list_services();
           ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
           CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "grpc.reflection.v1alpha.ServerReflectionRequest.list_services"));
@@ -509,10 +515,10 @@ failure:
 #undef CHK_
 }
 
-::PROTOBUF_NAMESPACE_ID::uint8* ServerReflectionRequest::_InternalSerialize(
-    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+uint8_t* ServerReflectionRequest::_InternalSerialize(
+    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:grpc.reflection.v1alpha.ServerReflectionRequest)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   // string host = 1;
@@ -585,7 +591,7 @@ size_t ServerReflectionRequest::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:grpc.reflection.v1alpha.ServerReflectionRequest)
   size_t total_size = 0;
 
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -655,7 +661,7 @@ void ServerReflectionRequest::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message* to,
 void ServerReflectionRequest::MergeFrom(const ServerReflectionRequest& from) {
 // @@protoc_insertion_point(class_specific_merge_from_start:grpc.reflection.v1alpha.ServerReflectionRequest)
   GOOGLE_DCHECK_NE(&from, this);
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   if (!from._internal_host().empty()) {
@@ -739,6 +745,9 @@ ExtensionRequest::ExtensionRequest(const ExtensionRequest& from)
   : ::PROTOBUF_NAMESPACE_ID::Message() {
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   containing_type_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    containing_type_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
   if (!from._internal_containing_type().empty()) {
     containing_type_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_containing_type(), 
       GetArenaForAllocation());
@@ -747,8 +756,11 @@ ExtensionRequest::ExtensionRequest(const ExtensionRequest& from)
   // @@protoc_insertion_point(copy_constructor:grpc.reflection.v1alpha.ExtensionRequest)
 }
 
-void ExtensionRequest::SharedCtor() {
+inline void ExtensionRequest::SharedCtor() {
 containing_type_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  containing_type_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
 extension_number_ = 0;
 }
 
@@ -776,7 +788,7 @@ void ExtensionRequest::SetCachedSize(int size) const {
 
 void ExtensionRequest::Clear() {
 // @@protoc_insertion_point(message_clear_start:grpc.reflection.v1alpha.ExtensionRequest)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -788,12 +800,12 @@ void ExtensionRequest::Clear() {
 const char* ExtensionRequest::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
   while (!ctx->Done(&ptr)) {
-    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    uint32_t tag;
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
     switch (tag >> 3) {
       // string containing_type = 1;
       case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 10)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 10)) {
           auto str = _internal_mutable_containing_type();
           ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
           CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "grpc.reflection.v1alpha.ExtensionRequest.containing_type"));
@@ -803,8 +815,8 @@ const char* ExtensionRequest::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPA
         continue;
       // int32 extension_number = 2;
       case 2:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 16)) {
-          extension_number_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 16)) {
+          extension_number_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
           CHK_(ptr);
         } else
           goto handle_unusual;
@@ -832,10 +844,10 @@ failure:
 #undef CHK_
 }
 
-::PROTOBUF_NAMESPACE_ID::uint8* ExtensionRequest::_InternalSerialize(
-    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+uint8_t* ExtensionRequest::_InternalSerialize(
+    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:grpc.reflection.v1alpha.ExtensionRequest)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   // string containing_type = 1;
@@ -866,7 +878,7 @@ size_t ExtensionRequest::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:grpc.reflection.v1alpha.ExtensionRequest)
   size_t total_size = 0;
 
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -901,7 +913,7 @@ void ExtensionRequest::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message* to,
 void ExtensionRequest::MergeFrom(const ExtensionRequest& from) {
 // @@protoc_insertion_point(class_specific_merge_from_start:grpc.reflection.v1alpha.ExtensionRequest)
   GOOGLE_DCHECK_NE(&from, this);
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   if (!from._internal_containing_type().empty()) {
@@ -1047,6 +1059,9 @@ ServerReflectionResponse::ServerReflectionResponse(const ServerReflectionRespons
   : ::PROTOBUF_NAMESPACE_ID::Message() {
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   valid_host_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    valid_host_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
   if (!from._internal_valid_host().empty()) {
     valid_host_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_valid_host(), 
       GetArenaForAllocation());
@@ -1081,8 +1096,11 @@ ServerReflectionResponse::ServerReflectionResponse(const ServerReflectionRespons
   // @@protoc_insertion_point(copy_constructor:grpc.reflection.v1alpha.ServerReflectionResponse)
 }
 
-void ServerReflectionResponse::SharedCtor() {
+inline void ServerReflectionResponse::SharedCtor() {
 valid_host_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  valid_host_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
 original_request_ = nullptr;
 clear_has_message_response();
 }
@@ -1150,7 +1168,7 @@ void ServerReflectionResponse::clear_message_response() {
 
 void ServerReflectionResponse::Clear() {
 // @@protoc_insertion_point(message_clear_start:grpc.reflection.v1alpha.ServerReflectionResponse)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -1166,12 +1184,12 @@ void ServerReflectionResponse::Clear() {
 const char* ServerReflectionResponse::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
   while (!ctx->Done(&ptr)) {
-    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    uint32_t tag;
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
     switch (tag >> 3) {
       // string valid_host = 1;
       case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 10)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 10)) {
           auto str = _internal_mutable_valid_host();
           ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
           CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "grpc.reflection.v1alpha.ServerReflectionResponse.valid_host"));
@@ -1181,7 +1199,7 @@ const char* ServerReflectionResponse::_InternalParse(const char* ptr, ::PROTOBUF
         continue;
       // .grpc.reflection.v1alpha.ServerReflectionRequest original_request = 2;
       case 2:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 18)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 18)) {
           ptr = ctx->ParseMessage(_internal_mutable_original_request(), ptr);
           CHK_(ptr);
         } else
@@ -1189,7 +1207,7 @@ const char* ServerReflectionResponse::_InternalParse(const char* ptr, ::PROTOBUF
         continue;
       // .grpc.reflection.v1alpha.FileDescriptorResponse file_descriptor_response = 4;
       case 4:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 34)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 34)) {
           ptr = ctx->ParseMessage(_internal_mutable_file_descriptor_response(), ptr);
           CHK_(ptr);
         } else
@@ -1197,7 +1215,7 @@ const char* ServerReflectionResponse::_InternalParse(const char* ptr, ::PROTOBUF
         continue;
       // .grpc.reflection.v1alpha.ExtensionNumberResponse all_extension_numbers_response = 5;
       case 5:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 42)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 42)) {
           ptr = ctx->ParseMessage(_internal_mutable_all_extension_numbers_response(), ptr);
           CHK_(ptr);
         } else
@@ -1205,7 +1223,7 @@ const char* ServerReflectionResponse::_InternalParse(const char* ptr, ::PROTOBUF
         continue;
       // .grpc.reflection.v1alpha.ListServiceResponse list_services_response = 6;
       case 6:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 50)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 50)) {
           ptr = ctx->ParseMessage(_internal_mutable_list_services_response(), ptr);
           CHK_(ptr);
         } else
@@ -1213,7 +1231,7 @@ const char* ServerReflectionResponse::_InternalParse(const char* ptr, ::PROTOBUF
         continue;
       // .grpc.reflection.v1alpha.ErrorResponse error_response = 7;
       case 7:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 58)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 58)) {
           ptr = ctx->ParseMessage(_internal_mutable_error_response(), ptr);
           CHK_(ptr);
         } else
@@ -1242,10 +1260,10 @@ failure:
 #undef CHK_
 }
 
-::PROTOBUF_NAMESPACE_ID::uint8* ServerReflectionResponse::_InternalSerialize(
-    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+uint8_t* ServerReflectionResponse::_InternalSerialize(
+    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:grpc.reflection.v1alpha.ServerReflectionResponse)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   // string valid_host = 1;
@@ -1310,7 +1328,7 @@ size_t ServerReflectionResponse::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:grpc.reflection.v1alpha.ServerReflectionResponse)
   size_t total_size = 0;
 
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -1380,7 +1398,7 @@ void ServerReflectionResponse::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message* to,
 void ServerReflectionResponse::MergeFrom(const ServerReflectionResponse& from) {
 // @@protoc_insertion_point(class_specific_merge_from_start:grpc.reflection.v1alpha.ServerReflectionResponse)
   GOOGLE_DCHECK_NE(&from, this);
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   if (!from._internal_valid_host().empty()) {
@@ -1468,7 +1486,7 @@ FileDescriptorResponse::FileDescriptorResponse(const FileDescriptorResponse& fro
   // @@protoc_insertion_point(copy_constructor:grpc.reflection.v1alpha.FileDescriptorResponse)
 }
 
-void FileDescriptorResponse::SharedCtor() {
+inline void FileDescriptorResponse::SharedCtor() {
 }
 
 FileDescriptorResponse::~FileDescriptorResponse() {
@@ -1494,7 +1512,7 @@ void FileDescriptorResponse::SetCachedSize(int size) const {
 
 void FileDescriptorResponse::Clear() {
 // @@protoc_insertion_point(message_clear_start:grpc.reflection.v1alpha.FileDescriptorResponse)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -1505,12 +1523,12 @@ void FileDescriptorResponse::Clear() {
 const char* FileDescriptorResponse::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
   while (!ctx->Done(&ptr)) {
-    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    uint32_t tag;
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
     switch (tag >> 3) {
       // repeated bytes file_descriptor_proto = 1;
       case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 10)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 10)) {
           ptr -= 1;
           do {
             ptr += 1;
@@ -1545,10 +1563,10 @@ failure:
 #undef CHK_
 }
 
-::PROTOBUF_NAMESPACE_ID::uint8* FileDescriptorResponse::_InternalSerialize(
-    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+uint8_t* FileDescriptorResponse::_InternalSerialize(
+    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:grpc.reflection.v1alpha.FileDescriptorResponse)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   // repeated bytes file_descriptor_proto = 1;
@@ -1569,7 +1587,7 @@ size_t FileDescriptorResponse::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:grpc.reflection.v1alpha.FileDescriptorResponse)
   size_t total_size = 0;
 
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -1600,7 +1618,7 @@ void FileDescriptorResponse::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message* to,
 void FileDescriptorResponse::MergeFrom(const FileDescriptorResponse& from) {
 // @@protoc_insertion_point(class_specific_merge_from_start:grpc.reflection.v1alpha.FileDescriptorResponse)
   GOOGLE_DCHECK_NE(&from, this);
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   file_descriptor_proto_.MergeFrom(from.file_descriptor_proto_);
@@ -1651,6 +1669,9 @@ ExtensionNumberResponse::ExtensionNumberResponse(const ExtensionNumberResponse& 
       extension_number_(from.extension_number_) {
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   base_type_name_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    base_type_name_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
   if (!from._internal_base_type_name().empty()) {
     base_type_name_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_base_type_name(), 
       GetArenaForAllocation());
@@ -1658,8 +1679,11 @@ ExtensionNumberResponse::ExtensionNumberResponse(const ExtensionNumberResponse& 
   // @@protoc_insertion_point(copy_constructor:grpc.reflection.v1alpha.ExtensionNumberResponse)
 }
 
-void ExtensionNumberResponse::SharedCtor() {
+inline void ExtensionNumberResponse::SharedCtor() {
 base_type_name_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  base_type_name_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
 }
 
 ExtensionNumberResponse::~ExtensionNumberResponse() {
@@ -1686,7 +1710,7 @@ void ExtensionNumberResponse::SetCachedSize(int size) const {
 
 void ExtensionNumberResponse::Clear() {
 // @@protoc_insertion_point(message_clear_start:grpc.reflection.v1alpha.ExtensionNumberResponse)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -1698,12 +1722,12 @@ void ExtensionNumberResponse::Clear() {
 const char* ExtensionNumberResponse::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
   while (!ctx->Done(&ptr)) {
-    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    uint32_t tag;
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
     switch (tag >> 3) {
       // string base_type_name = 1;
       case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 10)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 10)) {
           auto str = _internal_mutable_base_type_name();
           ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
           CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "grpc.reflection.v1alpha.ExtensionNumberResponse.base_type_name"));
@@ -1713,11 +1737,11 @@ const char* ExtensionNumberResponse::_InternalParse(const char* ptr, ::PROTOBUF_
         continue;
       // repeated int32 extension_number = 2;
       case 2:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 18)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 18)) {
           ptr = ::PROTOBUF_NAMESPACE_ID::internal::PackedInt32Parser(_internal_mutable_extension_number(), ptr, ctx);
           CHK_(ptr);
-        } else if (static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 16) {
-          _internal_add_extension_number(::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr));
+        } else if (static_cast<uint8_t>(tag) == 16) {
+          _internal_add_extension_number(::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr));
           CHK_(ptr);
         } else
           goto handle_unusual;
@@ -1745,10 +1769,10 @@ failure:
 #undef CHK_
 }
 
-::PROTOBUF_NAMESPACE_ID::uint8* ExtensionNumberResponse::_InternalSerialize(
-    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+uint8_t* ExtensionNumberResponse::_InternalSerialize(
+    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:grpc.reflection.v1alpha.ExtensionNumberResponse)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   // string base_type_name = 1;
@@ -1782,7 +1806,7 @@ size_t ExtensionNumberResponse::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:grpc.reflection.v1alpha.ExtensionNumberResponse)
   size_t total_size = 0;
 
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -1793,7 +1817,7 @@ size_t ExtensionNumberResponse::ByteSizeLong() const {
     if (data_size > 0) {
       total_size += 1 +
         ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
-            static_cast<::PROTOBUF_NAMESPACE_ID::int32>(data_size));
+            static_cast<int32_t>(data_size));
     }
     int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(data_size);
     _extension_number_cached_byte_size_.store(cached_size,
@@ -1827,7 +1851,7 @@ void ExtensionNumberResponse::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message* to,
 void ExtensionNumberResponse::MergeFrom(const ExtensionNumberResponse& from) {
 // @@protoc_insertion_point(class_specific_merge_from_start:grpc.reflection.v1alpha.ExtensionNumberResponse)
   GOOGLE_DCHECK_NE(&from, this);
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   extension_number_.MergeFrom(from.extension_number_);
@@ -1890,7 +1914,7 @@ ListServiceResponse::ListServiceResponse(const ListServiceResponse& from)
   // @@protoc_insertion_point(copy_constructor:grpc.reflection.v1alpha.ListServiceResponse)
 }
 
-void ListServiceResponse::SharedCtor() {
+inline void ListServiceResponse::SharedCtor() {
 }
 
 ListServiceResponse::~ListServiceResponse() {
@@ -1916,7 +1940,7 @@ void ListServiceResponse::SetCachedSize(int size) const {
 
 void ListServiceResponse::Clear() {
 // @@protoc_insertion_point(message_clear_start:grpc.reflection.v1alpha.ListServiceResponse)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -1927,12 +1951,12 @@ void ListServiceResponse::Clear() {
 const char* ListServiceResponse::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
   while (!ctx->Done(&ptr)) {
-    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    uint32_t tag;
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
     switch (tag >> 3) {
       // repeated .grpc.reflection.v1alpha.ServiceResponse service = 1;
       case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 10)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 10)) {
           ptr -= 1;
           do {
             ptr += 1;
@@ -1966,10 +1990,10 @@ failure:
 #undef CHK_
 }
 
-::PROTOBUF_NAMESPACE_ID::uint8* ListServiceResponse::_InternalSerialize(
-    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+uint8_t* ListServiceResponse::_InternalSerialize(
+    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:grpc.reflection.v1alpha.ListServiceResponse)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   // repeated .grpc.reflection.v1alpha.ServiceResponse service = 1;
@@ -1992,7 +2016,7 @@ size_t ListServiceResponse::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:grpc.reflection.v1alpha.ListServiceResponse)
   size_t total_size = 0;
 
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -2022,7 +2046,7 @@ void ListServiceResponse::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message* to,
 void ListServiceResponse::MergeFrom(const ListServiceResponse& from) {
 // @@protoc_insertion_point(class_specific_merge_from_start:grpc.reflection.v1alpha.ListServiceResponse)
   GOOGLE_DCHECK_NE(&from, this);
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   service_.MergeFrom(from.service_);
@@ -2071,6 +2095,9 @@ ServiceResponse::ServiceResponse(const ServiceResponse& from)
   : ::PROTOBUF_NAMESPACE_ID::Message() {
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   name_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    name_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
   if (!from._internal_name().empty()) {
     name_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_name(), 
       GetArenaForAllocation());
@@ -2078,8 +2105,11 @@ ServiceResponse::ServiceResponse(const ServiceResponse& from)
   // @@protoc_insertion_point(copy_constructor:grpc.reflection.v1alpha.ServiceResponse)
 }
 
-void ServiceResponse::SharedCtor() {
+inline void ServiceResponse::SharedCtor() {
 name_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  name_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
 }
 
 ServiceResponse::~ServiceResponse() {
@@ -2106,7 +2136,7 @@ void ServiceResponse::SetCachedSize(int size) const {
 
 void ServiceResponse::Clear() {
 // @@protoc_insertion_point(message_clear_start:grpc.reflection.v1alpha.ServiceResponse)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -2117,12 +2147,12 @@ void ServiceResponse::Clear() {
 const char* ServiceResponse::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
   while (!ctx->Done(&ptr)) {
-    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    uint32_t tag;
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
     switch (tag >> 3) {
       // string name = 1;
       case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 10)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 10)) {
           auto str = _internal_mutable_name();
           ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
           CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "grpc.reflection.v1alpha.ServiceResponse.name"));
@@ -2153,10 +2183,10 @@ failure:
 #undef CHK_
 }
 
-::PROTOBUF_NAMESPACE_ID::uint8* ServiceResponse::_InternalSerialize(
-    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+uint8_t* ServiceResponse::_InternalSerialize(
+    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:grpc.reflection.v1alpha.ServiceResponse)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   // string name = 1;
@@ -2181,7 +2211,7 @@ size_t ServiceResponse::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:grpc.reflection.v1alpha.ServiceResponse)
   size_t total_size = 0;
 
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -2211,7 +2241,7 @@ void ServiceResponse::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message* to,
 void ServiceResponse::MergeFrom(const ServiceResponse& from) {
 // @@protoc_insertion_point(class_specific_merge_from_start:grpc.reflection.v1alpha.ServiceResponse)
   GOOGLE_DCHECK_NE(&from, this);
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   if (!from._internal_name().empty()) {
@@ -2268,6 +2298,9 @@ ErrorResponse::ErrorResponse(const ErrorResponse& from)
   : ::PROTOBUF_NAMESPACE_ID::Message() {
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   error_message_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    error_message_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
   if (!from._internal_error_message().empty()) {
     error_message_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_error_message(), 
       GetArenaForAllocation());
@@ -2276,8 +2309,11 @@ ErrorResponse::ErrorResponse(const ErrorResponse& from)
   // @@protoc_insertion_point(copy_constructor:grpc.reflection.v1alpha.ErrorResponse)
 }
 
-void ErrorResponse::SharedCtor() {
+inline void ErrorResponse::SharedCtor() {
 error_message_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  error_message_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
 error_code_ = 0;
 }
 
@@ -2305,7 +2341,7 @@ void ErrorResponse::SetCachedSize(int size) const {
 
 void ErrorResponse::Clear() {
 // @@protoc_insertion_point(message_clear_start:grpc.reflection.v1alpha.ErrorResponse)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -2317,20 +2353,20 @@ void ErrorResponse::Clear() {
 const char* ErrorResponse::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
   while (!ctx->Done(&ptr)) {
-    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    uint32_t tag;
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
     switch (tag >> 3) {
       // int32 error_code = 1;
       case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
-          error_code_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 8)) {
+          error_code_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
           CHK_(ptr);
         } else
           goto handle_unusual;
         continue;
       // string error_message = 2;
       case 2:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 18)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 18)) {
           auto str = _internal_mutable_error_message();
           ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
           CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "grpc.reflection.v1alpha.ErrorResponse.error_message"));
@@ -2361,10 +2397,10 @@ failure:
 #undef CHK_
 }
 
-::PROTOBUF_NAMESPACE_ID::uint8* ErrorResponse::_InternalSerialize(
-    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+uint8_t* ErrorResponse::_InternalSerialize(
+    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:grpc.reflection.v1alpha.ErrorResponse)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   // int32 error_code = 1;
@@ -2395,7 +2431,7 @@ size_t ErrorResponse::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:grpc.reflection.v1alpha.ErrorResponse)
   size_t total_size = 0;
 
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -2430,7 +2466,7 @@ void ErrorResponse::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message* to,
 void ErrorResponse::MergeFrom(const ErrorResponse& from) {
 // @@protoc_insertion_point(class_specific_merge_from_start:grpc.reflection.v1alpha.ErrorResponse)
   GOOGLE_DCHECK_NE(&from, this);
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   if (!from._internal_error_message().empty()) {
