@@ -210,8 +210,8 @@ int32_t Session::GetErrorString(Session* session, int32_t code, char* buffer, si
             }
             if (session) {
                 session->RaiseBufferSizeOutOfRangeWarning();
-                return session->_error_code;
             }
+            return static_cast<int32_t>(ErrorCode::kBufferSizeOutOfRangeWarning);
         }
     } else {
         *size = message.size() + 1;  // include null char
