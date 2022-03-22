@@ -38,8 +38,7 @@ string TraceExceptions(const exception& ex) {
 }
 
 Session::Session(const string& target, const shared_ptr<ChannelCredentials>& credentials) :
-    _client(target, credentials)
-{
+    _client(target, credentials) {
     ClearErrorState();
 }
 
@@ -160,11 +159,9 @@ int32_t Session::GetDefaultRequest(
             string request = client.GetDefaultRequest(service, method, deadline);
             if (!buffer) {
                 *size = request.size() + 1;  // include null char
-            }
-            else if (*size > request.size()) {  // null char
+            } else if (*size > request.size()) {  // null char
                 strncpy(buffer, request.c_str(), *size);
-            }
-            else {
+            } else {
                 string message = {
                     "The buffer size is too small to accommodate the response."
                 };
@@ -248,8 +245,7 @@ int32_t Session::Evaluate(const function<ErrorCode(UnaryUnaryJsonClient&)>& func
     return _error_code;
 }
 
-void Session::SetErrorState(ErrorCode code, const string& message)
-{
+void Session::SetErrorState(ErrorCode code, const string& message) {
     _error_code = static_cast<int32_t>(code);
     _error_message = message;
 }
@@ -260,8 +256,7 @@ void Session::ClearErrorState() {
     RaiseWarning(code, message);  // to format message
 }
 
-void Session::RaiseWarning(ErrorCode code, string message)
-{
+void Session::RaiseWarning(ErrorCode code, string message) {
     message = JsonClientException::FormatErrorMessage(code, message, string());
     SetErrorState(code, message);
 }

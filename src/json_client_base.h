@@ -41,7 +41,7 @@ class JsonClientBase {
         const std::string& method_name,
         const std::chrono::system_clock::time_point& deadline);
 
-    std::string GetDefaultRequest (
+    std::string GetDefaultRequest(
         const std::string& service_name,
         const std::string& method_name,
         const std::chrono::system_clock::time_point& deadline);
