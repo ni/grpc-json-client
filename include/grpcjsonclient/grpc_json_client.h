@@ -32,7 +32,8 @@ DLLEXPORT int32_t GrpcJsonClient_StartAsyncCall(
     intptr_t* tag);
 
 // Finishes an asynchronous call started by GrpcJsonClient_StartAsyncCall. Pass null as the response
-// argument to query the function for the minimum buffer size.
+// argument to query the function for the minimum buffer size. To finish the call without returning
+// the response, pass null as the size argument.
 DLLEXPORT int32_t GrpcJsonClient_FinishAsyncCall(
     intptr_t session_handle, intptr_t tag, int32_t timeout, char* response, size_t* size);
 

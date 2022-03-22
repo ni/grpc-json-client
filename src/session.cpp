@@ -81,17 +81,21 @@ int32_t Session::FinishAsyncCall(
             if (!_responses.count(tag)) {
                 _responses[tag] = client.FinishAsyncCall(tag, deadline);
             }
-            const string& response = _responses[tag];
-            if (!buffer) {
-                *size = response.size() + 1;  // include null char
-            } else if (*size > response.size()) {  // null char
-                strncpy(buffer, response.c_str(), *size);
-                _responses.erase(tag);
+            if (size) {
+                const string& response = _responses[tag];
+                if (!buffer) {
+                    *size = response.size() + 1;  // include null char
+                } else if (*size > response.size()) {  // null char
+                    strncpy(buffer, response.c_str(), *size);
+                    _responses.erase(tag);
+                } else {
+                    string message = {
+                        "The buffer size is too small to accommodate the response."
+                    };
+                    throw BufferSizeOutOfRangeException(message);
+                }
             } else {
-                string message = {
-                    "The buffer size is too small to accommodate the response."
-                };
-                throw BufferSizeOutOfRangeException(message);
+                _responses.erase(tag);
             }
             return ErrorCode::kNone;
         });
