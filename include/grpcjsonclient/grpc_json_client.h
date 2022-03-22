@@ -56,7 +56,7 @@ DLLEXPORT int32_t GrpcJsonClient_BlockingCall(
 // Locks the session for exclusive use by the caller. Use this function to prevent multiple threads
 // from accessing the session simultaneously, potentially causing race conditions. The has_lock
 // argument is optional and specifies whether the caller currently owns the lock. Pass null or false
-// to try acquiring the lock. If has_lock is not null, it will be set to true if the lock is
+// to try acquiring the lock. If has_lock is false it will be set to true if the lock is
 // successfully acquired. Callers that do not own the lock will block until the specified timeout is
 // reached.
 DLLEXPORT int32_t GrpcJsonClient_LockSession(
@@ -79,7 +79,7 @@ DLLEXPORT int32_t GrpcJsonClient_GetDefaultRequest(
     size_t* size);
 
 // Gets and clears error information from the session. Sessions store the most recent error or
-// warning that occures. Pass null as the buffer argument to query the function for the minimum
+// warning that occurs. Pass null as the buffer argument to query the function for the minimum
 // buffer size. Pass null as the size argument to clear the error state without returning the error
 // message.
 DLLEXPORT int32_t GrpcJsonClient_GetError(
