@@ -38,10 +38,10 @@ string TraceExceptions(const exception& ex) {
 }
 
 Session::Session(const string& target, const shared_ptr<ChannelCredentials>& credentials) :
-    _client(target, credentials),
-    _error_code(ErrorCode::kNone),
-    _error_message(ni::grpc_json_client::GetErrorString(ErrorCode::kNone))
-{}
+    _client(target, credentials)
+{
+    ClearErrorState();
+}
 
 int32_t Session::ResetDescriptorDatabase() {
     return Evaluate(
@@ -127,15 +127,24 @@ int32_t Session::BlockingCall(
 int32_t Session::Lock(const system_clock::time_point& deadline, uint8_t* has_lock) {
     return Evaluate(
         [=, &deadline](const UnaryUnaryJsonClient&) {
-            *has_lock = _lock.try_lock_until(deadline);
+            if (!has_lock || !*has_lock) {
+                if (_lock.try_lock_until(deadline) && has_lock) {
+                    *has_lock = true;
+                }
+            }
             return ErrorCode::kNone;
         });
 }
 
-int32_t Session::Unlock() {
+int32_t Session::Unlock(uint8_t* has_lock) {
     return Evaluate(
         [=](const UnaryUnaryJsonClient&) {
-            _lock.unlock();
+            if (!has_lock || *has_lock) {
+                _lock.unlock();
+                if (has_lock) {
+                    *has_lock = false;
+                }
+            }
             return ErrorCode::kNone;
         });
 }
@@ -169,22 +178,24 @@ int32_t Session::GetError(int32_t* code, char* buffer, size_t* size) {
     return Evaluate(
         [=](const UnaryUnaryJsonClient&) {
             if (code) {
-                *code = static_cast<int32_t>(_error_code);
+                *code = _error_code;
             }
-            if (buffer) {
-                strncpy(buffer, _error_message.c_str(), *size);
-                if (*size > _error_message.size()) {
-                    // clear error state
-                    _error_code = ErrorCode::kNone;
-                    _error_message = ni::grpc_json_client::GetErrorString(_error_code);
-                } else {
-                    if (*size > 0) {
-                        buffer[*size - 1] = NULL;  // strncpy doesn't add null char
+            if (size) {
+                if (buffer) {
+                    strncpy(buffer, _error_message.c_str(), *size);
+                    if (*size > _error_message.size()) {
+                        ClearErrorState();
+                    } else {
+                        if (*size > 0) {
+                            buffer[*size - 1] = NULL;  // strncpy doesn't add null char
+                        }
+                        return RaiseBufferSizeOutOfRangeWarning();
                     }
-                    return static_cast<ErrorCode>(RaiseBufferSizeOutOfRangeWarning());
+                } else {
+                    *size = _error_message.size() + 1;  // include null char
                 }
             } else {
-                *size = _error_message.size() + 1;  // include null char
+                ClearErrorState();
             }
             return ErrorCode::kNone;
         });
@@ -201,7 +212,8 @@ int32_t Session::GetErrorString(Session* session, int32_t code, char* buffer, si
                 buffer[*size - 1] = NULL;  // strncpy doesn't add null char
             }
             if (session) {
-                return session->RaiseBufferSizeOutOfRangeWarning();
+                session->RaiseBufferSizeOutOfRangeWarning();
+                return session->_error_code;
             }
         }
     } else {
@@ -231,23 +243,36 @@ int32_t Session::Evaluate(const function<ErrorCode(UnaryUnaryJsonClient&)>& func
         }
     }
     catch (const JsonClientException& ex) {
-        _error_code = ex.code();
-        _error_message = TraceExceptions(ex);
+        SetErrorState(ex.code(), TraceExceptions(ex));
     }
-    return static_cast<int32_t>(_error_code);
+    return _error_code;
 }
 
-int32_t Session::RaiseWarning(ErrorCode warning_code, const string& message) {
-    _error_code = warning_code;
-    _error_message = JsonClientException::FormatErrorMessage(warning_code, message, string());
-    return static_cast<int>(warning_code);
+void Session::SetErrorState(ErrorCode code, const string& message)
+{
+    _error_code = static_cast<int32_t>(code);
+    _error_message = message;
 }
 
-int32_t Session::RaiseBufferSizeOutOfRangeWarning() {
+void Session::ClearErrorState() {
+    ErrorCode code = ErrorCode::kNone;
+    string message = ni::grpc_json_client::GetErrorString(code);
+    RaiseWarning(code, message);  // to format message
+}
+
+void Session::RaiseWarning(ErrorCode code, string message)
+{
+    message = JsonClientException::FormatErrorMessage(code, message, string());
+    SetErrorState(code, message);
+}
+
+ErrorCode Session::RaiseBufferSizeOutOfRangeWarning() {
+    ErrorCode code = ErrorCode::kBufferSizeOutOfRangeWarning;
     string message = {
         "The buffer size is too small to accomodate the entire string. It will be truncated."
     };
-    return RaiseWarning(ErrorCode::kBufferSizeOutOfRangeWarning, message);
+    RaiseWarning(code, message);
+    return code;
 }
 
 }  // namespace grpc_json_client

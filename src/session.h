@@ -44,7 +44,7 @@ class Session {
         char* response,
         size_t* size);
     int32_t Lock(const std::chrono::system_clock::time_point& deadline, uint8_t* has_lock);
-    int32_t Unlock();
+    int32_t Unlock(uint8_t* has_lock);
     int32_t GetDefaultRequest(
         const char* service,
         const char* method,
@@ -56,16 +56,19 @@ class Session {
     int32_t Close();
 
  private:
-    std::recursive_timed_mutex _lock;
+    std::timed_mutex _lock;
     UnaryUnaryJsonClient _client;
     std::unordered_map<const void*, std::string> _responses;
-    ErrorCode _error_code;
+    int32_t _error_code;
     std::string _error_message;
 
     // Helper function for catching exceptions.
     int32_t Evaluate(const std::function<ErrorCode(UnaryUnaryJsonClient&)>& func);
-    int32_t RaiseWarning(ErrorCode warning_code, const std::string& message);
-    int32_t RaiseBufferSizeOutOfRangeWarning();
+    void SetErrorState(ErrorCode code, const std::string& message);
+    // Returns error code and error message to their default values.
+    void ClearErrorState();
+    void RaiseWarning(ErrorCode code, std::string message);
+    ErrorCode RaiseBufferSizeOutOfRangeWarning();
 };
 
 }  // namespace grpc_json_client

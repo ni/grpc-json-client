@@ -87,9 +87,9 @@ int32_t GrpcJsonClient_LockSession(intptr_t session_handle, int32_t timeout, uin
     return session->Lock(deadline, has_lock);
 }
 
-int32_t GrpcJsonClient_UnlockSession(intptr_t session_handle) {
+int32_t GrpcJsonClient_UnlockSession(intptr_t session_handle, uint8_t* has_lock) {
     Session* session = reinterpret_cast<Session*>(session_handle);
-    return session->Unlock();
+    return session->Unlock(has_lock);
 }
 
 int32_t GrpcJsonClient_GetDefaultRequest(

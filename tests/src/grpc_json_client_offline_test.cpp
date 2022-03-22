@@ -10,6 +10,7 @@
 #include "helpers.h"
 
 using std::string;
+using std::thread;
 using std::unique_ptr;
 
 namespace ni {
@@ -59,7 +60,8 @@ TEST_F(GrpcJsonClientOfflineTest, LockAndUnlockSessionSucceeds) {
     uint8_t has_lock = 0;
     EXPECT_FALSE(GrpcJsonClient_LockSession(session, -1, &has_lock));
     EXPECT_TRUE(has_lock);
-    EXPECT_FALSE(GrpcJsonClient_UnlockSession(session));
+    EXPECT_FALSE(GrpcJsonClient_UnlockSession(session, &has_lock));
+    EXPECT_FALSE(has_lock);
 }
 
 TEST_F(GrpcJsonClientOfflineTest, RecursiveLockingSucceeds) {
@@ -68,8 +70,21 @@ TEST_F(GrpcJsonClientOfflineTest, RecursiveLockingSucceeds) {
     EXPECT_TRUE(has_lock);
     EXPECT_FALSE(GrpcJsonClient_LockSession(session, -1, &has_lock));
     EXPECT_TRUE(has_lock);
-    EXPECT_FALSE(GrpcJsonClient_UnlockSession(session));
-    EXPECT_FALSE(GrpcJsonClient_UnlockSession(session));
+    EXPECT_FALSE(GrpcJsonClient_UnlockSession(session, &has_lock));
+    EXPECT_FALSE(has_lock);
+    EXPECT_FALSE(GrpcJsonClient_UnlockSession(session, &has_lock));
+    EXPECT_FALSE(has_lock);
+}
+
+TEST_F(GrpcJsonClientOfflineTest, GetDefaultRequestFailsWithRemoteProcedureCallError) {
+    size_t size = 0;
+    int32_t error_code = {
+        GrpcJsonClient_GetDefaultRequest(session, service, echo, -1, nullptr, &size)
+    };
+    EXPECT_EQ(error_code, -2);  // ErrorCode::kRemoteProcedureCallError
+
+    string expected_message("Failed to initiate communication with the host.");
+    EXPECT_NO_FATAL_FAILURE(CheckErrorMessageHelper(session, expected_message, true));
 }
 
 TEST_F(GrpcJsonClientOfflineTest, GetErrorWithNoErrorSucceeds) {
@@ -77,7 +92,7 @@ TEST_F(GrpcJsonClientOfflineTest, GetErrorWithNoErrorSucceeds) {
     string error_message;
     EXPECT_FALSE(GetErrorHelper(session, &error_code, &error_message));
     EXPECT_FALSE(error_code);
-    EXPECT_EQ(error_message, "No error");
+    EXPECT_EQ(error_message, "Error Code: 0\nError Message: No error");
 }
 
 TEST_F(GrpcJsonClientOfflineTest, GetErrorStringWithNoErrorSucceeds) {
@@ -142,7 +157,7 @@ TEST_F(GrpcJsonClientOfflineTest, GetErrorClearsErrorState) {
     EXPECT_FALSE(GetErrorHelper(session, &error_code, &error_message));
     EXPECT_FALSE(GetErrorHelper(session, &error_code, &error_message));
     EXPECT_FALSE(error_code);
-    EXPECT_EQ(error_message, "No error");
+    EXPECT_EQ(error_message, "Error Code: 0\nError Message: No error");
 }
 
 }  // namespace grpc_json_client

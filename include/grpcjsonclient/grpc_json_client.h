@@ -53,17 +53,19 @@ DLLEXPORT int32_t GrpcJsonClient_BlockingCall(
     char* response,
     size_t* size);
 
-// Locks the session for exclusive use by the calling thread. Use this function to prevent other
-// threads from accessing the session simultaneously, potentially causing race conditions. Threads
-// that do not own the session will block until the specified timeout is reached. The has_lock
-// argument is set to true if the thread successfully acquires the lock; otherwise it is set to
-// false. The lock is recursive.
+// Locks the session for exclusive use by the caller. Use this function to prevent multiple threads
+// from accessing the session simultaneously, potentially causing race conditions. The has_lock
+// argument is optional and specifies whether the caller currently owns the lock. Pass null or false
+// to try acquiring the lock. If has_lock is not null, it will be set to true if the lock is
+// successfully acquired. Callers that do not own the lock will block until the specified timeout is
+// reached.
 DLLEXPORT int32_t GrpcJsonClient_LockSession(
     intptr_t session_handle, int32_t timeout, uint8_t* has_lock);
 
-// Unlocks the session. Call this method the same number of times as GrpcJsonClient_LockSession to
-// prevent deadlock.
-DLLEXPORT int32_t GrpcJsonClient_UnlockSession(intptr_t session_handle);
+// Unlocks the session. The has_lock argument is optional and specifies whether the caller currently
+// owns the lock. Pass null or true to release the lock. If has_lock is not null, it will be set to
+// false after the lock is released.
+DLLEXPORT int32_t GrpcJsonClient_UnlockSession(intptr_t session_handle, uint8_t* has_lock);
 
 // Returns the default request string for the specified method. Some gRPC fields (such as oneof)
 // default to an empty value and are thus unpopulated. Pass null as the buffer argument to query
@@ -78,7 +80,8 @@ DLLEXPORT int32_t GrpcJsonClient_GetDefaultRequest(
 
 // Gets and clears error information from the session. Sessions store the most recent error or
 // warning that occures. Pass null as the buffer argument to query the function for the minimum
-// buffer size.
+// buffer size. To clear the error state without returning the error message, pass null as the size
+// argument.
 DLLEXPORT int32_t GrpcJsonClient_GetError(
     intptr_t session_handle, int32_t* code, char* buffer, size_t* size);
 
