@@ -23,37 +23,34 @@ TEST_F(GrpcJsonClientOfflineTest, ResetDescriptorDatabaseSucceeds) {
 }
 TEST_F(GrpcJsonClientOfflineTest, FillDescriptorDatabaseFailsWithRemoteProcedureCallError) {
     int32_t error_code = GrpcJsonClient_FillDescriptorDatabase(session, -1);
-    EXPECT_EQ(error_code, -2);  // ErrorCode::kRemoteProcedureCallError
-
+    int32_t expected_code = -2;  // ErrorCode::kRemoteProcedureCallError
+    EXPECT_EQ(error_code, expected_code);
     string expected_message("Failed to initiate communication with the host.");
-    EXPECT_NO_FATAL_FAILURE(CheckErrorMessageHelper(session, expected_message, true));
+    EXPECT_NO_FATAL_FAILURE(CheckGetErrorHelper(session, expected_code, expected_message, true));
 }
 
 TEST_F(GrpcJsonClientOfflineTest, StartAsyncCallFailsWithRemoteProcedureCallError) {
     int32_t error_code = GrpcJsonClient_StartAsyncCall(session, "", "", "", -1, 0);
-    EXPECT_EQ(error_code, -2);  // ErrorCode::kRemoteProcedureCallError
-
+    int32_t expected_code = -2;  // ErrorCode::kRemoteProcedureCallError
+    EXPECT_EQ(error_code, expected_code);
     string expected_message("Failed to initiate communication with the host.");
-    EXPECT_NO_FATAL_FAILURE(CheckErrorMessageHelper(session, expected_message, true));
+    EXPECT_NO_FATAL_FAILURE(CheckGetErrorHelper(session, expected_code, expected_message, true));
 }
 
 TEST_F(GrpcJsonClientOfflineTest, FinishAsyncCallFailsWithInvalidTagError) {
-    int32_t error_code = GrpcJsonClient_FinishAsyncCall(session, 0, -1, nullptr, nullptr);
-    EXPECT_EQ(error_code, -8);  // ErrorCode::kInvalidArgumentError
-
+    int32_t error_code = FinishAsyncCallHelper(session, 0, -1, nullptr);
+    int32_t expected_code = -8;  // ErrorCode::kInvalidArgumentError
+    EXPECT_EQ(error_code, expected_code);
     string expected_message("An active remote procedure call was not found for the specified tag.");
-    EXPECT_NO_FATAL_FAILURE(CheckErrorMessageHelper(session, expected_message));
+    EXPECT_NO_FATAL_FAILURE(CheckGetErrorHelper(session, expected_code, expected_message));
 }
 
 TEST_F(GrpcJsonClientOfflineTest, BlockingCallFailsWithRemoteProcedureCallError) {
-    intptr_t tag = 0;
-    int32_t error_code = {
-        GrpcJsonClient_BlockingCall(session, "", "", "", -1, &tag, nullptr, nullptr)
-    };
-    EXPECT_EQ(error_code, -2);  // ErrorCode::kRemoteProcedureCallError
-
+    int32_t error_code = BlockingCallHelper(session, "", "", "", -1, nullptr);
+    int32_t expected_code = -2;  // ErrorCode::kRemoteProcedureCallError
+    EXPECT_EQ(error_code, expected_code);
     string expected_message("Failed to initiate communication with the host.");
-    EXPECT_NO_FATAL_FAILURE(CheckErrorMessageHelper(session, expected_message, true));
+    EXPECT_NO_FATAL_FAILURE(CheckGetErrorHelper(session, expected_code, expected_message, true));
 }
 
 TEST_F(GrpcJsonClientOfflineTest, LockAndUnlockSessionSucceeds) {
@@ -77,52 +74,29 @@ TEST_F(GrpcJsonClientOfflineTest, RecursiveLockingSucceeds) {
 }
 
 TEST_F(GrpcJsonClientOfflineTest, GetDefaultRequestFailsWithRemoteProcedureCallError) {
-    size_t size = 0;
-    int32_t error_code = {
-        GrpcJsonClient_GetDefaultRequest(session, service, echo, -1, nullptr, &size)
-    };
-    EXPECT_EQ(error_code, -2);  // ErrorCode::kRemoteProcedureCallError
-
+    int32_t error_code = GetDefaultRequestHelper(session, service, echo, -1, nullptr);
+    int32_t expected_code = -2;  // ErrorCode::kRemoteProcedureCallError
+    EXPECT_EQ(error_code, expected_code);
     string expected_message("Failed to initiate communication with the host.");
-    EXPECT_NO_FATAL_FAILURE(CheckErrorMessageHelper(session, expected_message, true));
+    EXPECT_NO_FATAL_FAILURE(CheckGetErrorHelper(session, expected_code, expected_message, true));
 }
-
 TEST_F(GrpcJsonClientOfflineTest, GetErrorWithNoErrorSucceeds) {
-    int32_t error_code = 0;
-    string error_message;
-    EXPECT_FALSE(GetErrorHelper(session, &error_code, &error_message));
-    EXPECT_FALSE(error_code);
-    EXPECT_EQ(error_message, "Error Code: 0\nError Message: No error");
+    EXPECT_NO_FATAL_FAILURE(CheckGetErrorHelper(session, 0, "No error"));
 }
 
 TEST_F(GrpcJsonClientOfflineTest, GetErrorStringWithNoErrorSucceeds) {
-    int32_t error_code = 0;
-    size_t size = 0;
-    EXPECT_FALSE(GrpcJsonClient_GetErrorString(session, error_code, nullptr, &size));
-    unique_ptr<char> buffer(new char[size]);
-    EXPECT_FALSE(GrpcJsonClient_GetErrorString(session, error_code, buffer.get(), &size));
-    EXPECT_STREQ(buffer.get(), "Error Code: 0\nError Message: No error");
+    EXPECT_NO_FATAL_FAILURE(CheckGetErrorStringHelper(session, 0, "No error"));
 }
 
 TEST_F(GrpcJsonClientOfflineTest, GetErrorStringWithErrorSucceeds) {
-    int32_t error_code = -1;
-    size_t size = 0;
-    EXPECT_FALSE(GrpcJsonClient_GetErrorString(session, error_code, nullptr, &size));
-    unique_ptr<char> buffer(new char[size]);
-    EXPECT_FALSE(GrpcJsonClient_GetErrorString(session, error_code, buffer.get(), &size));
-    EXPECT_STREQ(buffer.get(), "Error Code: -1\nError Message: Unknown error");
+    EXPECT_NO_FATAL_FAILURE(CheckGetErrorStringHelper(session, -1, "Unknown error"));
 }
 
 TEST_F(
     GrpcJsonClientOfflineTest,
     GetErrorStringWithOutOfRangeErrorCodeReturnsUndefinedErrorCodeMessage
 ) {
-    int32_t error_code = -100;
-    size_t size = 0;
-    EXPECT_FALSE(GrpcJsonClient_GetErrorString(session, error_code, nullptr, &size));
-    unique_ptr<char> buffer(new char[size]);
-    EXPECT_FALSE(GrpcJsonClient_GetErrorString(session, error_code, buffer.get(), &size));
-    EXPECT_STREQ(buffer.get(), "Error Code: -100\nError Message: Undefined error code");
+    EXPECT_NO_FATAL_FAILURE(CheckGetErrorStringHelper(session, -100, "Undefined error code"));
 }
 
 TEST_F(
@@ -131,7 +105,9 @@ TEST_F(
 ) {
     char* buffer = "";
     size_t size = 0;
-    int32_t error_code = GrpcJsonClient_GetErrorString(session, 0, buffer, &size);
+    int32_t error_code = GrpcJsonClient_GetErrorString(0, 0, buffer, &size);
+    EXPECT_EQ(error_code, 1);  // ErrorCode::kBufferSizeOutOfRangeWarning
+    error_code = GrpcJsonClient_GetErrorString(session, 0, buffer, &size);
     EXPECT_EQ(error_code, 1);  // ErrorCode::kBufferSizeOutOfRangeWarning
 }
 
@@ -139,25 +115,22 @@ TEST_F(GrpcJsonClientOfflineTest, GetErrorStringWithSmallBufferPopulatesErrorSta
     char* buffer = "";
     size_t size = 0;
     int32_t error_code = GrpcJsonClient_GetErrorString(session, 0, buffer, &size);
-    EXPECT_EQ(error_code, 1);  // ErrorCode::kBufferSizeOutOfRangeWarning
-
+    int32_t expected_code = 1;  // ErrorCode::kBufferSizeOutOfRangeWarning
+    EXPECT_EQ(error_code, expected_code);
     string expected_message = {
         "The buffer size is too small to accomodate the entire string. It will be truncated."
     };
-    EXPECT_NO_FATAL_FAILURE(CheckErrorMessageHelper(session, expected_message));
+    EXPECT_NO_FATAL_FAILURE(CheckGetErrorHelper(session, expected_code, expected_message));
 }
 
 TEST_F(GrpcJsonClientOfflineTest, GetErrorClearsErrorState) {
     char* buffer = "";
     size_t size = 0;
     int32_t error_code = GrpcJsonClient_GetErrorString(session, 0, buffer, &size);
-    EXPECT_EQ(error_code, 1);  // ErrorCode::kBufferSizeOutOfRangeWarning
-
-    string error_message;
-    EXPECT_FALSE(GetErrorHelper(session, &error_code, &error_message));
-    EXPECT_FALSE(GetErrorHelper(session, &error_code, &error_message));
-    EXPECT_FALSE(error_code);
-    EXPECT_EQ(error_message, "Error Code: 0\nError Message: No error");
+    int32_t expected_code = 1;  // ErrorCode::kBufferSizeOutOfRangeWarning
+    EXPECT_EQ(error_code, expected_code);
+    EXPECT_FALSE(GetErrorHelper(session, nullptr, nullptr));
+    EXPECT_NO_FATAL_FAILURE(CheckGetErrorHelper(session, 0, "No error"));
 }
 
 }  // namespace grpc_json_client

@@ -25,13 +25,11 @@ void GrpcJsonClientNoReflectionTest::TearDownTestSuite() {
 }
 
 TEST_F(GrpcJsonClientNoReflectionTest, CallsReturnsReflectionServiceNotRunningErrorMessage) {
-    intptr_t tag = 0;
-    size_t size = 0;
     int32_t error_code = BlockingCallHelper(session, "", "", "", 100, nullptr);
-    EXPECT_EQ(error_code, -2);  // ErrorCode::kRemoteProcedureCallError
-
+    int32_t expected_code = -2;  // ErrorCode::kRemoteProcedureCallError
+    EXPECT_EQ(error_code, expected_code);
     string expected_message("The reflection service is not running on the host.");
-    EXPECT_NO_FATAL_FAILURE(CheckErrorMessageHelper(session, expected_message, true));
+    EXPECT_NO_FATAL_FAILURE(CheckGetErrorHelper(session, expected_code, expected_message, true));
 }
 
 }  // namespace grpc_json_client

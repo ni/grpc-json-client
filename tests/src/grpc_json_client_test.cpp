@@ -37,11 +37,9 @@ TEST_F(GrpcJsonClientTest, SynchronousCallsWithTimeoutsSucceed) {
         intptr_t tag = 0;
         EXPECT_FALSE(GrpcJsonClient_StartAsyncCall(
             session, service, echo, request.dump().c_str(), 100, &tag));
-        size_t size = 0;
-        EXPECT_FALSE(GrpcJsonClient_FinishAsyncCall(session, tag, 100, 0, &size));
-        unique_ptr<char> buffer(new char[size]);
-        EXPECT_FALSE(GrpcJsonClient_FinishAsyncCall(session, tag, 100, buffer.get(), &size));
-        json response = json::parse(buffer.get());
+        string raw_response;
+        EXPECT_FALSE(FinishAsyncCallHelper(session, tag, 100, &raw_response));
+        json response = json::parse(raw_response);
         EXPECT_EQ(response["string_field"], string_field);
     }
 }
@@ -52,11 +50,9 @@ TEST_F(GrpcJsonClientTest, SynchronousCallsWithoutTimeoutsSucceed) {
         intptr_t tag = 0;
         EXPECT_FALSE(GrpcJsonClient_StartAsyncCall(
             session, service, echo, request.dump().c_str(), -1, &tag));
-        size_t size = 0;
-        EXPECT_FALSE(GrpcJsonClient_FinishAsyncCall(session, tag, -1, 0, &size));
-        unique_ptr<char> buffer(new char[size]);
-        EXPECT_FALSE(GrpcJsonClient_FinishAsyncCall(session, tag, -1, buffer.get(), &size));
-        json response = json::parse(buffer.get());
+        string raw_response;
+        EXPECT_FALSE(FinishAsyncCallHelper(session, tag, -1, &raw_response));
+        json response = json::parse(raw_response);
         EXPECT_EQ(response["string_field"], string_field);
     }
 }
@@ -69,13 +65,10 @@ TEST_F(GrpcJsonClientTest, AsynchronousCallsWithTimeoutsSucceed) {
         EXPECT_FALSE(GrpcJsonClient_StartAsyncCall(
             session, service, echo, request.dump().c_str(), 100, &tags[i]));
     }
-
     for (size_t i = 0; i < 2; i++) {
-        size_t size = 0;
-        EXPECT_FALSE(GrpcJsonClient_FinishAsyncCall(session, tags[i], 100, 0, &size));
-        unique_ptr<char> buffer(new char[size]);
-        EXPECT_FALSE(GrpcJsonClient_FinishAsyncCall(session, tags[i], 100, buffer.get(), &size));
-        json response = json::parse(buffer.get());
+        string raw_response;
+        EXPECT_FALSE(FinishAsyncCallHelper(session, tags[i], 100, &raw_response));
+        json response = json::parse(raw_response);
         EXPECT_EQ(response["string_field"], string_fields[i]);
     }
 }
@@ -88,27 +81,20 @@ TEST_F(GrpcJsonClientTest, AsynchronousCallsWithoutTimeoutsSucceed) {
         EXPECT_FALSE(GrpcJsonClient_StartAsyncCall(
             session, service, echo, request.dump().c_str(), -1, &tags[i]));
     }
-
     for (size_t i = 0; i < 2; i++) {
-        size_t size = 0;
-        EXPECT_FALSE(GrpcJsonClient_FinishAsyncCall(session, tags[i], -1, 0, &size));
-        unique_ptr<char> buffer(new char[size]);
-        EXPECT_FALSE(GrpcJsonClient_FinishAsyncCall(session, tags[i], -1, buffer.get(), &size));
-        json response = json::parse(buffer.get());
+        string raw_response;
+        EXPECT_FALSE(FinishAsyncCallHelper(session, tags[i], -1, &raw_response));
+        json response = json::parse(raw_response);
         EXPECT_EQ(response["string_field"], string_fields[i]);
     }
 }
 
 TEST_F(GrpcJsonClientTest, BlockingCallSucceeds) {
     json request = { {"string_field", "BlockingCall"} };
-    intptr_t tag = 0;
-    size_t size = 0;
-    EXPECT_FALSE(GrpcJsonClient_BlockingCall(
-        session, service, echo, request.dump().c_str(), 100, &tag, 0, &size));
-    unique_ptr<char> buffer(new char[size]);
-    EXPECT_FALSE(GrpcJsonClient_BlockingCall(
-        session, nullptr, nullptr, nullptr, 100, &tag, buffer.get(), &size));
-    json response = json::parse(buffer.get());
+    string raw_response;
+    EXPECT_FALSE(BlockingCallHelper(
+        session, service, echo, request.dump().c_str(), 100, &raw_response));
+    json response = json::parse(raw_response);
     EXPECT_EQ(response["string_field"], "BlockingCall");
 }
 
@@ -116,43 +102,40 @@ TEST_F(GrpcJsonClientTest, StartAsyncCallToUndefinedServiceFailsWithServiceNotFo
     intptr_t tag = 0;
     int32_t error_code = GrpcJsonClient_StartAsyncCall(
         session, "UndefinedService", "UndefinedMethod", "{}", -1, &tag);
-    EXPECT_EQ(error_code, -4);  // ErrorCode::kServiceNotFoundError
-
+    int32_t expected_code = -4;  // ErrorCode::kServiceNotFoundError
+    EXPECT_EQ(error_code, expected_code);
     string expected_message("The service \"UndefinedService\" was not found.");
-    EXPECT_NO_FATAL_FAILURE(CheckErrorMessageHelper(session, expected_message, true));
+    EXPECT_NO_FATAL_FAILURE(CheckGetErrorHelper(session, expected_code, expected_message, true));
 }
 
 TEST_F(GrpcJsonClientTest, StartAsyncCallToUndefinedMethodFailsWithMethodNotFoundError) {
     intptr_t tag = 0;
     int32_t error_code = GrpcJsonClient_StartAsyncCall(
         session, service, "UndefinedMethod", "{}", -1, &tag);
-    EXPECT_EQ(error_code, -5);  // ErrorCode::kMethodNotFoundError
-
+    int32_t expected_code = -5;  // ErrorCode::kServiceNotFoundError
+    EXPECT_EQ(error_code, expected_code);
     string expected_message("The method \"UndefinedMethod\" was not found.");
-    EXPECT_NO_FATAL_FAILURE(CheckErrorMessageHelper(session, expected_message));
+    EXPECT_NO_FATAL_FAILURE(CheckGetErrorHelper(session, expected_code, expected_message));
 }
 
 TEST_F(GrpcJsonClientTest, StartAsyncCallWithMalformedMessageFailsWithSerializationError) {
     intptr_t tag = 0;
     int32_t error_code = GrpcJsonClient_StartAsyncCall(
         session, service, echo, "", -1, &tag);
-    EXPECT_EQ(error_code, -6);  // ErrorCode::kSerializationError
-
+    int32_t expected_code = -6;  // ErrorCode::kSerializationError
+    EXPECT_EQ(error_code, expected_code);
     string expected_message("Failed to create protobuf message from JSON string.");
-    EXPECT_NO_FATAL_FAILURE(CheckErrorMessageHelper(session, expected_message, true));
+    EXPECT_NO_FATAL_FAILURE(CheckGetErrorHelper(session, expected_code, expected_message, true));
 }
 
 TEST_F(GrpcJsonClientTest, FinishAsyncCallWithInvalidTagFailsWithInvalidArgumentError) {
     intptr_t tag = 0;
-    EXPECT_FALSE(GrpcJsonClient_StartAsyncCall(
-        session, service, echo, "{}", -1, &tag));
-
-    size_t size = 0;
-    int32_t error_code = GrpcJsonClient_FinishAsyncCall(session, ++tag, 100, 0, &size);
-    EXPECT_EQ(error_code, -8);  // ErrorCode::kInvalidArgumentError
-
+    EXPECT_FALSE(GrpcJsonClient_StartAsyncCall(session, service, echo, "{}", -1, &tag));
+    int32_t error_code = FinishAsyncCallHelper(session, ++tag, -1, nullptr);
+    int32_t expected_code = -8;  // ErrorCode::kInvalidArgumentError
+    EXPECT_EQ(error_code, expected_code);
     string expected_message("An active remote procedure call was not found for the specified tag.");
-    EXPECT_NO_FATAL_FAILURE(CheckErrorMessageHelper(session, expected_message));
+    EXPECT_NO_FATAL_FAILURE(CheckGetErrorHelper(session, expected_code, expected_message));
 }
 
 TEST_F(GrpcJsonClientTest, CallWithShortTimeoutFailsWithTimeoutError) {
@@ -160,33 +143,28 @@ TEST_F(GrpcJsonClientTest, CallWithShortTimeoutFailsWithTimeoutError) {
     intptr_t tag = 0;
     EXPECT_FALSE(GrpcJsonClient_StartAsyncCall(
         session, service, echo, request.dump().c_str(), -1, &tag));
-
-    size_t size = 0;
-    int32_t error_code = GrpcJsonClient_FinishAsyncCall(session, tag, 10, 0, &size);
-    EXPECT_EQ(error_code, -9);  // ErrorCode::kTimeoutError
-
+    int32_t error_code = FinishAsyncCallHelper(session, tag, 10, nullptr);
+    int32_t expected_code = -9;  // ErrorCode::kTimeoutError
+    EXPECT_EQ(error_code, expected_code);
     string expected_message("Timed out while waiting for the remote procedure call to complete.");
-    EXPECT_NO_FATAL_FAILURE(CheckErrorMessageHelper(session, expected_message));
+    EXPECT_NO_FATAL_FAILURE(CheckGetErrorHelper(session, expected_code, expected_message));
 }
 
 TEST_F(GrpcJsonClientTest, FinishAsyncCallWithSmallBufferFailsWithBufferSizeOutOfRangeError) {
     intptr_t tag = 0;
-    EXPECT_FALSE(GrpcJsonClient_StartAsyncCall(
-        session, service, echo, "{}", -1, &tag));
-
+    EXPECT_FALSE(GrpcJsonClient_StartAsyncCall(session, service, echo, "{}", -1, &tag));
     char* buffer = "";
     size_t size = 0;
-    int32_t error_code = GrpcJsonClient_FinishAsyncCall(session, tag, 100, buffer, &size);
-    EXPECT_EQ(error_code, -10);  // ErrorCode::kBufferSizeOutOfRangeError
-
+    int32_t error_code = GrpcJsonClient_FinishAsyncCall(session, tag, -1, buffer, &size);
+    int32_t expected_code = -10;  // ErrorCode::kBufferSizeOutOfRangeError
+    EXPECT_EQ(error_code, expected_code);
     string expected_message("The buffer size is too small to accommodate the response.");
-    EXPECT_NO_FATAL_FAILURE(CheckErrorMessageHelper(session, expected_message));
+    EXPECT_NO_FATAL_FAILURE(CheckGetErrorHelper(session, expected_code, expected_message));
 }
 
 TEST_F(GrpcJsonClientTest, GetDefaultRequestSucceeds) {
     string request;
     EXPECT_NO_FATAL_FAILURE(GetDefaultRequestHelper(session, service, echo, -1, &request));
-
     string expected = R"({"delay":0})";
     EXPECT_EQ(request, expected);
 }
@@ -195,45 +173,32 @@ TEST_F(GrpcJsonClientTest, GetErrorSucceeds) {
     intptr_t tag = 0;
     int32_t expected_code = GrpcJsonClient_StartAsyncCall(
         session, "UndefinedService", "UndefinedMethod", "{}", -1, &tag);
-
-    int32_t error_code = 0;
-    size_t size = 0;
-    EXPECT_FALSE(GrpcJsonClient_GetError(session, &error_code, 0, &size));
-    unique_ptr<char> buffer(new char[size]);
-    EXPECT_FALSE(GrpcJsonClient_GetError(session, &error_code, buffer.get(), &size));
-
-    EXPECT_EQ(error_code, expected_code);  // returns most recent code
     string expected_message("The service \"UndefinedService\" was not found.");
-    EXPECT_NO_FATAL_FAILURE(CheckErrorMessageHelper(
-        error_code, buffer.get(), expected_message, true));
+    EXPECT_NO_FATAL_FAILURE(CheckGetErrorHelper(session, expected_code, expected_message, true));
 }
 
 TEST_F(GrpcJsonClientTest, GetErrorWithSmallBufferSucceedsWithBufferSizeOutOfRangeWarning) {
     intptr_t tag = 0;
-    GrpcJsonClient_StartAsyncCall(session, "UndefinedService", "UndefinedMethod", "{}", -1, &tag);
-
-    char* buffer = "";
-    size_t size = 0;
+    EXPECT_TRUE(GrpcJsonClient_StartAsyncCall(
+        session, "UndefinedService", "UndefinedMethod", "{}", -1, &tag));
+    char buffer[15] = {};
+    size_t size = 15;
     int32_t error_code = GrpcJsonClient_GetError(session, nullptr, buffer, &size);
-
-    ASSERT_EQ(error_code, 1);  // ErrorCode::kBufferSizeOutOfRangeWarning
+    int32_t expected_code = 1;  // ErrorCode::kBufferSizeOutOfRangeWarning
+    EXPECT_EQ(error_code, expected_code);
+    EXPECT_STREQ(buffer, "Error Code: -4");
     string expected_message = {
         "The buffer size is too small to accomodate the entire string. It will be truncated."
     };
-    EXPECT_NO_FATAL_FAILURE(CheckErrorMessageHelper(session, expected_message));
+    EXPECT_NO_FATAL_FAILURE(CheckGetErrorHelper(session, expected_code, expected_message));
 }
 
 TEST_F(GrpcJsonClientTest, GetErrorStringWithoutSessionSucceeds) {
     intptr_t tag = 0;
     int32_t error_code = GrpcJsonClient_StartAsyncCall(
         session, "UndefinedService", "UndefinedMethod", "{}", -1, &tag);
-
-    size_t size = 0;
-    ASSERT_FALSE(GrpcJsonClient_GetErrorString(0, error_code, 0, &size));
-    unique_ptr<char> buffer(new char[size]);
-    ASSERT_FALSE(GrpcJsonClient_GetErrorString(0, error_code, buffer.get(), &size));
-
-    ASSERT_STREQ(buffer.get(), "Error Code: -4\nError Message: Service not found");
+    string expected_message("Service not found");
+    EXPECT_NO_FATAL_FAILURE(CheckGetErrorStringHelper(0, error_code, expected_message));
 }
 
 }  // namespace grpc_json_client
