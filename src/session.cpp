@@ -163,7 +163,7 @@ int32_t Session::GetDefaultRequest(
                 strncpy(buffer, request.c_str(), *size);
             } else {
                 string message = {
-                    "The buffer size is too small to accommodate the response."
+                    "The buffer size is too small to accommodate the message."
                 };
                 throw BufferSizeOutOfRangeException(message);
             }

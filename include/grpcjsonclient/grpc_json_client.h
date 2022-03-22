@@ -80,8 +80,8 @@ DLLEXPORT int32_t GrpcJsonClient_GetDefaultRequest(
 
 // Gets and clears error information from the session. Sessions store the most recent error or
 // warning that occures. Pass null as the buffer argument to query the function for the minimum
-// buffer size. To clear the error state without returning the error message, pass null as the size
-// argument.
+// buffer size. Pass null as the size argument to clear the error state without returning the error
+// message.
 DLLEXPORT int32_t GrpcJsonClient_GetError(
     intptr_t session_handle, int32_t* code, char* buffer, size_t* size);
 

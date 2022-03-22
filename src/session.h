@@ -21,7 +21,6 @@ class Session {
  public:
     Session(
         const std::string& target, const std::shared_ptr<grpc::ChannelCredentials>& credentials);
-
     int32_t ResetDescriptorDatabase();
     int32_t FillDescriptorDatabase(const std::chrono::system_clock::time_point& deadline);
     int32_t StartAsyncCall(

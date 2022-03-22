@@ -121,6 +121,5 @@ int32_t GrpcJsonClient_GetErrorString(
 
 int32_t GrpcJsonClient_Close(intptr_t session_handle) {
     unique_ptr<Session> session(reinterpret_cast<Session*>(session_handle));
-    int32_t error_code = session->Close();
-    return error_code;
+    return session->Close();
 }
