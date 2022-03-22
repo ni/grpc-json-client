@@ -101,7 +101,7 @@ TEST_F(GrpcJsonClientOfflineTest, GetErrorStringWithNoErrorSucceeds) {
     EXPECT_FALSE(GrpcJsonClient_GetErrorString(session, error_code, nullptr, &size));
     unique_ptr<char> buffer(new char[size]);
     EXPECT_FALSE(GrpcJsonClient_GetErrorString(session, error_code, buffer.get(), &size));
-    EXPECT_STREQ(buffer.get(), "No error");
+    EXPECT_STREQ(buffer.get(), "Error Code: 0\nError Message: No error");
 }
 
 TEST_F(GrpcJsonClientOfflineTest, GetErrorStringWithErrorSucceeds) {
@@ -110,19 +110,19 @@ TEST_F(GrpcJsonClientOfflineTest, GetErrorStringWithErrorSucceeds) {
     EXPECT_FALSE(GrpcJsonClient_GetErrorString(session, error_code, nullptr, &size));
     unique_ptr<char> buffer(new char[size]);
     EXPECT_FALSE(GrpcJsonClient_GetErrorString(session, error_code, buffer.get(), &size));
-    EXPECT_STREQ(buffer.get(), "Unknown error");
+    EXPECT_STREQ(buffer.get(), "Error Code: -1\nError Message: Unknown error");
 }
 
 TEST_F(
     GrpcJsonClientOfflineTest,
     GetErrorStringWithOutOfRangeErrorCodeReturnsUndefinedErrorCodeMessage
 ) {
-    int32_t error_code = INT32_MIN;
+    int32_t error_code = -100;
     size_t size = 0;
     EXPECT_FALSE(GrpcJsonClient_GetErrorString(session, error_code, nullptr, &size));
     unique_ptr<char> buffer(new char[size]);
     EXPECT_FALSE(GrpcJsonClient_GetErrorString(session, error_code, buffer.get(), &size));
-    EXPECT_STREQ(buffer.get(), "Undefined error code");
+    EXPECT_STREQ(buffer.get(), "Error Code: -100\nError Message: Undefined error code");
 }
 
 TEST_F(

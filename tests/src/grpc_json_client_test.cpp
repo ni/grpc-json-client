@@ -233,7 +233,7 @@ TEST_F(GrpcJsonClientTest, GetErrorStringWithoutSessionSucceeds) {
     unique_ptr<char> buffer(new char[size]);
     ASSERT_FALSE(GrpcJsonClient_GetErrorString(0, error_code, buffer.get(), &size));
 
-    ASSERT_STREQ(buffer.get(), "Service not found");
+    ASSERT_STREQ(buffer.get(), "Error Code: -4\nError Message: Service not found");
 }
 
 }  // namespace grpc_json_client

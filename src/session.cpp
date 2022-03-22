@@ -199,12 +199,12 @@ int32_t Session::GetError(int32_t* code, char* buffer, size_t* size) {
 }
 
 int32_t Session::GetErrorString(Session* session, int32_t code, char* buffer, size_t* size) {
-    string description = {
-        ni::grpc_json_client::GetErrorString(static_cast<ErrorCode>(code))
-    };
+    ErrorCode error_code = static_cast<ErrorCode>(code);
+    string message = ni::grpc_json_client::GetErrorString(error_code);
+    message = JsonClientException::FormatErrorMessage(error_code, message, string());
     if (buffer) {
-        strncpy(buffer, description.c_str(), *size);
-        if (*size <= description.size()) {
+        strncpy(buffer, message.c_str(), *size);
+        if (*size <= message.size()) {
             if (*size > 0) {
                 buffer[*size - 1] = NULL;  // strncpy doesn't add null char
             }
@@ -214,7 +214,7 @@ int32_t Session::GetErrorString(Session* session, int32_t code, char* buffer, si
             }
         }
     } else {
-        *size = description.size() + 1;  // include null char
+        *size = message.size() + 1;  // include null char
     }
     return static_cast<int32_t>(ErrorCode::kNone);
 }
