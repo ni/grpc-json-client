@@ -73,7 +73,7 @@ class Session {
     void SetErrorState(ErrorCode code, const std::string& message);
     // Returns error code and error message to their default values.
     void ClearErrorState();
-    void RaiseWarning(ErrorCode code, std::string message);
+    void RaiseWarning(ErrorCode code, const std::string& message);
     ErrorCode RaiseBufferSizeOutOfRangeWarning();
 };
 

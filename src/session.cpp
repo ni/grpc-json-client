@@ -234,19 +234,16 @@ int32_t Session::FinishAsyncCall(
                 const string& response = _responses[tag];
                 if (!buffer) {
                     *size = response.size() + 1;  // include null char
-                }
-                else if (*size > response.size()) {  // null char
+                } else if (*size > response.size()) {  // null char
                     strncpy(buffer, response.c_str(), *size);
                     _responses.erase(tag);
-                }
-                else {
+                } else {
                     string message = {
                         "The buffer size is too small to accommodate the response."
                     };
                     throw BufferSizeOutOfRangeException(message);
                 }
-            }
-            else {
+            } else {
                 _responses.erase(tag);
             }
             return ErrorCode::kNone;
@@ -282,12 +279,13 @@ void Session::SetErrorState(ErrorCode code, const string& message) {
 void Session::ClearErrorState() {
     ErrorCode code = ErrorCode::kNone;
     string message = ni::grpc_json_client::GetErrorString(code);
-    RaiseWarning(code, message);  // to format message
-}
-
-void Session::RaiseWarning(ErrorCode code, string message) {
     message = JsonClientException::FormatErrorMessage(code, message, string());
     SetErrorState(code, message);
+}
+
+void Session::RaiseWarning(ErrorCode code, const string& message) {
+    string formatted = JsonClientException::FormatErrorMessage(code, message, string());
+    SetErrorState(code, formatted);
 }
 
 ErrorCode Session::RaiseBufferSizeOutOfRangeWarning() {
