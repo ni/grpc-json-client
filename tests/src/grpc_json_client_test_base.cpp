@@ -27,7 +27,7 @@ void GrpcJsonClientTestBase::SetUp() {
 }
 
 void GrpcJsonClientTestBase::TearDown() {
-    ASSERT_FALSE(GrpcJsonClient_Close(session));
+    EXPECT_FALSE(GrpcJsonClient_Close(session));
 }
 
 }  // namespace grpc_json_client
