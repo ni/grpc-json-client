@@ -152,7 +152,7 @@ void JsonClientBase::QueryReflectionService(
     if (!got_response) {
         // failsafe to make sure we don't continue if we got StatusCode OK but somehow didn't get a
         // response
-        string message("Failed to receive a response from the host despite gRPC StatusCode OK.");
+        string message("Failed to receive a response from the host despite OK status code.");
         throw runtime_error(message);
     }
     if (response->has_error_response()) {

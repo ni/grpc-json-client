@@ -16,6 +16,7 @@
 #include "unary_unary_json_client.h"
 
 using grpc::ChannelCredentials;
+using std::chrono::milliseconds;
 using std::chrono::system_clock;
 using std::exception;
 using std::function;
@@ -24,6 +25,14 @@ using std::string;
 
 namespace ni {
 namespace grpc_json_client {
+
+// Converts a timeout to a deadline.
+system_clock::time_point DeadlineFromTimeout(int32_t timeout) {
+    if (timeout < 0) {
+        return system_clock::time_point::max();
+    }
+    return system_clock::now() + milliseconds(timeout);
+}
 
 // Builds an error message from nested exceptions.
 string TraceExceptions(const exception& ex) {
@@ -50,7 +59,8 @@ int32_t Session::ResetDescriptorDatabase() {
         });
 }
 
-int32_t Session::FillDescriptorDatabase(const system_clock::time_point& deadline) {
+int32_t Session::FillDescriptorDatabase(int32_t timeout) {
+    system_clock::time_point deadline = DeadlineFromTimeout(timeout);
     return Evaluate(
         [&](UnaryUnaryJsonClient& client) {
             client.FillDescriptorDatabase(deadline);
@@ -59,59 +69,31 @@ int32_t Session::FillDescriptorDatabase(const system_clock::time_point& deadline
 }
 
 int32_t Session::StartAsyncCall(
-    const char* service,
-    const char* method,
-    const char* request,
-    const system_clock::time_point& deadline,
-    void** tag
+    const char* service, const char* method, const char* request, int32_t timeout, void** tag
 ) {
-    return Evaluate(
-        [=, &deadline](UnaryUnaryJsonClient& client) {
-            *tag = client.StartAsyncCall(service, method, request, deadline);
-            return ErrorCode::kNone;
-        });
+    system_clock::time_point deadline = DeadlineFromTimeout(timeout);
+    return StartAsyncCall(service, method, request, deadline, tag);
 }
 
-int32_t Session::FinishAsyncCall(
-    void* tag, const system_clock::time_point& deadline, char* buffer, size_t* size
-) {
-    return Evaluate(
-        [=, &deadline](UnaryUnaryJsonClient& client) {
-            if (!_responses.count(tag)) {
-                _responses[tag] = client.FinishAsyncCall(tag, deadline);
-            }
-            if (size) {
-                const string& response = _responses[tag];
-                if (!buffer) {
-                    *size = response.size() + 1;  // include null char
-                } else if (*size > response.size()) {  // null char
-                    strncpy(buffer, response.c_str(), *size);
-                    _responses.erase(tag);
-                } else {
-                    string message = {
-                        "The buffer size is too small to accommodate the response."
-                    };
-                    throw BufferSizeOutOfRangeException(message);
-                }
-            } else {
-                _responses.erase(tag);
-            }
-            return ErrorCode::kNone;
-        });
+int32_t Session::FinishAsyncCall(void* tag, int32_t timeout, char* buffer, size_t* size) {
+    system_clock::time_point deadline = DeadlineFromTimeout(timeout);
+    return FinishAsyncCall(tag, deadline, buffer, size);
 }
 
 int32_t Session::BlockingCall(
     const char* service,
     const char* method,
     const char* request,
-    const system_clock::time_point& deadline,
+    int32_t timeout,
     void** tag,
     char* response,
     size_t* size
 ) {
     if (*tag) {
-        return FinishAsyncCall(*tag, deadline, response, size);
+        // deadline will be ignored by the method
+        return FinishAsyncCall(*tag, system_clock::now(), response, size);
     }
+    system_clock::time_point deadline = DeadlineFromTimeout(timeout);
     int32_t error_code = StartAsyncCall(service, method, request, deadline, tag);
     if (error_code < 0) {
         return error_code;
@@ -123,7 +105,8 @@ int32_t Session::BlockingCall(
     return error_code > 0 ? error_code : next_error_code;
 }
 
-int32_t Session::Lock(const system_clock::time_point& deadline, uint8_t* has_lock) {
+int32_t Session::Lock(int32_t timeout, uint8_t* has_lock) {
+    system_clock::time_point deadline = DeadlineFromTimeout(timeout);
     return Evaluate(
         [=, &deadline](const UnaryUnaryJsonClient&) {
             if (!has_lock || !*has_lock) {
@@ -151,9 +134,10 @@ int32_t Session::Unlock(uint8_t* has_lock) {
 int32_t Session::GetDefaultRequest(
     const char* service,
     const char* method,
-    const system_clock::time_point& deadline,
+    int32_t timeout,
     char* buffer,
     size_t* size) {
+    system_clock::time_point deadline = DeadlineFromTimeout(timeout);
     return Evaluate(
         [=, &deadline](UnaryUnaryJsonClient& client) {
             string request = client.GetDefaultRequest(service, method, deadline);
@@ -222,6 +206,51 @@ int32_t Session::GetErrorString(Session* session, int32_t code, char* buffer, si
 int32_t Session::Close() {
     // placeholder for any pre-destructor cleanup operations
     return static_cast<int32_t>(ErrorCode::kNone);
+}
+
+int32_t Session::StartAsyncCall(
+    const char* service,
+    const char* method,
+    const char* request,
+    const system_clock::time_point& deadline,
+    void** tag
+) {
+    return Evaluate(
+        [=, &deadline](UnaryUnaryJsonClient& client) {
+            *tag = client.StartAsyncCall(service, method, request, deadline);
+            return ErrorCode::kNone;
+        });
+}
+
+int32_t Session::FinishAsyncCall(
+    void* tag, const system_clock::time_point& deadline, char* buffer, size_t* size
+) {
+    return Evaluate(
+        [=, &deadline](UnaryUnaryJsonClient& client) {
+            if (!_responses.count(tag)) {
+                _responses[tag] = client.FinishAsyncCall(tag, deadline);
+            }
+            if (size) {
+                const string& response = _responses[tag];
+                if (!buffer) {
+                    *size = response.size() + 1;  // include null char
+                }
+                else if (*size > response.size()) {  // null char
+                    strncpy(buffer, response.c_str(), *size);
+                    _responses.erase(tag);
+                }
+                else {
+                    string message = {
+                        "The buffer size is too small to accommodate the response."
+                    };
+                    throw BufferSizeOutOfRangeException(message);
+                }
+            }
+            else {
+                _responses.erase(tag);
+            }
+            return ErrorCode::kNone;
+        });
 }
 
 int32_t Session::Evaluate(const function<ErrorCode(UnaryUnaryJsonClient&)>& func) {
