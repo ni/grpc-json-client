@@ -60,12 +60,12 @@ DLLEXPORT int32_t GrpcJsonClient_BlockingCall(
 // successfully acquired. Callers that do not own the lock will block until the specified timeout is
 // reached.
 DLLEXPORT int32_t GrpcJsonClient_LockSession(
-    intptr_t session_handle, int32_t timeout, uint8_t* has_lock);
+    intptr_t session_handle, int32_t timeout, int8_t* has_lock);
 
 // Unlocks the session. The has_lock argument is optional and specifies whether the caller currently
 // owns the lock. Pass null or true to release the lock. If has_lock is not null, it will be set to
 // false after the lock is released.
-DLLEXPORT int32_t GrpcJsonClient_UnlockSession(intptr_t session_handle, uint8_t* has_lock);
+DLLEXPORT int32_t GrpcJsonClient_UnlockSession(intptr_t session_handle, int8_t* has_lock);
 
 // Returns the default request string for the specified method. Some gRPC fields (such as oneof)
 // default to an empty value and are thus unpopulated. Pass null as the buffer argument to query

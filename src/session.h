@@ -38,8 +38,8 @@ class Session {
         void** tag,
         char* response,
         size_t* size);
-    int32_t Lock(int32_t timeout, uint8_t* has_lock);
-    int32_t Unlock(uint8_t* has_lock);
+    int32_t Lock(int32_t timeout, int8_t* has_lock);
+    int32_t Unlock(int8_t* has_lock);
     int32_t GetDefaultRequest(
         const char* service,
         const char* method,
