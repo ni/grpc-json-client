@@ -20,9 +20,11 @@ DLLEXPORT int32_t GrpcJsonClient_ResetDescriptorDatabase(intptr_t session_handle
 // Queries the host for the file descriptors of all services exposed by the reflection service.
 DLLEXPORT int32_t GrpcJsonClient_FillDescriptorDatabase(intptr_t session_handle, int32_t timeout);
 
-// Starts an asynchronous call to a unary unary RPC. The returned tag is a unique identifier that
-// should be passed to GrpcJsonClient_FinishAsyncCall to complete the call. The service argument
-// must be the fully-qualified service name, for example: "package.subpackage.service".
+// Starts an asynchronous call to a unary unary RPC. The service argument must be the
+// fully-qualified service name, for example: "package.subpackage.service". The timeout argument
+// specifies the maximum time allowed for the host to finish the call and return a response. The
+// returned tag is a unique identifier that should be passed to GrpcJsonClient_FinishAsyncCall to
+// complete the call.
 DLLEXPORT int32_t GrpcJsonClient_StartAsyncCall(
     intptr_t session_handle,
     const char* service,
@@ -31,9 +33,12 @@ DLLEXPORT int32_t GrpcJsonClient_StartAsyncCall(
     int32_t timeout,
     intptr_t* tag);
 
-// Finishes an asynchronous call started by GrpcJsonClient_StartAsyncCall. Pass null as the response
-// argument to query the function for the minimum buffer size. To finish the call without returning
-// the response, pass null as the size argument.
+// Finishes an asynchronous call started by GrpcJsonClient_StartAsyncCall. If the client hasn't
+// received a response before the timeout specified in GrpcJsonClient_StartAsyncCall expires, this
+// function blocks for the remaining time. The timeout argument to this function specifies the
+// maximum time allowed for the client to complete the call after the response is received. Pass
+// null as the response argument to query the function for the minimum buffer size. To finish the
+// call without returning the response, pass null as the size argument.
 DLLEXPORT int32_t GrpcJsonClient_FinishAsyncCall(
     intptr_t session_handle, intptr_t tag, int32_t timeout, char* response, size_t* size);
 
@@ -57,8 +62,8 @@ DLLEXPORT int32_t GrpcJsonClient_BlockingCall(
 // from accessing the session simultaneously, potentially causing race conditions. The has_lock
 // argument is optional and specifies whether the caller currently owns the lock. Pass null or false
 // to try acquiring the lock. If has_lock is false it will be set to true if the lock is
-// successfully acquired. Callers that do not own the lock will block until the specified timeout is
-// reached.
+// successfully acquired. Callers that do not own the lock will block until the specified timeout
+// expires.
 DLLEXPORT int32_t GrpcJsonClient_LockSession(
     intptr_t session_handle, int32_t timeout, int8_t* has_lock);
 
