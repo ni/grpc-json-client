@@ -4,7 +4,7 @@
 #include "gtest/gtest.h"
 
 #include "grpcjsonclient/grpc_json_client.h"
-#include "grpc_json_client_test.h"
+#include "grpc_json_client_test_base.h"
 #include "helpers.h"
 
 using std::string;
@@ -12,7 +12,17 @@ using std::string;
 namespace ni {
 namespace grpc_json_client {
 
-using GrpcJsonClientSerializerTest = GrpcJsonClientTest;
+class GrpcJsonClientSerializerTest : public GrpcJsonClientTestBase {
+ protected:
+    static void SetUpTestSuite() {
+        server->EnableReflection();
+        server->Start();
+    }
+
+    static void TearDownTestSuite() {
+        server->Stop();
+    }
+};
 
 TEST_F(GrpcJsonClientSerializerTest, ValidJsonObjectSucceeds) {
     const char* valid_json = R"({"delay":0})";
