@@ -35,10 +35,10 @@ DLLEXPORT int32_t GrpcJsonClient_StartAsyncCall(
 
 // Finishes an asynchronous call started by GrpcJsonClient_StartAsyncCall. If the client hasn't
 // received a response before the timeout specified in GrpcJsonClient_StartAsyncCall expires, this
-// function blocks for the remaining time. The timeout argument to this function specifies the
-// maximum time allowed for the client to complete the call after the response is received. Pass
-// null as the response argument to query the function for the minimum buffer size. To finish the
-// call without returning the response, pass null as the size argument.
+// function may block for the remaining time. The timeout argument specifies the maximum time this
+// function waits for the the call to complete. Pass null as the response argument to query the
+// function for the minimum buffer size. To finish the call without returning the response, pass
+// null as the size argument.
 DLLEXPORT int32_t GrpcJsonClient_FinishAsyncCall(
     intptr_t session_handle, intptr_t tag, int32_t timeout, char* response, size_t* size);
 
