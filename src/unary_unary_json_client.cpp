@@ -17,6 +17,7 @@ using grpc::ByteBuffer;
 using grpc::CompletionQueue;
 using grpc::ChannelCredentials;
 using grpc::Status;
+using grpc::StatusCode;
 using std::runtime_error;
 using std::shared_ptr;
 using std::string;
@@ -93,6 +94,13 @@ string UnaryUnaryJsonClient::FinishAsyncCall(void* tag, const system_clock::time
             throw runtime_error(message);
         }
         if (ok) {
+            if (status.error_code() == StatusCode::DEADLINE_EXCEEDED) {
+                string message = {
+                    "The timeout specified when the remote procedure call was started expired "
+                    "before the call finished or was requested to finish."
+                };
+                throw RemoteProcedureCallException(status, message);
+            }
             if (!status.ok()) {
                 string summary("An error occurred during the remote procedure call.");
                 throw RemoteProcedureCallException(status, summary);
@@ -105,7 +113,7 @@ string UnaryUnaryJsonClient::FinishAsyncCall(void* tag, const system_clock::time
         throw runtime_error("The completion queue is shutting down unexpectedly.");
     case CompletionQueue::NextStatus::TIMEOUT:
         throw TimeoutException(
-            "Timed out while waiting for the remote procedure call to complete.");
+            "The timeout expired while waiting for the remote procedure call to complete.");
     default:
         // throw exception for unhandled case
         throw runtime_error("An unknown status was returned from the completion queue.");
